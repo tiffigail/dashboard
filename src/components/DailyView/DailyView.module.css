@@ -1,0 +1,474 @@
+/* src/components/DailyView/DailyView.module.css */
+/* Styles corresponding to DailyView.jsx, using variables from index.css */
+
+/* Color Palette Reference (from provided index.css):
+   --axis-color-on-track-n-plus-1-2: #72B0AB; (Sapphire) - Score Line
+   --axis-color-environment-3: #d8bf67;       (Pistachio) - Epiphany Line
+   --axis-color-financial-3: #927aaa;         (Dark Purple) - Despair Line
+   --text-primary: var(--color-on-track-n-plus-1-4); (#053229 Peacock)
+   --text-secondary: var(--color-on-track-n-plus-1-3); (#355E58 Spruce)
+   --text-muted: var(--color-rest-and-preparation-5); (#6c757d Dark Grey)
+   --border-light: var(--color-on-track-n-plus-1-1); (#BCDDDC Arctic)
+   --border-secondary: var(--color-on-track-n-plus-1-2); (#72B0AB Sapphire)
+   --border-primary: var(--color-on-track-n-plus-1-3); (#355E58 Spruce)
+   --border-dashed: var(--color-environment-2); (#ead6a0 Sage)
+   --bg-card: var(--color-white); (#FFFFFF White)
+   --bg-panel: var(--color-on-track-n-plus-1-1); (#BCDDDC Arctic)
+   --bg-panel-accent: #e0f2f7;                (Lighter Arctic)
+   --bg-input: var(--color-white); (#FFFFFF White)
+   --bg-input-disabled: var(--color-rest-and-preparation-2); (#d6e2ed Light Grey)
+   --button-primary-bg: var(--color-on-track-n-plus-1-2); (#72B0AB Sapphire)
+   --button-primary-text: var(--color-white); (#FFFFFF White)
+   --button-primary-border: var(--color-on-track-n-plus-1-3); (#355E58 Spruce)
+   --button-primary-hover-bg: var(--color-on-track-n-plus-1-3); (#355E58 Spruce)
+   --button-secondary-bg: var(--color-environment-2); (#ead6a0 Sage)
+   --button-secondary-text: var(--color-on-track-n-plus-1-4); (#053229 Peacock)
+   --button-secondary-border: var(--color-environment-3); (#d8bf67 Pistachio)
+   --button-secondary-hover-bg: var(--color-environment-3); (#d8bf67 Pistachio)
+   --color-environment-1: #efe5c3; (Environment Yellow/Gold 1) - Moment Button BG
+   --color-environment-3: #d8bf67; (Environment Yellow/Gold 3) - Moment Button Border, PM Button Hover BG
+   --color-environment-2: #ead6a0; (Environment Yellow/Gold 2) - Reveal Button Color, PM Button BG
+*/
+
+.dailyViewContainer {
+    padding: var(--space-lg, 1.5rem);
+    background-color: var(--bg-main, #fff); /* Use global */
+    color: var(--text-primary, #053229); /* Use global */
+    font-family: sans-serif;
+    max-width: 1200px; /* Max width for the view */
+    margin: 0 auto; /* Center the view */
+    min-height: calc(100vh - (var(--space-lg, 1.5rem) * 2)); /* Example height */
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg, 1.5rem); /* Consistent gap */
+}
+
+.errorText {
+    color: var(--text-error, #dc3545); /* Use global error color */
+    text-align: center;
+    margin-top: 1rem;
+    font-weight: bold;
+}
+
+/* --- Header Section Styles --- */
+.headerSection {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: var(--space-lg, 1.5rem);
+    align-items: start;
+    padding: 1.5rem;
+    background-color: var(--bg-panel, #BCDDDC); /* Use global */
+    border: 1px solid var(--border-primary, #355E58); /* Use global */
+    border-radius: 8px;
+    box-sizing: border-box;
+}
+
+.headerLeft {
+    text-align: left;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md, 1rem);
+}
+
+.axisTitleLg {
+    font-size: 2.8em;
+    color: var(--text-secondary, #355E58); /* Use global */
+    margin: 0 0 0.2rem 0;
+    line-height: 1.1;
+    font-weight: bold;
+}
+
+.dateInfo {
+    font-size: 1em;
+    color: var(--text-secondary, #355E58); /* Use global */
+    margin: 0;
+}
+
+.headerRight {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.3rem;
+}
+
+/* Text Size Hierarchy */
+.contextStretch { font-size: 0.85em; color: var(--text-accent, #72B0AB); margin: 0; font-style: italic; }
+.contextYear { font-size: 0.95em; color: var(--text-secondary, #355E58); margin: 0; }
+.contextMonth { font-size: 1.05em; color: var(--text-primary, #053229); margin: 0; font-weight: 500; }
+.contextWeek { font-size: 1.15em; color: var(--text-primary, #053229); margin: 0; font-weight: bold; }
+.notSet { font-style: italic; opacity: 0.7; color: var(--text-muted, #6c757d); }
+/* --- End Header Section Styles --- */
+
+
+/* --- Chart Container Styling --- */
+.chartContainerInHeader {
+    width: 100%;
+    padding: var(--space-sm, 0.5rem);
+    border-radius: 4px;
+    min-height: 210px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--bg-panel-accent, #e0f2f7); /* Lighter Arctic */
+}
+.chartMessageSmall {
+    font-size: 0.9em;
+    color: var(--text-muted, #6c757d);
+    font-style: italic;
+}
+/* --- End Chart Container Styling --- */
+
+
+/* --- Roadmap Section Styles --- */
+.roadmapSection {
+    padding: var(--space-lg, 1.5rem);
+    border-radius: 8px;
+    background-color: var(--bg-card, #fff); /* White background for the whole section */
+    box-shadow: 0 2px 5px var(--shadow-color, rgba(0,0,0,0.1));
+    /* Use the CSS variables passed via inline style from DailyView.jsx */
+    border: 2px solid var(--roadmap-border-color, var(--border-primary));
+    /* Default text color for the section */
+    color: var(--text-primary); /* Use primary text as default */
+}
+
+.roadmapHorizontalContainer {
+    display: flex;
+    gap: var(--space-lg, 1.5rem);
+    margin-top: var(--space-md, 1rem);
+    align-items: stretch;
+    flex-wrap: wrap;
+}
+
+.roadmapColumn {
+    padding: var(--space-md, 1rem);
+    /* Use light axis color for border */
+    border-left: 4px solid var(--roadmap-color-light, var(--axis-color-default-1));
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    border: 1px solid var(--roadmap-color-medium, var(--axis-color-default-2)); /* Add subtle border */
+    /* Default background for columns */
+    background-color: var(--bg-card, #fff);
+}
+.roadmapColumn:first-child {
+    border-left: none;
+}
+
+/* Set fixed width for Question and Goal columns */
+.roadmapQuestion,
+.roadmapYearlyGoal {
+    flex: 0 0 120px;
+    width: 120px;
+    border-left: 4px solid var(--roadmap-color-light, var(--axis-color-default-1)); /* Keep left stripe */
+}
+
+/* Specific background for Question card */
+.roadmapQuestion {
+    background-color: var(--bg-panel-accent, #e0f2f7); /* Lighter Arctic */
+    border: 1px solid var(--roadmap-color-medium, var(--axis-color-default-2));
+    color: var(--text-secondary); /* Use secondary text for better contrast */
+}
+.roadmapQuestion:first-child {
+     border-left: none; /* Remove stripe if it's the first column */
+     border: 1px solid var(--roadmap-color-medium, var(--axis-color-default-2)); /* Keep regular border */
+}
+
+/* Specific background and text color for Yearly Goal card */
+.roadmapYearlyGoal {
+    background-color: var(--roadmap-color-dark, var(--axis-color-default-3)); /* Darkest axis color */
+    color: var(--color-white, #fff); /* White text */
+    border: 1px solid var(--roadmap-color-medium, var(--axis-color-default-2));
+}
+.roadmapYearlyGoal:first-child {
+     border-left: none; /* Remove stripe if it's the first column */
+     border: 1px solid var(--roadmap-color-medium, var(--axis-color-default-2)); /* Keep regular border */
+}
+/* Ensure title inside Yearly Goal is also white */
+.roadmapYearlyGoal .roadmapColumnTitle {
+    color: var(--color-white, #fff);
+    border-bottom-color: rgba(255, 255, 255, 0.5); /* Lighter border for contrast */
+}
+/* Ensure paragraphs inside Yearly Goal are also white */
+.roadmapYearlyGoal p {
+    color: var(--color-white, #fff);
+}
+.roadmapYearlyGoal i { /* Style italic 'not set' text */
+    color: rgba(255, 255, 255, 0.8); /* Slightly transparent white */
+}
+
+
+.roadmapMilestones {
+    flex: 1 1 auto;
+    min-width: 250px;
+    /* Ensure milestones column also gets the border color */
+    border-left: 4px solid var(--roadmap-color-light, var(--axis-color-default-1));
+    /* Use panel accent background (Lighter Arctic) for this column */
+    background-color: var(--bg-panel-accent, #e0f2f7);
+}
+
+
+.roadmapColumnTitle {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-top: 0;
+    margin-bottom: var(--space-md, 1rem);
+    padding-bottom: var(--space-sm, 0.5rem);
+    /* Use medium axis color for border */
+    border-bottom: 1px solid var(--roadmap-color-medium, var(--axis-color-default-2));
+    color: inherit; /* Inherit color from parent column */
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.roadmapQuestion p,
+.roadmapYearlyGoal p {
+    font-style: italic;
+    font-size: 0.95em;
+    line-height: 1.4;
+    color: inherit; /* Inherits from parent column */
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    word-wrap: break-word;
+}
+.roadmapQuestion p:last-child,
+.roadmapYearlyGoal p:last-child {
+    margin-bottom: 0;
+}
+
+/* --- Horizontal Milestone List --- */
+.milestonesHorizontalList {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 0.8rem;
+    padding-top: 0.3rem;
+    padding-bottom: 10px;
+    flex-grow: 1;
+    overflow-x: auto;
+    min-height: 70px;
+    /* Use panel accent background (Lighter Arctic) for scroll area */
+    background-color: var(--bg-panel-accent, #e0f2f7);
+    border-radius: 4px;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+}
+
+/* --- Horizontal Milestone Item --- */
+.milestoneItemHoriz {
+  font-size: 0.85em;
+  border-radius: 4px;
+  padding: 0.4rem 0.8rem;
+  flex: 0 0 120px;
+  text-align: center;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  white-space: normal;
+  width: 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 50px;
+  transition: background-color 0.2s, border-color 0.2s, filter 0.2s, color 0.2s;
+}
+
+.milestoneTextHoriz {
+  font-weight: 500;
+  color: inherit; /* Inherit color from parent .milestoneItemHoriz */
+  display: block;
+  margin-bottom: 0.2rem;
+}
+
+.milestoneDateHoriz {
+  font-size: 0.9em;
+  color: inherit; /* Inherit color from parent .milestoneItemHoriz */
+  opacity: 0.8;
+  font-style: italic;
+  white-space: nowrap;
+  display: block;
+  margin-top: 0.2rem;
+}
+
+/* Milestone Status Styles using Roadmap Colors */
+.milestoneItemHoriz.completed {
+    background-color: var(--roadmap-color-light, var(--axis-color-default-1));
+    border: 1px solid var(--roadmap-color-medium, var(--axis-color-default-2));
+    color: var(--text-muted, #6c757d) !important;
+}
+.milestoneItemHoriz.completed .milestoneTextHoriz {
+    text-decoration: line-through;
+    color: var(--text-muted, #6c757d) !important;
+}
+.milestoneItemHoriz.completed .milestoneDateHoriz {
+    color: var(--text-muted, #6c757d) !important;
+    opacity: 0.7;
+}
+
+.milestoneItemHoriz.current {
+    background-color: var(--roadmap-color-medium, var(--axis-color-default-2));
+    border: 2px solid var(--roadmap-color-dark, var(--axis-color-default-3));
+    font-weight: bold;
+    box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    color: var(--text-primary, #053229); /* Explicitly dark text */
+    filter: none;
+}
+.milestoneItemHoriz.current .milestoneTextHoriz {
+    font-weight: bold;
+}
+.milestoneItemHoriz.current:hover {
+     filter: none;
+}
+
+
+/* UPDATED: Upcoming milestone style */
+.milestoneItemHoriz.upcoming {
+    /* Use medium axis color for background */
+    background-color: var(--roadmap-color-medium, var(--axis-color-default-2));
+    /* Use dark axis color for border */
+    border: 1px solid var(--roadmap-color-dark, var(--axis-color-default-3));
+    /* UPDATED: Use white text for contrast on darker background */
+    color: var(--color-white, #fff);
+    /* Apply brightness filter */
+    filter: brightness(85%); /* Darken the medium background */
+}
+.milestoneItemHoriz.upcoming:hover {
+    filter: brightness(65%); /* Slightly less dark on hover */
+}
+
+
+.noMilestones {
+    font-style: italic;
+    color: var(--text-muted, #777);
+    font-size: 0.9em;
+    margin: 0.5rem 0 0 0;
+    text-align: center;
+}
+/* --- End Roadmap Styles --- */
+
+
+/* Routine Buttons */
+.routineButtonsWrapper {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-md, 1rem); /* Adjusted gap slightly */
+    margin-top: var(--space-lg, 1.5rem);
+    padding-top: var(--space-lg, 1.5rem);
+    border-top: 1px solid var(--border-light, #BCDDDC); /* Use global */
+    width: 100%;
+    flex-wrap: wrap; /* Allow buttons to wrap */
+}
+
+.routineButton {
+    padding: var(--space-sm, 0.5rem) var(--space-md, 1rem); /* Slightly smaller padding */
+    font-size: 0.9rem; /* Slightly smaller font */
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s, box-shadow 0.2s, color 0.2s, border-color 0.2s;
+    border: 1px solid var(--button-primary-border, #355E58); /* Default primary */
+    background-color: var(--button-primary-bg, #72B0AB); /* Default primary */
+    color: var(--button-primary-text, #fff); /* Default primary */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    flex-grow: 1; /* Allow buttons to grow slightly */
+    text-align: center;
+    min-width: 150px; /* Ensure buttons have a minimum width */
+}
+.routineButton:hover:not(:disabled) {
+    background-color: var(--button-primary-hover-bg, #355E58); /* Default primary hover */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+/* Ready For Work Button Style */
+.readyButton {
+    background-color: var(--axis-color-financial-3, #927aaa); /* Darkest Financial Purple */
+    color: var(--color-white, #fff); /* White text */
+    border-color: var(--axis-color-financial-2, #b8a7cd); /* Medium Financial Purple border */
+}
+.readyButton:hover:not(:disabled) {
+    background-color: var(--axis-color-financial-2, #b8a7cd); /* Medium Financial Purple on hover */
+    border-color: var(--axis-color-financial-3, #927aaa); /* Dark Financial Purple border on hover */
+    color: var(--text-primary, #053229); /* Peacock text on hover */
+}
+
+/* Study Button Style */
+.studyButton {
+    background-color: var(--axis-color-gear-2, #8dc2d7); /* Gear Medium */
+    color: var(--text-primary, #053229); /* Peacock text */
+    border-color: var(--axis-color-gear-3, #3280a7); /* Gear Dark */
+}
+.studyButton:hover:not(:disabled) {
+    background-color: var(--axis-color-gear-3, #3280a7); /* Gear Dark */
+    color: var(--color-white, #fff); /* White text on hover */
+}
+
+/* Family Clean Button uses Secondary styles */
+.familyCleanButton {
+    background-color: var(--button-secondary-bg, #ead6a0); /* Sage */
+    color: var(--button-secondary-text, #053229); /* Peacock */
+    border-color: var(--button-secondary-border, #d8bf67); /* Pistachio */
+}
+.familyCleanButton:hover:not(:disabled) {
+     background-color: var(--button-secondary-hover-bg, #d8bf67); /* Pistachio */
+}
+
+
+/* PM Button uses Dark N+1 colors */
+.pmButton {
+    background-color: var(--color-on-track-n-plus-1-4, #053229); /* Peacock */
+    color: var(--color-white, #fff); /* White text */
+    border-color: var(--color-on-track-n-plus-1-3, #355E58); /* Spruce border */
+}
+.pmButton:hover:not(:disabled) {
+     background-color: var(--color-on-track-n-plus-1-3, #355E58); /* Spruce hover */
+     border-color: var(--color-on-track-n-plus-1-4, #053229); /* Peacock border on hover */
+}
+
+/* Responsive adjustments */
+@media (max-width: 900px) {
+    .headerSection {
+        grid-template-columns: 1fr; /* Stack header columns */
+    }
+    .headerLeft, .headerRight {
+        text-align: left; /* Align left on mobile */
+        align-items: flex-start;
+        padding-right: 0;
+    }
+    .headerRight { margin-top: 1rem; }
+
+    .roadmapHorizontalContainer {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    .roadmapColumn {
+        border-left: none; /* Remove left border when stacked */
+        /* Use medium axis color for top border when stacked */
+        border-top: 4px solid var(--roadmap-color-medium, var(--axis-color-default-2));
+        padding-top: var(--space-md, 1rem);
+        width: 100%; /* Make columns full width when stacked */
+        flex-basis: auto !important; /* Allow natural height */
+    }
+     .roadmapColumn:first-child {
+        border-top: none; /* Remove top border from first column */
+    }
+    .roadmapQuestion, .roadmapYearlyGoal {
+        width: 100%; /* Allow full width when stacked */
+        flex-basis: auto; /* Allow natural height */
+    }
+}
+
+@media (max-width: 768px) {
+    .dailyViewContainer {
+        padding: var(--space-md, 1rem);
+        gap: var(--space-md, 1rem);
+    }
+    .routineButtonsWrapper {
+        flex-direction: column; /* Stack buttons on small screens */
+        align-items: stretch;
+        gap: var(--space-md, 1rem);
+    }
+    .routineButton {
+        width: 100%; /* Make buttons full width */
+        padding: var(--space-md, 1rem); /* More padding on mobile */
+    }
+}
+

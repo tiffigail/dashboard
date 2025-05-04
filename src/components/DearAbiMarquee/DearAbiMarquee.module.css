@@ -1,0 +1,79 @@
+/* src/components/DearAbiMarquee/DearAbiMarquee.module.css */
+
+.marqueeContainer {
+    background-color: var(--bg-secondary, #f8f9fa); /* Light background */
+    border: 1px solid var(--border-light, #dee2e6);
+    border-radius: 6px;
+    padding: var(--space-sm) var(--space-md);
+    margin-top: var(--space-md); /* Space above the marquee */
+    overflow: hidden; /* Crucial: Hides the text outside the container */
+    position: relative; /* Needed for absolute positioning if required */
+    width: 100%; /* Take full width of parent */
+    box-sizing: border-box;
+}
+
+.marqueeTitle {
+    font-weight: bold;
+    font-style: italic;
+    color: var(--text-secondary, #6c757d);
+    margin: 0 0 var(--space-xs) 0;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.marqueeContent {
+    display: inline-block; /* Allows animation */
+    white-space: nowrap; /* Prevents text wrapping */
+    padding-left: 100%; /* Start the text off-screen to the right */
+    /* Animation properties */
+    animation-name: marqueeAnimation;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    /* animation-duration is set dynamically via inline style */
+    will-change: transform; /* Optimize animation performance */
+}
+
+.quoteItem {
+    display: inline-block; /* Treat each quote as a block */
+    padding: 0 var(--space-lg); /* Space between quotes */
+    font-size: 0.9rem;
+    color: var(--text-primary);
+}
+.quoteItem::after {
+    content: "•"; /* Separator */
+    margin-left: var(--space-lg);
+    opacity: 0.5;
+}
+/* Remove separator from the very last item (in the duplicated list) */
+.marqueeContent span:last-child::after {
+    content: "";
+    margin-left: 0;
+}
+
+
+.loadingText {
+    font-style: italic;
+    color: var(--text-muted);
+    text-align: center;
+    padding: var(--space-sm) 0;
+}
+
+.errorText {
+    color: var(--text-error);
+    font-size: 0.85rem;
+    text-align: center;
+    padding: var(--space-sm) 0;
+}
+
+
+/* Define the scrolling animation */
+@keyframes marqueeAnimation {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        /* Move text leftwards by 50% of its total width (since we duplicated it) */
+        transform: translateX(-50%);
+    }
+}
+

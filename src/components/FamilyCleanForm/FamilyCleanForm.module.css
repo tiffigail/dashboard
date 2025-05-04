@@ -1,0 +1,104 @@
+/* src/components/FamilyCleanForm/FamilyCleanForm.module.css */
+
+.form {
+    padding: 20px;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    max-width: 500px;
+    margin: 0 auto;
+    font-family: sans-serif;
+  }
+  
+  .formTitle {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    color: #2c3e50;
+    text-align: center;
+  }
+  
+  .section {
+    margin-bottom: 20px;
+  }
+  
+  .sectionTitle {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    color: #34495e;
+  }
+  
+  .checkItem {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+  .checkbox {
+    margin-right: 10px;
+  }
+  
+  .personDropdown{
+      margin-left: auto;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 1em;
+      width: 150px;
+  }
+  
+  .inputField {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+  }
+  
+  .inputField label {
+    margin-bottom: 5px;
+    color: #7f8c8d;
+  }
+  
+  .inputField input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1em;
+  }
+  .numberInput{
+    width: 50px;
+  }
+  
+  .journalTextarea {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1em;
+    width: 100%;
+    min-height: 100px;
+    resize: vertical;
+  }
+  
+  .errorText {
+    color: #e74c3c;
+    margin-bottom: 15px;
+  }
+  
+  .submitButton {
+    padding: 10px 20px;
+    background-color: #0d4139;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: 100%;
+  }
+  
+  .submitButton:hover {
+    background-color: #06231a;
+  }
+  
+  .submitButton:disabled {
+    background-color: #bdc3c7;
+    cursor: not-allowed;
+  }
+  

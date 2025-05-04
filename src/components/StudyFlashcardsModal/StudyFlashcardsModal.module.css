@@ -1,0 +1,144 @@
+/* src/components/StudyFlashcardsModal/StudyFlashcardsModal.module.css */
+
+/* Style for the semi-transparent background overlay */
+.modalOverlay {
+    position: fixed; /* Cover the entire viewport */
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent black */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Ensure it's above other content */
+}
+
+/* Style for the modal content box */
+.modalContent {
+    background-color: #fff; /* White background */
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    max-width: 500px; /* Max width for the modal */
+    position: relative; /* Needed for absolute positioning of close button */
+    text-align: center;
+    color: #333; /* Default text color */
+}
+
+/* Style for the close button (top right corner) */
+.closeButton {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.75rem;
+    background: none;
+    border: none;
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #aaa;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+}
+.closeButton:hover {
+    color: #333;
+}
+
+.modalTitle {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    color: #053229; /* Peacock */
+    font-size: 1.5rem;
+}
+
+.loadingText,
+.errorText {
+    font-style: italic;
+    margin: 2rem 0;
+}
+.errorText {
+    color: #dc3545; /* Red for errors */
+    font-weight: bold;
+}
+
+.cardCounter {
+    font-size: 0.9rem;
+    color: #6c757d; /* Grey */
+    margin-bottom: 0.5rem;
+}
+
+.topicDisplay {
+    font-size: 0.9rem;
+    color: #444;
+    margin-bottom: 1rem;
+    font-style: italic;
+}
+.topicDisplay strong {
+    font-style: normal;
+}
+
+/* Style for the flashcard area */
+.flashcard {
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 1.5rem;
+    min-height: 150px; /* Ensure a minimum height */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #f8f9fa; /* Light grey background */
+    cursor: pointer; /* Indicate it's clickable to flip */
+    margin-bottom: 1.5rem;
+    transition: background-color 0.2s;
+}
+.flashcard:hover {
+    background-color: #e9ecef;
+}
+
+.cardQuestion p,
+.cardAnswer p {
+    margin: 0.3rem 0;
+    font-size: 1.1rem;
+}
+.cardQuestion p:first-child, /* Style the "Question/Title:" label */
+.cardAnswer p:first-child { /* Style the "Answer:" label */
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin-bottom: 0.5rem;
+}
+
+/* Style for the control buttons */
+.controls {
+    display: flex;
+    justify-content: space-between; /* Space out buttons */
+    align-items: center;
+    margin-top: 1rem;
+}
+
+.navButton,
+.flipButton {
+    padding: 0.6rem 1.2rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #e7e7e7;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.2s;
+}
+.navButton:hover,
+.flipButton:hover {
+    background-color: #ddd;
+}
+
+.flipButton {
+    background-color: #72B0AB; /* Sapphire */
+    color: white;
+    border-color: #72B0AB;
+}
+.flipButton:hover {
+    background-color: #355E58; /* Spruce */
+    border-color: #355E58;
+}
+

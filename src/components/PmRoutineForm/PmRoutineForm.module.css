@@ -1,0 +1,151 @@
+/* src/components/PmRoutineForm/PmRoutineForm.module.css */
+
+.form {
+    padding: 0.5rem 1rem;
+  }
+  
+  .formTitle {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  
+  .section {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+  }
+  .section:last-of-type {
+    border-bottom: none;
+    margin-bottom: 1rem;
+  }
+  
+  
+  .sectionTitle {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 1rem;
+  }
+  
+  .checkItem {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.6rem;
+  }
+  
+  .checkItem label {
+    margin-left: 0.75rem;
+    font-size: 0.95rem;
+    color: #444;
+    cursor: pointer;
+  }
+  
+  .checkbox {
+    width: 1.1rem;
+    height: 1.1rem;
+    cursor: pointer;
+  }
+  
+  /* Styles for regular input fields */
+  .inputField {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1rem;
+  }
+  
+  .inputField label {
+    margin-bottom: 0.4rem;
+    font-weight: 600;
+    color: #4a5568;
+    font-size: 0.9rem;
+  }
+  
+  .inputField input {
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: 4px;
+    border: 1px solid #e2e8f0;
+    font-size: 1rem;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease;
+  }
+  
+  .inputField input:focus {
+    border-color: #f59e0b; /* Amber border on focus for PM */
+    outline: none;
+  }
+  
+  /* Styles for the Journal textarea field - Updated */
+  .journalSection { /* Added class for potential section styling */
+    padding-bottom: 1rem; /* Ensure padding below */
+  }
+  
+  .journalField {
+    display: flex;
+    flex-direction: column;
+    margin-top: 0.5rem; /* Adjust as needed */
+    /* Removed padding-left to allow full width */
+  }
+  
+  .journalField label {
+    margin-bottom: 0.4rem;
+    font-weight: 600;
+    color: #4a5568;
+    font-size: 0.9rem;
+    text-align: center; /* Center label */
+  }
+  
+  .journalField textarea {
+    width: 100%; /* Take full width of container */
+    max-width: 100%; /* Ensure it doesn't overflow */
+    padding: 0.75rem;
+    border-radius: 4px;
+    border: 1px solid #e2e8f0;
+    font-size: 1rem;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease;
+    font-family: inherit;
+    resize: vertical;
+    min-height: 100px; /* Increased default height */
+  }
+  
+  .journalField textarea:focus {
+    border-color: #f59e0b;
+    outline: none;
+  }
+  
+  /* Error text style */
+  .errorText {
+    color: #dc2626; /* Red color */
+    font-size: 0.9rem;
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+  
+  .submitButton {
+    background-color: #074539; /* Peacock light*/
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: background-color 0.2s ease;
+    margin-top: 1.5rem;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .submitButton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  .submitButton:hover:not(:disabled) {
+    background-color: #04231c; /* Peacock light*/
+  }
+  

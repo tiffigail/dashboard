@@ -1,0 +1,46 @@
+/* src/components/Modal/Modal.module.css */
+
+.modalBackdrop {
+  position: fixed; /* Stay in place */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent black */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Ensure it's on top */
+}
+
+.modalContent {
+  background-color: white;
+  padding: 2rem; /* Keep padding */
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  max-width: 90%; /* Max width relative to viewport */
+  /* width: 500px; */ /* REMOVED: Fixed width that was limiting content */
+  max-height: 90vh; /* Max height relative to viewport */
+  overflow-y: auto; /* Add scrollbar if content is too tall */
+  position: relative; /* Needed for absolute positioning of close button */
+  /* Add box-sizing for consistency */
+  box-sizing: border-box;
+}
+
+.closeButton {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #aaa;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+}
+
+.closeButton:hover {
+  color: #333;
+}

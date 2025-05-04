@@ -1,0 +1,123 @@
+/* src/components/ContextMap/ContextMap.module.css */
+
+/* Color Palette Reference:
+    #72B0AB (Sapphire)
+    #BCDDDC (Arctic)
+    #FFFFFF (White)
+    #CFB97E (Sage)
+    #B89D47 (Pistachio)
+    #355E58 (Spruce)
+    #053229 (Peacock)
+*/
+
+.contextMapContainer {
+    padding: 1rem;
+    background-color: #e0f2f7; /* Lighter Arctic */
+    border: 1px solid #72B0AB; /* Sapphire */
+    border-radius: 6px;
+    color: #053229; /* Peacock */
+    font-family: sans-serif;
+    margin-top: .01rem; /* Add space above if needed */
+    /* --- NEW: Center align all text within container --- */
+    text-align: center;
+}
+
+.loading,
+.error {
+    font-style: italic;
+    color: #6c757d;
+    text-align: center;
+    padding: 1rem;
+}
+.error {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+/* Text Size Hierarchy */
+.contextStretch { /* Smallest */
+    font-size: 0.8em;
+    color: #72B0AB; /* Sapphire */
+    margin: 0 0 0.2rem 0;
+    font-style: italic;
+    /* text-align: right; */ /* REMOVED - Inherit center */
+}
+.contextYear {
+    font-size: 0.9em;
+    color: #355E58; /* Spruce */
+    margin: 0 0 0.2rem 0;
+    /* text-align: right; */ /* REMOVED - Inherit center */
+}
+.contextMonth {
+    font-size: 1em;
+    color: #08483b; /* Peacock */
+    margin: 0 0 0.2rem 0;
+    font-weight: 500;
+    /* text-align: right; */ /* REMOVED - Inherit center */
+}
+
+/* --- ADDED: Style for Next Milestone --- */
+.contextMilestone {
+    font-size: 1.1em; /* Slightly larger than Month */
+    color: #1f3e3a; /* Spruce - same as Year or choose another */
+    margin: 0 0 0.25rem 0; /* Spacing similar to others */
+    font-weight: 550; /* Match month weight or make bold */
+    /* Inherits text-align: center */
+}
+/* --- End Added Style --- */
+
+.contextWeek {
+    font-size: 1.2em; /* Keep week slightly larger than milestone */
+    color: #053229; /* Peacock */
+    margin: 0 0 0.3rem 0; /* More space before steps */
+    font-weight: bold;
+    /* text-align: right; */ /* REMOVED - Inherit center */
+}
+
+/* Style for the 'Not Set' italic text */
+.notSet {
+    font-style: italic;
+    color: #6c757d; /* Grey color */
+    font-weight: normal; /* Ensure it's not bold if parent is */
+}
+
+
+/* Steps Section */
+.stepsSection {
+    margin-top: .5rem;
+    padding-top: 0.1rem;
+}
+
+.stepsTitle {
+    font-size: 1.35em; /* Keep title size relative */
+    font-weight: bold;
+    color: #031c17; /* Darker Peacock/Spruce */
+    margin: 0 0 0.5rem 0;
+    text-align: center; /* Keep centered */
+}
+
+.stepsList {
+    list-style: none; /* Remove bullets */
+    margin: 0; /* Remove default list margin */
+    padding: 0; /* Remove default list padding */
+    color: #010f0d; /* Darkest Peacock */
+    text-align: center; /* Keep centered */
+}
+
+.stepsList li {
+    margin-bottom: 0.5rem; /* Adjust spacing */
+    line-height: 1.3; /* Adjust line height */
+    font-size: 1.5em; /* Increased font size - Adjust as needed */
+    font-weight: bold; /* Keep bold */
+}
+.stepsList li:last-child {
+    margin-bottom: 0;
+}
+
+.noSteps {
+   font-style: italic;
+   color: #777;
+   font-size: 1em; /* Match Month font size */
+   margin: 0.5rem 0 0 0;
+   text-align: center; /* Keep centered */
+}

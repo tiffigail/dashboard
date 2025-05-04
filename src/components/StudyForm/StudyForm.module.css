@@ -1,0 +1,140 @@
+/* src/components/StudyForm/StudyForm.module.css */
+
+.form {
+    padding: var(--space-lg, 1.5rem);
+    background-color: var(--bg-card, #fff);
+    border-radius: 8px;
+    max-height: 85vh; /* Limit height */
+    overflow-y: auto; /* Allow scrolling within form */
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg, 1.5rem);
+    color: var(--text-primary); /* Use global text color */
+}
+
+.formTitle {
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: var(--space-md, 1rem);
+    color: var(--text-secondary, #355E58);
+    font-size: 1.5em; /* Adjust size */
+}
+
+.section {
+    padding: var(--space-md, 1rem);
+    border: 1px solid var(--border-light, #BCDDDC);
+    border-radius: 6px;
+    background-color: var(--bg-panel-accent, #e0f2f7);
+}
+
+.sectionTitle {
+    font-size: 1.1em;
+    font-weight: 600;
+    margin-top: 0;
+    margin-bottom: var(--space-md, 1rem);
+    padding-bottom: var(--space-sm, 0.5rem);
+    border-bottom: 1px solid var(--border-secondary, #72B0AB);
+    color: var(--text-secondary, #355E58);
+}
+
+.axisQuestion {
+    font-style: italic;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-md);
+    padding: var(--space-sm);
+    background-color: rgba(255, 255, 255, 0.5); /* Slight background */
+    border-radius: 4px;
+}
+
+.inputField {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs, 0.25rem);
+    margin-bottom: var(--space-md, 1rem);
+}
+.inputField:last-child {
+    margin-bottom: 0;
+}
+
+.inputField label {
+    font-weight: 500;
+    font-size: 0.9em;
+    color: var(--text-secondary);
+}
+
+.textInput,
+.textArea {
+    width: 100%;
+    padding: var(--space-sm, 0.5rem);
+    border-radius: 4px;
+    border: 1px solid var(--border-muted, #ced4da);
+    background-color: var(--bg-input, #fff);
+    color: var(--text-primary, #053229);
+    font-size: 1em; /* Ensure consistent font size */
+    box-sizing: border-box; /* Include padding/border in width */
+}
+
+.textArea {
+    resize: vertical;
+    min-height: 60px; /* Adjust min height */
+}
+
+.addInsightButton {
+    align-self: flex-end; /* Align to the right */
+    margin-top: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    font-size: 0.9em;
+    /* Use secondary button styles */
+    background-color: var(--button-secondary-bg, #ead6a0);
+    color: var(--button-secondary-text, #053229);
+    border: 1px solid var(--button-secondary-border, #d8bf67);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.addInsightButton:hover:not(:disabled) {
+    background-color: var(--button-secondary-hover-bg, #d8bf67);
+}
+.addInsightButton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.errorText,
+.errorTextInline {
+    color: var(--text-error, #dc3545);
+    font-size: 0.9em;
+    margin-top: var(--space-sm, 0.5rem);
+}
+.errorText { /* For final submit error */
+    text-align: center;
+    margin-bottom: var(--space-sm);
+}
+.errorTextInline { /* For insight error */
+     text-align: right; /* Align near button */
+     margin-bottom: 0;
+}
+
+
+.submitButton {
+    align-self: center; /* Center button */
+    padding: var(--space-md, 1rem) var(--space-lg, 1.5rem);
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s, box-shadow 0.2s;
+    border: 1px solid var(--button-primary-border, #355E58);
+    background-color: var(--button-primary-bg, #72B0AB);
+    color: var(--button-primary-text, #fff);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-top: var(--space-md, 1rem);
+}
+.submitButton:hover:not(:disabled) {
+    background-color: var(--button-primary-hover-bg, #355E58);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+.submitButton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}

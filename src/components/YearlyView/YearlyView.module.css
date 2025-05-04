@@ -1,0 +1,149 @@
+/* src/components/YearlyView/YearlyView.module.css */
+/* Using CSS Variables from global file */
+
+.yearlyViewContainer {
+  padding: var(--space-lg);
+  max-width: 1000px; /* Adjusted max-width for single column */
+  margin: 0 auto;
+  color: var(--text-primary);
+}
+
+.viewTitle {
+  color: var(--text-secondary);
+  text-align: center;
+  margin-bottom: var(--space-lg);
+  font-size: 1.8rem;
+  font-weight: bold;
+}
+
+.errorText {
+    color: var(--text-error);
+    text-align: center;
+    margin-top: var(--space-md);
+    font-weight: bold;
+}
+
+/* --- MODIFIED: Grid to display axis cards --- */
+.axisGrid {
+    /* display: grid; */ /* REMOVED */
+    /* grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); */ /* REMOVED */
+    display: flex; /* NEW */
+    flex-direction: column; /* NEW */
+    gap: 2mm; /* NEW: Specific spacing */
+    width: 100%; /* Ensure container takes width */
+}
+/* --- End Modification --- */
+
+/* --- MODIFIED: Styling for each axis card --- */
+.axisCard {
+    background-color: var(--bg-panel); /* Arctic */
+    border: 1px solid var(--border-primary); /* Spruce */
+    border-radius: 8px;
+    padding: var(--space-sm) var(--space-lg); /* Adjusted padding */
+    box-shadow: 0 2px 4px var(--shadow-color);
+    box-sizing: border-box;
+    /* display: flex; */ /* REMOVED - Let content flow naturally */
+    height: 1.8cm; /* NEW: Fixed height */
+    display: flex; /* Re-add flex to use align-items */
+    align-items: center; /* NEW: Vertically center content */
+    overflow: hidden; /* Hide overflow if content exceeds fixed height */
+}
+/* --- End Modification --- */
+
+/* Flex container inside the card */
+.cardContent {
+    display: flex;
+    align-items: center; /* Vertically align title and goals */
+    gap: var(--space-lg); /* Space between left and right */
+    width: 100%; /* Ensure content fills card */
+}
+
+/* Left side of the card */
+.cardLeft {
+    flex: 1; /* Take up available space */
+    text-align: left;
+    padding-right: var(--space-md); /* Space before goals */
+}
+
+.axisTitleLg {
+    font-size: 1.8em; /* Adjusted size for fixed height */
+    color: var(--text-primary); /* Peacock */
+    margin: 0;
+    line-height: 1.1;
+    font-weight: bold;
+}
+
+/* Right side of the card */
+.cardRight {
+    flex-basis: 65%; /* Adjusted basis */
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end; /* Align goals to the right */
+    gap: 0; /* Remove gap for tighter fit */
+    overflow: hidden; /* Hide overflow */
+    text-overflow: ellipsis; /* Add ellipsis if text overflows */
+    white-space: nowrap; /* Prevent wrapping that breaks height */
+}
+
+.stretchGoalText {
+    font-size: 0.8em; /* Adjusted size */
+    color: var(--text-secondary); /* Spruce */
+    margin: 0;
+    font-style: italic; /* Italicize stretch goal */
+    line-height: 1.2; /* Adjust line height */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%; /* Ensure it takes width for ellipsis */
+}
+
+.yearlyGoalText {
+    font-size: 1em; /* Adjusted size */
+    color: var(--text-primary); /* Peacock */
+    margin: 0;
+    font-weight: 500; /* Slightly bolder */
+    line-height: 1.2; /* Adjust line height */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%; /* Ensure it takes width for ellipsis */
+}
+
+.notSet {
+    font-style: italic;
+    opacity: 0.7;
+    color: var(--text-muted);
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    /* .axisGrid { } */ /* No change needed for stacking */
+    .axisCard {
+        height: auto; /* Allow height to adjust on mobile */
+        min-height: 1.8cm; /* Set a minimum */
+        padding: var(--space-md); /* Adjust padding */
+    }
+    .cardContent {
+        flex-direction: column; /* Stack title and goals */
+        align-items: flex-start; /* Align left */
+        text-align: left;
+        gap: var(--space-sm); /* Reduce gap */
+    }
+    .cardRight {
+        flex-basis: auto; /* Reset basis */
+        align-items: flex-start; /* Align left */
+        text-align: left;
+        margin-top: var(--space-sm);
+        white-space: normal; /* Allow wrapping on mobile */
+        overflow: visible;
+        text-overflow: clip;
+    }
+     .stretchGoalText, .yearlyGoalText {
+        text-align: left;
+        white-space: normal;
+        overflow: visible;
+        text-overflow: clip;
+        width: auto;
+    }
+}

@@ -1,0 +1,109 @@
+/* src/components/EditMilestoneForm/EditMilestoneForm.module.css */
+
+.form {
+    padding: 0.5rem 1rem; /* Padding inside the modal content area */
+    min-width: 350px; /* Ensure form has some width */
+  }
+  
+  .formTitle {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  .inputField {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1rem;
+  }
+  
+  .inputField label {
+    margin-bottom: 0.4rem;
+    font-weight: 600;
+    color: #4a5568;
+    font-size: 0.9rem;
+  }
+  
+  .inputField input[type="text"],
+  .inputField input[type="date"],
+  .inputField textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: 4px;
+    border: 1px solid #e2e8f0;
+    font-size: 1rem;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease;
+    font-family: inherit;
+  }
+  
+  .inputField textarea {
+    resize: vertical;
+    min-height: 80px;
+  }
+  
+  .inputField input:focus,
+  .inputField textarea:focus {
+    border-color: #3b82f6; /* Blue focus */
+    outline: none;
+  }
+  
+  .checkField {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    margin-top: 1rem;
+  }
+  
+  .checkbox {
+    width: 1.1rem;
+    height: 1.1rem;
+    cursor: pointer;
+  }
+  
+  .checkField label {
+    margin-left: 0.5rem;
+    font-size: 0.95rem;
+    color: #444;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  
+  .buttonGroup {
+    display: flex;
+    justify-content: flex-end; /* Align buttons to the right */
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid #eee;
+  }
+  
+  .button {
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .cancelButton {
+    background-color: #e2e8f0; /* Light gray */
+    color: #4a5568;
+  }
+  .cancelButton:hover {
+    background-color: #cbd5e1;
+  }
+  
+  .saveButton {
+    background-color: #16a34a; /* Green */
+    color: white;
+  }
+  .saveButton:hover {
+    background-color: #15803d;
+  }
+  
+  

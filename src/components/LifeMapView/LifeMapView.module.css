@@ -1,0 +1,252 @@
+/* src/components/LifeMapView/LifeMapView.module.css */
+
+.lifeMapViewContainer {
+  padding: var(--space-lg, 1.5rem);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center timeline horizontally */
+}
+
+.viewTitle {
+  color: var(--text-secondary, #355E58);
+  margin-bottom: var(--space-xl, 2rem);
+  text-align: center;
+}
+
+/* --- Life Timeline Styles --- */
+.timelineWrapper {
+  width: 90%; /* Control overall width */
+  max-width: 1000px; /* Max width */
+  margin-top: var(--space-xl, 2rem);
+  /* margin-bottom: var(--space-xl, 2rem); */ /* Reduced bottom margin */
+  margin-bottom: var(--space-lg, 1.5rem); /* Space before project timeline */
+  padding: var(--space-xl, 2rem) 0; /* Vertical padding for labels */
+  position: relative; /* Needed for absolute positioning of markers */
+}
+
+.timeline {
+  width: 100%;
+  height: 8px; /* Thickness of the timeline bar */
+  background-color: var(--border-secondary, #72B0AB); /* Use a theme color */
+  border-radius: 4px;
+  position: relative;
+}
+
+.timelineMarker {
+  position: absolute;
+  top: 50%; /* Center vertically on the line */
+  transform: translateY(-50%); /* Adjust vertical centering */
+  width: 16px; /* Size of the marker */
+  height: 16px; /* Size of the marker */
+  border-radius: 50%; /* Make it a circle */
+  background-color: var(--text-secondary, #355E58); /* Default marker color */
+  border: 2px solid var(--bg-card, #fff); /* White border for contrast */
+  cursor: pointer;
+  z-index: 2; /* Ensure markers are above spans */
+}
+
+.timelineEndpoint {
+  width: 20px; /* Slightly larger endpoints */
+  height: 20px;
+  background-color: transparent; /* Unfilled */
+  border: 3px solid var(--text-secondary, #355E58); /* Border color */
+}
+/* Adjust position slightly because of larger size */
+.startPoint { transform: translate(-50%, -50%); }
+.endPoint { transform: translate(-50%, -50%); }
+
+
+.eventMarker {
+  /* Specific styles for event markers if needed */
+  background-color: var(--axis-color-financial-3, #927aaa); /* Example: Purple */
+}
+
+.markerLabel {
+  position: absolute;
+  bottom: 100%; /* Position above the marker */
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 8px; /* Space above marker */
+  white-space: nowrap;
+  font-size: 0.8em;
+  color: var(--text-muted, #6c757d);
+  background-color: rgba(255, 255, 255, 0.8); /* Slight background for readability */
+  padding: 2px 4px;
+  border-radius: 3px;
+  opacity: 0; /* Hidden by default */
+  transition: opacity 0.2s ease-in-out;
+  pointer-events: none; /* Don't interfere with hover on marker */
+}
+.endpointLabel { /* Style for start/end year labels */
+  opacity: 1; /* Always visible */
+  font-weight: bold;
+  color: var(--text-secondary);
+  background-color: transparent;
+  margin-bottom: 12px; /* More space */
+}
+
+
+.timelineMarker:hover .markerLabel {
+  opacity: 1; /* Show on hover */
+}
+
+.timelineSpan {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 12px; /* Slightly thicker than the main line */
+  background-color: var(--axis-color-physical-2, #FE9179); /* Example: Coral */
+  border-radius: 6px;
+  opacity: 0.7;
+  cursor: pointer;
+  z-index: 1; /* Below markers */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.timelineSpan:hover {
+  opacity: 0.9;
+}
+
+.spanLabel {
+  font-size: 0.75em;
+  color: var(--color-white, #fff);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0 5px;
+}
+
+.nowMarker {
+  background-color: var(--color-error-red, red); /* Distinct color for Now */
+  width: 18px; /* Slightly larger */
+  height: 18px;
+  z-index: 3; /* Above everything */
+  border-color: var(--color-white);
+  position: relative; /* Needed for tooltip positioning */
+}
+
+.nowTooltip {
+  visibility: hidden; /* Hidden by default */
+  width: 140px; /* Adjust width as needed */
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+  position: absolute;
+  z-index: 1;
+  bottom: 150%; /* Position above the marker */
+  left: 50%;
+  margin-left: -70px; /* Use half of the width to center */
+  opacity: 0;
+  transition: opacity 0.3s;
+  font-size: 0.8em;
+}
+
+/* Tooltip arrow */
+.nowTooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: black transparent transparent transparent;
+}
+
+.nowMarker:hover .nowTooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* --- Styles for Year Markers --- */
+.yearMarkerContainer {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 20px; /* Height for tick + label */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 0; /* Below main markers/spans */
+}
+
+.yearMarkerTick {
+  width: 1px;
+  height: 10px; /* Height of the tick mark */
+  background-color: var(--text-muted, #aaa); /* Color of the tick */
+  position: absolute;
+  top: -5px; /* Position tick above the main line */
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.yearMarkerLabel {
+  position: absolute;
+  top: -25px; /* Position label above the tick */
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.75em;
+  color: var(--text-muted, #aaa);
+  white-space: nowrap;
+}
+/* --- End Year Marker Styles --- */
+/* --- End Life Timeline Styles --- */
+
+
+/* --- Project Timeline Styles --- */
+.projectTimelineWrapper {
+  width: 90%; /* Match life timeline width */
+  max-width: 1000px;
+  margin-top: var(--space-md); /* Space below life timeline */
+  margin-bottom: var(--space-xl);
+  padding: var(--space-sm) 0; /* Less vertical padding than life timeline */
+  position: relative;
+}
+
+.projectTimelineTitle {
+  text-align: center;
+  font-size: 1.1em;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-md);
+}
+
+.projectTimeline {
+  width: 100%;
+  height: 10px; /* Can be same or different thickness */
+  background-color: var(--border-light, #BCDDDC); /* Lighter background */
+  border-radius: 5px;
+  position: relative;
+}
+
+.projectTimelineSpan {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 100%; /* Fill the height of the project timeline bar */
+  background-color: var(--axis-color-gear-3, #3280a7); /* Example: Gear Dark Blue */
+  border-radius: 5px; /* Match parent */
+  opacity: 0.8;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.projectTimelineSpan:hover {
+  opacity: 1;
+}
+
+.projectSpanLabel {
+  font-size: 0.7em;
+  color: var(--color-white, #fff);
+  font-weight: 500;
+  white-space: nowrap;
+  padding: 0 6px;
+}
+/* --- End Project Timeline Styles --- */
+

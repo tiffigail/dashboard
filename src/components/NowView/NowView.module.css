@@ -1,0 +1,637 @@
+/* src/components/NowView/NowView.module.css */
+/* Styles corresponding to NowView.jsx with moment inputs and upcoming task display */
+
+/* Color Palette Reference (from global index.css):
+   --text-primary: var(--color-on-track-n-plus-1-4); (#053229 Peacock)
+   --text-secondary: var(--color-on-track-n-plus-1-3); (#355E58 Spruce)
+   --text-muted: var(--color-rest-and-preparation-5); (#6c757d Dark Grey)
+   --border-light: var(--color-on-track-n-plus-1-1); (#BCDDDC Arctic)
+   --border-secondary: var(--color-on-track-n-plus-1-2); (#72B0AB Sapphire)
+   --border-primary: var(--color-on-track-n-plus-1-3); (#355E58 Spruce)
+   --border-dashed: var(--color-environment-2); (#ead6a0 Sage)
+   --bg-card: var(--color-white); (#FFFFFF White)
+   --bg-panel: var(--color-on-track-n-plus-1-1); (#BCDDDC Arctic)
+   --bg-panel-accent: #e0f2f7;                (Lighter Arctic)
+   --bg-input: var(--color-white); (#FFFFFF White)
+   --bg-input-disabled: var(--color-rest-and-preparation-2); (#d6e2ed Light Grey)
+   --button-primary-bg: var(--color-on-track-n-plus-1-2); (#72B0AB Sapphire)
+   --button-primary-text: var(--color-white); (#FFFFFF White)
+   --button-primary-border: var(--color-on-track-n-plus-1-3); (#355E58 Spruce)
+   --button-primary-hover-bg: var(--color-on-track-n-plus-1-3); (#355E58 Spruce)
+   --button-secondary-bg: var(--color-environment-2); (#ead6a0 Sage)
+   --button-secondary-text: var(--color-on-track-n-plus-1-4); (#053229 Peacock)
+   --button-secondary-border: var(--color-environment-3); (#d8bf67 Pistachio)
+   --button-secondary-hover-bg: var(--color-environment-3); (#d8bf67 Pistachio)
+   --color-environment-1: #efe5c3; (Environment Yellow/Gold 1) - Moment Button BG
+   --color-environment-3: #d8bf67; (Environment Yellow/Gold 3) - Moment Button Border, PM Button Hover BG
+   --color-environment-2: #ead6a0; (Environment Yellow/Gold 2) - Reveal Button Color, PM Button BG
+*/
+
+/* Overall Container */
+.nowViewContainer {
+  padding: var(--space-lg, 1.5rem);
+  width: 100%;
+  min-height: calc(100vh - (var(--space-lg, 1.5rem) * 2));
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr; /* Center column is wider */
+  grid-template-rows: auto 1fr;
+  grid-template-areas:
+    "title title title"
+    "left center right";
+  gap: var(--space-lg, 1.5rem);
+  box-sizing: border-box;
+}
+
+/* View Title */
+.viewTitle {
+  grid-area: title;
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: var(--text-secondary, #355E58);
+  text-align: center;
+  margin-bottom: var(--space-lg, 1.5rem);
+}
+
+/* Panels */
+.leftPanel, .centerPanel, .rightPanel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg, 1.5rem);
+  align-items: center;
+  background-color: var(--bg-panel, #BCDDDC);
+  padding: var(--space-md, 1rem);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px var(--shadow-color, rgba(0,0,0,0.1));
+  border: 1px solid var(--border-primary, #355E58);
+  box-sizing: border-box;
+  overflow: hidden;
+}
+.leftPanel { grid-area: left; }
+.centerPanel { grid-area: center; }
+.rightPanel { grid-area: right; }
+
+
+/* Section Titles within Panels */
+.sectionTitle {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-secondary, #355E58);
+  margin-top: 0;
+  margin-bottom: var(--space-md, 1rem);
+  border-bottom: 1px solid var(--border-secondary, #72B0AB);
+  padding-bottom: var(--space-sm, 0.5rem);
+  width: 100%;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/* --- Styles for Moment Tracker --- */
+.momentsTracker {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  max-width: 250px;
+  box-shadow: 0 1px 3px var(--shadow-color, rgba(0,0,0,0.1));
+  gap: var(--space-md, 1rem);
+  background-color: var(--bg-card, #fff);
+  padding: var(--space-md, 1rem);
+  border-radius: 8px;
+  margin-bottom: 0;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.momentEntry {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm, 0.5rem);
+}
+
+.momentCounter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  color: var(--text-secondary, #355E58);
+  margin-bottom: 0;
+}
+
+.momentButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  padding: 0;
+  flex-shrink: 0;
+  background-color: var(--color-environment-1, #efe5c3);
+  color: var(--text-primary, #053229);
+  border: 1px solid var(--color-environment-3, #d8bf67);
+  border-radius: 50%;
+  width: 25px;
+  height: 25px;
+  font-size: 1.1em;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s, filter 0.2s;
+  box-sizing: border-box;
+}
+.momentButton:hover:not(:disabled) {
+  filter: brightness(95%);
+}
+.momentButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.momentInput {
+  width: 100%;
+  padding: var(--space-sm, 0.5rem); /* Adjusted padding */
+  border-radius: 4px;
+  border: 1px solid var(--border-secondary, #72B0AB); /* Slightly darker border */
+  font-size: 0.9em; /* Adjusted font size */
+  box-sizing: border-box;
+  background-color: var(--bg-input, #fff);
+  color: var(--text-primary);
+  line-height: 1.4; /* Increased line-height */
+}
+.momentInput:disabled {
+  background-color: var(--bg-input-disabled, #f8f9fa);
+  opacity: 0.7;
+}
+/* --- End Moment Tracker Styles --- */
+
+
+.productivityDisplay {
+  font-size: 1rem;
+  font-weight: 600;
+  width: 100%;
+  max-width: 250px;
+  text-align: center;
+  box-shadow: 0 1px 3px var(--shadow-color, rgba(0,0,0,0.1));
+  background-color: var(--button-primary-bg, #72B0AB);
+  color: var(--button-primary-text, #fff);
+  padding: var(--space-sm, 0.5rem);
+  border-radius: 8px;
+  margin-bottom: 0;
+  border: 1px solid var(--button-primary-border, #355E58);
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+.score {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+/* --- REMOVED Styles for old Break Placeholder --- */
+
+
+/* Journal Section */
+.journalPlaceholder {
+  width: 100%;
+  max-width: 250px;
+  min-height: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm, 0.5rem);
+  background-color: var(--bg-card, #fff);
+  border: 1px dashed var(--border-dashed, #ead6a0);
+  border-radius: 8px;
+  padding: var(--space-md, 1rem);
+  color: var(--text-secondary, #355E58);
+  margin-bottom: 0;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+.journalLabel {
+  display: block;
+  margin-bottom: var(--space-sm, 0.5rem);
+  font-weight: bold;
+  color: var(--text-secondary, #355E58);
+  align-self: flex-start;
+}
+.journalTextarea {
+  width: 100%;
+  padding: var(--space-sm, 0.5rem);
+  border-radius: 4px;
+  font-size: 0.9rem;
+  box-sizing: border-box;
+  resize: vertical;
+  min-height: 50px;
+  flex-grow: 1;
+  border: 1px solid var(--border-secondary, #72B0AB);
+  background-color: var(--bg-input, #fff);
+  color: var(--text-primary, #053229);
+  margin-bottom: var(--space-sm, 0.5rem);
+}
+.journalTextarea:disabled {
+ background-color: var(--bg-input-disabled, #f8f9fa);
+ opacity: 0.7;
+}
+.saveJournalButton {
+  font-size: 0.85rem;
+  align-self: flex-end;
+  background-color: var(--button-primary-bg, #72B0AB);
+  color: var(--button-primary-text, #fff);
+  border: 1px solid var(--button-primary-border, #355E58);
+  padding: var(--space-sm, 0.5rem) var(--space-md, 1rem);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+.saveJournalButton:hover:not(:disabled) {
+  background-color: var(--button-primary-hover-bg, #355E58);
+}
+.saveJournalButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+
+/* Center Panel Specifics */
+.centerPanel { grid-area: center; }
+
+/* Container for Title and Scrollable List */
+.taskListContainer {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-lg, 1.5rem);
+  border-radius: 8px;
+  box-shadow: 0 2px 5px var(--shadow-color, rgba(0,0,0,0.1));
+  width: 100%;
+  background-color: var(--bg-card, #fff);
+  margin-bottom: var(--space-lg, 1.5rem);
+  box-sizing: border-box;
+  flex-grow: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Styles for Current Task Display Box */
+.currentTaskDisplay {
+  padding: var(--space-md, 1rem);
+  margin-bottom: var(--space-md, 1rem);
+  border-radius: 4px;
+  text-align: center;
+  background-color: var(--bg-input, #fff);
+  min-height: 150px; /* Adjusted min-height */
+  display: flex;
+  flex-direction: column-reverse; /* Stack bottom-up */
+  align-items: center;
+  justify-content: flex-end; /* Align to bottom */
+  border: 1px dashed var(--border-primary, #355E58);
+  box-shadow:
+    inset 0 0 0 1px var(--border-secondary, #72B0AB),
+    inset 0 0 0 2px var(--border-light, #BCDDDC);
+  color: var(--text-secondary, #355E58);
+  font-style: italic;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+/* Styles for Upcoming Task Items */
+.upcomingTaskItem {
+  width: 95%;
+  padding: 0 var(--space-xs);
+  /* Default margin removed, set individually below */
+  margin-bottom: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+  font-style: normal;
+  line-height: 1.3;
+  transition: all 0.3s ease-out;
+}
+
+/* Style for the primary (bottom-most) task */
+.upcomingTaskItem0 {
+  font-size: 1.5em;
+  font-weight: bold;
+  color: var(--text-primary, #053229);
+  opacity: 1;
+  margin-bottom: calc(var(--space-xs) * 1); /* Base spacing */
+}
+
+/* Style for the second task */
+.upcomingTaskItem1 {
+  font-size: 1.1em;
+  font-weight: 500;
+  color: var(--text-secondary, #355E58);
+  opacity: 0.9;
+   /* UPDATED: Reduced spacing */
+  margin-bottom: calc(var(--space-xs) * 0.75);
+}
+
+/* Style for the third task */
+.upcomingTaskItem2 {
+  font-size: 0.9em;
+  font-weight: 400;
+  color: var(--text-muted, #6c757d);
+  opacity: 0.8;
+  /* UPDATED: Reduced spacing */
+  margin-bottom: calc(var(--space-xs) * 0.5);
+}
+
+/* Style for the fourth task */
+.upcomingTaskItem3 {
+  font-size: 0.8em;
+  font-weight: 400;
+  color: var(--text-muted, #6c757d);
+  opacity: 0.6;
+   /* UPDATED: Reduced spacing */
+  margin-bottom: calc(var(--space-xs) * 0.35);
+}
+
+/* Style for the fifth task */
+.upcomingTaskItem4 {
+  font-size: 0.7em;
+  font-weight: 400;
+  color: var(--text-muted, #6c757d);
+  opacity: 0.4;
+   /* UPDATED: Reduced spacing */
+  margin-bottom: calc(var(--space-xs) * 0.25);
+}
+/* Style for the sixth task */
+.upcomingTaskItem5 {
+  font-size: 0.6em;
+  font-weight: 400;
+  color: var(--text-muted, #6c757d);
+  opacity: 0.2;
+   /* UPDATED: Minimal spacing */
+  margin-bottom: calc(var(--space-xs) * 0.15);
+}
+
+.noTasksMessage {
+  font-style: italic;
+  color: var(--text-muted);
+  align-self: center;
+  margin: auto;
+}
+
+.rolloverIndicatorSmall {
+  font-size: 0.8em;
+  margin-left: var(--space-xs);
+  font-style: italic;
+  opacity: 0.8;
+}
+/* --- End Upcoming Task Styles --- */
+
+
+/* Task List Scroll Styling */
+.taskList {
+  width: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: calc(6 * (var(--space-sm, 0.5rem)*2 + 1rem + var(--space-sm, 0.5rem))); /* Approx 6 items */
+  padding-bottom: var(--space-sm, 0.5rem);
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-secondary, #72B0AB) var(--bg-panel, #BCDDDC);
+}
+.taskList::-webkit-scrollbar { width: 8px; }
+.taskList::-webkit-scrollbar-track { background: var(--bg-panel, #BCDDDC); border-radius: 4px; }
+.taskList::-webkit-scrollbar-thumb { background-color: var(--border-secondary, #72B0AB); border-radius: 4px; border: 2px solid var(--bg-panel, #BCDDDC); }
+
+
+/* Task Item Styling (Using ::before for Stripes) */
+.taskItem {
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--space-sm, 0.5rem);
+  padding: var(--space-sm, 0.5rem) var(--space-md, 1rem);
+  padding-left: calc(10mm + var(--space-md, 1rem)); /* Space for stripes */
+  border-radius: 4px;
+  transition: background-color 0.2s, box-shadow 0.2s, opacity 0.2s;
+  cursor: grab;
+  box-sizing: border-box;
+  position: relative;
+  border: 1px solid var(--border-light, #BCDDDC);
+  background-color: var(--color-white, #fff);
+  box-shadow: none;
+}
+.taskItem:last-child {
+  margin-bottom: 0;
+}
+
+/* ::before pseudo-element for stripes */
+.taskItem::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 10mm; /* Total width for stripes and spaces */
+  background-image: linear-gradient(
+        to right,
+        /* Darkest: 3mm */
+        var(--task-color-dark, var(--axis-color-default-3, #6c757d)) 0mm,
+        var(--task-color-dark, var(--axis-color-default-3, #6c757d)) 3mm,
+        /* Space: 2mm */
+        transparent 3mm, transparent 5mm,
+        /* Medium: 2mm */
+        var(--task-color-medium, var(--axis-color-default-2, #e9ecef)) 5mm,
+        var(--task-color-medium, var(--axis-color-default-2, #e9ecef)) 7mm,
+        /* Space: 2mm */
+        transparent 7mm, transparent 9mm,
+        /* Lightest: 1mm */
+        var(--task-color-light, var(--axis-color-default-1, #f8f9fa)) 9mm,
+        var(--task-color-light, var(--axis-color-default-1, #f8f9fa)) 10mm
+      );
+  z-index: 0;
+}
+
+/* Drag and Drop Styles */
+.taskItem.dragging { opacity: 0.5; cursor: grabbing; border-style: dashed; }
+.taskItem.dragOver { background-color: var(--bg-panel-accent, #e0f2f7); }
+
+
+.taskItem:hover {
+  filter: brightness(98%);
+}
+
+/* Selected Task Style */
+.selectedTask {
+  color: var(--text-primary, #053229) !important;
+  border: 2px solid black !important;
+  padding: calc(var(--space-sm, 0.5rem) - 1px) calc(var(--space-md, 1rem) - 1px);
+  padding-left: calc(10mm + var(--space-md, 1rem) - 1px); /* Adjust padding for border */
+  box-shadow: none;
+  cursor: default;
+}
+.selectedTask.dragging { cursor: grabbing; }
+/* Selected item's label should be flat */
+.selectedTask .taskLabel {
+  transform: none !important; /* Override inline style */
+}
+
+
+/* Checkbox and its container */
+.checkboxContainer {
+  flex-shrink: 0;
+  margin-right: var(--space-md, 1rem);
+  z-index: 1;
+}
+.checkbox {
+  width: 1.1rem; height: 1.1rem;
+  cursor: pointer;
+  accent-color: var(--text-secondary, #355E58);
+  background-color: var(--color-white, #fff);
+  border: 1px solid var(--text-secondary, #355E58);
+  border-radius: 3px;
+  appearance: none;
+  display: inline-block;
+  position: relative;
+  vertical-align: middle;
+}
+.checkbox:checked { background-color: var(--text-secondary, #355E58); }
+.checkbox:checked::after {
+  content: ''; position: absolute;
+  left: 4px; top: 1px; width: 4px; height: 8px;
+  border: solid var(--color-white, #fff);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+.checkbox:disabled { opacity: 0.6; cursor: not-allowed; }
+
+
+/* Task Label - Basic style */
+.taskLabel {
+  font-size: 1rem;
+  flex-grow: 1;
+  transition: color 0.2s ease; /* Keep transition */
+  color: var(--text-primary, #053229);
+  position: relative;
+  z-index: 1;
+  font-style: normal;
+  display: inline-block;
+  transform-origin: center center;
+  pointer-events: none;
+  white-space: nowrap;
+  overflow: hidden; /* Keep text overflow handling */
+  text-overflow: ellipsis;
+}
+
+.completedTask { /* Class is on the label */ }
+.allTasksDoneMessage {
+  text-align: center; font-style: italic; color: var(--text-muted, #6c757d);
+  padding: var(--space-md, 1rem) 0;
+}
+
+.rolloverIndicator {
+  font-size: 0.8em; margin-left: var(--space-sm, 0.5rem);
+  color: var(--color-environment-3, #d8bf67); /* Pistachio */
+  font-style: italic;
+  display: inline-block;
+}
+
+/* Ad Hoc Task Form */
+.adHocForm {
+  margin-top: var(--space-lg, 1.5rem); padding-top: var(--space-md, 1rem);
+  border-top: 1px solid var(--border-secondary, #72B0AB);
+  width: 100%;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+.adHocTitle {
+  color: var(--text-secondary, #355E58); margin-top: 0; margin-bottom: var(--space-sm, 0.5rem);
+  font-size: 1.1em; text-align: center;
+}
+.adHocTextarea {
+  width: 100%; padding: var(--space-sm, 0.5rem); border-radius: 4px;
+  border: 1px solid var(--border-secondary, #72B0AB); background-color: var(--bg-input, #fff);
+  color: var(--text-primary, #053229); margin-bottom: var(--space-sm, 0.5rem);
+  resize: vertical; box-sizing: border-box;
+}
+.adHocControls { display: flex; gap: var(--space-md, 1rem); }
+.adHocSelect {
+  padding: var(--space-sm, 0.5rem); border-radius: 4px;
+  border: 1px solid var(--border-secondary, #72B0AB); background-color: var(--bg-input, #fff);
+  color: var(--text-primary, #053229); flex-grow: 1; cursor: pointer; box-sizing: border-box;
+}
+.adHocButton {
+  background-color: var(--button-primary-bg, #72B0AB); color: var(--button-primary-text, #fff);
+  border: 1px solid var(--button-primary-border, #355E58); padding: var(--space-sm, 0.5rem) var(--space-md, 1rem);
+  border-radius: 4px; cursor: pointer; transition: background-color 0.2s;
+  box-sizing: border-box;
+}
+.adHocButton:hover:not(:disabled) { background-color: var(--button-primary-hover-bg, #355E58); }
+.adHocButton:disabled { opacity: 0.6; cursor: not-allowed; }
+.adHocWarning { font-size: 0.9em; color: var(--color-environment-3, #d8bf67); margin-top: var(--space-sm, 0.5rem); }
+
+
+/* Right Panel Specifics */
+.rightPanel { grid-area: right; }
+
+.contextMapPlaceholder {
+  border-radius: 8px; padding: var(--space-xl, 2rem) var(--space-md, 1rem);
+  width: 100%; max-width: 250px; text-align: center; font-style: italic;
+  min-height: 80px; display: flex; align-items: center; justify-content: center;
+  box-sizing: border-box; background-color: var(--bg-panel-accent, #e0f2f7);
+  border: 1px dashed var(--border-dashed, #ead6a0); color: var(--text-secondary, #355E58);
+  margin-bottom: 0; flex-shrink: 0;
+}
+
+.timerSection {
+  padding: var(--space-md, 1rem) var(--space-lg, 1.5rem); border-radius: 8px;
+  width: 100%; max-width: 250px; box-shadow: 0 1px 3px var(--shadow-color, rgba(0,0,0,0.1));
+  text-align: center; background-color: var(--bg-card, #fff);
+  margin-bottom: 0; box-sizing: border-box; flex-shrink: 0;
+}
+.timeLabel { font-size: 0.9rem; margin-bottom: var(--space-sm, 0.5rem); color: var(--text-secondary, #355E58); }
+.timerDisplay {
+  display: flex; align-items: center; margin-bottom: var(--space-sm, 0.5rem);
+  font-size: 3em; font-weight: bold; color: var(--text-primary, #053229);
+  justify-content: center; gap: var(--space-md, 1rem);
+}
+.tomatoImage { width: 60px; height: auto; vertical-align: middle; }
+.timerText { font-size: inherit; font-weight: bold; color: inherit; font-family: monospace; }
+.timerControls { display: flex; justify-content: center; gap: var(--space-md, 1rem); margin-bottom: var(--space-sm, 0.5rem); }
+
+/* Timer Button Color */
+.timerButton {
+  border: none; border-radius: 4px; padding: var(--space-xs, 0.25rem) var(--space-sm, 0.5rem);
+  font-size: 1.2rem; font-weight: bold; cursor: pointer; min-width: 40px;
+  transition: background-color 0.2s, filter 0.2s;
+  background-color: var(--color-environment-1, #efe5c3); color: var(--text-primary, #053229);
+  border: 1px solid var(--color-environment-3, #d8bf67); box-sizing: border-box;
+}
+.timerButton:hover:not(:disabled) { filter: brightness(95%); }
+.timerButton:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.timerConfig { margin-top: var(--space-md, 1rem); font-size: 0.9em; margin-bottom: var(--space-sm, 0.5rem); }
+.durationLabel { margin-right: var(--space-sm, 0.5rem); color: var(--text-secondary, #355E58); }
+.durationInput {
+  width: 50px; padding: var(--space-xs, 0.25rem) var(--space-sm, 0.5rem); border-radius: 3px;
+  border: 1px solid var(--border-secondary, #72B0AB); background-color: var(--bg-input, #fff);
+  color: var(--text-primary, #053229); box-sizing: border-box;
+}
+
+.nowLabel { font-size: 1.2rem; font-weight: bold; margin-top: var(--space-sm, 0.5rem); color: var(--text-secondary, #355E58); }
+
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .nowViewContainer {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "title"
+      "center"
+      "right"
+      "left";
+    gap: var(--space-md, 1rem);
+    padding: var(--space-md, 1rem);
+  }
+  .leftPanel, .rightPanel, .centerPanel {
+      max-width: none; /* Allow panels to fill width */
+      width: 100%;
+  }
+  .momentsTracker, .productivityDisplay, .timerSection, .contextMapPlaceholder, .breakPlaceholder, .journalPlaceholder, .taskListContainer, .adHocForm {
+      max-width: 100%; /* Allow content to fill panel */
+      box-sizing: border-box;
+  }
+  .taskList {
+      max-height: calc(6 * (var(--space-sm, 0.5rem)*2 + 1rem + var(--space-sm, 0.5rem))); /* Keep max-height */
+  }
+}

@@ -1,0 +1,205 @@
+/* src/components/ParetoView/ParetoView.module.css */
+/* Using CSS Variables from global file */
+
+.paretoViewContainer {
+  padding: var(--space-lg);
+  max-width: 1000px; /* Adjusted max-width */
+  margin: 0 auto;
+  color: var(--text-primary);
+}
+
+.viewTitle {
+  color: var(--text-secondary);
+  text-align: center;
+  margin-bottom: var(--space-lg);
+  font-size: 1.8rem;
+  font-weight: bold;
+}
+
+.errorText {
+    color: var(--text-error);
+    text-align: center;
+    margin-top: var(--space-md);
+    font-weight: bold;
+}
+
+/* --- Introduction Section Styles --- */
+.introSection {
+    background-color: var(--bg-panel-accent); /* Light background */
+    padding: var(--space-lg);
+    border-radius: 8px;
+    margin-bottom: var(--space-xl);
+    border: 1px solid var(--border-light);
+    color: var(--text-secondary);
+    font-size: 0.95em;
+    line-height: 1.6;
+    /* --- MODIFIED: Ensure overall section text is left aligned --- */
+    text-align: left;
+}
+.introSection h3 {
+    color: var(--text-primary);
+    font-size: 1.3em;
+    margin-top: 0;
+    text-align: center; /* Keep heading centered */
+    border-bottom: 1px solid var(--border-secondary);
+    padding-bottom: var(--space-sm);
+    margin-bottom: var(--space-md);
+}
+.introSection h4 {
+    color: var(--text-secondary);
+    font-size: 1.1em;
+    margin-top: var(--space-lg);
+    margin-bottom: var(--space-sm);
+    text-align: left; /* Ensure subheadings are left aligned */
+}
+.introSection ol {
+    padding-left: 1.5rem;
+    margin-bottom: 0;
+    text-align: left; /* Ensure ordered list items are left aligned */
+}
+.introSection ul {
+    list-style: disc;
+    margin-top: var(--space-xs);
+    margin-bottom: var(--space-md);
+    padding-left: 1.5rem;
+    text-align: left; /* Ensure unordered list items are left aligned */
+}
+.introSection li {
+    margin-bottom: var(--space-sm);
+    text-align: left; /* Ensure list items themselves are left aligned */
+}
+.introSection p {
+    text-align: left; /* Ensure paragraphs are left aligned */
+}
+/* --- End Introduction Styles --- */
+
+
+/* --- Axis Grid (Stacked Cards) --- */
+.axisGrid {
+    display: flex;
+    flex-direction: column;
+    gap: 2mm; /* Specific spacing */
+    width: 100%;
+}
+
+/* Styling for each axis card */
+.axisCard {
+    background-color: var(--bg-panel); /* Arctic */
+    border: 1px solid var(--border-primary); /* Spruce */
+    border-radius: 8px;
+    padding: var(--space-sm) var(--space-lg); /* Adjusted padding */
+    box-shadow: 0 2px 4px var(--shadow-color);
+    box-sizing: border-box;
+    height: 1cm; /* NEW: Fixed height */
+    display: flex;
+    align-items: center; /* Vertically center content */
+    overflow: hidden; /* Hide overflow */
+}
+
+/* Flex container inside the card */
+.cardContent {
+    display: flex;
+    align-items: center; /* Vertically align title and goals */
+    gap: var(--space-lg); /* Space between left and right */
+    width: 100%; /* Ensure content fills card */
+    overflow: hidden; /* Prevent internal content from overflowing card */
+}
+
+/* Left side of the card */
+.cardLeft {
+    flex: 1; /* Take up available space */
+    text-align: left;
+    padding-right: var(--space-md); /* Space before goals */
+    overflow: hidden; /* Hide overflowing title */
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.axisTitle { /* Renamed from axisTitleLg */
+    font-size: 1.4em; /* Adjusted size for 1cm height */
+    color: var(--text-primary); /* Peacock */
+    margin: 0;
+    line-height: 1.1;
+    font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Right side of the card */
+.cardRight {
+    flex-basis: 65%; /* Adjusted basis */
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end; /* Align goals to the right */
+    gap: 0; /* Remove gap for tighter fit */
+    overflow: hidden; /* Hide overflow */
+}
+
+.stretchGoalText {
+    font-size: 0.8em; /* Adjusted size */
+    color: var(--text-secondary); /* Spruce */
+    margin: 0;
+    font-style: italic; /* Italicize stretch goal */
+    line-height: 1.1; /* Adjust line height */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%; /* Ensure it takes width for ellipsis */
+}
+
+.yearlyGoalText {
+    font-size: 0.9em; /* Adjusted size */
+    color: var(--text-primary); /* Peacock */
+    margin: 0;
+    font-weight: 500; /* Slightly bolder */
+    line-height: 1.1; /* Adjust line height */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%; /* Ensure it takes width for ellipsis */
+}
+
+.notSet {
+    font-style: italic;
+    opacity: 0.7;
+    color: var(--text-muted);
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    .axisCard {
+        height: auto; /* Allow height to adjust on mobile */
+        min-height: 1cm; /* Set a minimum */
+        padding: var(--space-md); /* Adjust padding */
+        align-items: flex-start; /* Align top on mobile */
+    }
+    .cardContent {
+        flex-direction: column; /* Stack title and goals */
+        align-items: flex-start; /* Align left */
+        text-align: left;
+        gap: var(--space-sm); /* Reduce gap */
+    }
+    .cardRight {
+        flex-basis: auto; /* Reset basis */
+        align-items: flex-start; /* Align left */
+        text-align: left;
+        margin-top: var(--space-sm);
+        white-space: normal; /* Allow wrapping on mobile */
+        overflow: visible;
+        text-overflow: clip;
+        width: 100%;
+    }
+     .stretchGoalText, .yearlyGoalText {
+        text-align: left;
+        white-space: normal;
+        overflow: visible;
+        text-overflow: clip;
+        width: auto;
+    }
+    /* Ensure intro text is left-aligned on mobile too */
+    .introSection, .introSection ol, .introSection ul, .introSection li, .introSection p {
+        text-align: left;
+    }
+}

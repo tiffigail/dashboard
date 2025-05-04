@@ -1,0 +1,179 @@
+/* src/components/BreakReviewForm/BreakReviewForm.module.css */
+
+.form {
+    padding: var(--space-lg, 1.5rem);
+    background-color: var(--bg-card, #fff);
+    border-radius: 8px; /* Match modal rounding */
+    max-height: 80vh; /* Limit height */
+    overflow-y: auto; /* Allow scrolling within form */
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg, 1.5rem);
+    color: var(--text-primary); /* Use global text color */
+}
+
+.formTitle {
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: var(--space-md, 1rem);
+    color: var(--text-secondary, #355E58);
+    font-size: 1.5em; /* Adjust size */
+}
+
+.section {
+    padding: var(--space-md, 1rem);
+    border: 1px solid var(--border-light, #BCDDDC);
+    border-radius: 6px;
+    background-color: var(--bg-panel-accent, #e0f2f7);
+}
+
+.sectionTitle {
+    font-size: 1.1em;
+    font-weight: 600;
+    margin-top: 0;
+    margin-bottom: var(--space-md, 1rem);
+    padding-bottom: var(--space-sm, 0.5rem);
+    border-bottom: 1px solid var(--border-secondary, #72B0AB);
+    color: var(--text-secondary, #355E58);
+    text-align: center; /* Center section titles */
+}
+
+/* --- NEW Styles for Break Selector --- */
+.breakSelector {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Space out buttons and text */
+    gap: var(--space-md, 1rem);
+}
+
+.cycleButton {
+    background-color: var(--bg-input, #fff);
+    border: 1px solid var(--border-secondary, #72B0AB);
+    color: var(--text-secondary, #355E58);
+    padding: var(--space-xs, 0.25rem) var(--space-sm, 0.5rem);
+    border-radius: 4px;
+    font-size: 1.2em; /* Make arrows bigger */
+    line-height: 1;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+    flex-shrink: 0; /* Prevent buttons from shrinking */
+}
+.cycleButton:hover:not(:disabled) {
+    background-color: var(--bg-panel-accent, #e0f2f7);
+}
+.cycleButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.breakIdeaText {
+    font-style: italic;
+    font-size: 1.1em;
+    color: var(--text-primary);
+    text-align: center;
+    flex-grow: 1; /* Allow text to take available space */
+    margin: 0; /* Remove default margins */
+}
+/* --- End Break Selector Styles --- */
+
+
+/* Star Rating Styles */
+.starRating {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--space-xs, 0.25rem);
+}
+
+.starRating button {
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    font-size: 2rem; /* Adjust size of stars */
+    color: var(--border-muted, #ced4da); /* Default off color */
+    transition: color 0.2s ease-in-out;
+    line-height: 1; /* Prevent extra spacing */
+}
+
+.starRating button.on {
+    color: var(--color-environment-3, #d8bf67); /* Pistachio 'on' color */
+}
+.starRating button:hover:not(.on):not(:disabled) {
+    color: var(--color-environment-2, #ead6a0); /* Sage hover color for off stars */
+}
+.starRating button:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.star {
+    display: inline-block; /* Helps with alignment */
+}
+
+
+/* Input Field Styles */
+.inputField {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs, 0.25rem);
+    margin-bottom: var(--space-md, 1rem);
+}
+.inputField:last-child {
+    margin-bottom: 0;
+}
+
+.inputField label {
+    font-weight: 500;
+    font-size: 0.9em;
+    color: var(--text-secondary);
+    text-align: center; /* Center label */
+    margin-bottom: var(--space-sm);
+}
+
+.numberInput {
+    padding: var(--space-sm, 0.5rem);
+    border: 1px solid var(--border-muted, #ced4da);
+    border-radius: 4px;
+    width: 80px; /* Limit width */
+    align-self: center; /* Center input */
+    text-align: center;
+    font-size: 1em;
+}
+.numberInput:disabled {
+     background-color: var(--bg-input-disabled, #f8f9fa);
+     opacity: 0.7;
+}
+
+.errorText {
+    color: var(--text-error, #dc3545);
+    font-size: 0.9em;
+    margin-top: var(--space-sm, 0.5rem);
+    text-align: center;
+    margin-bottom: 0;
+}
+
+.submitButton {
+    align-self: center; /* Center button */
+    padding: var(--space-md, 1rem) var(--space-lg, 1.5rem);
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s, box-shadow 0.2s;
+    border: 1px solid var(--button-primary-border, #355E58);
+    background-color: var(--button-primary-bg, #72B0AB);
+    color: var(--button-primary-text, #fff);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-top: var(--space-md, 1rem);
+}
+.submitButton:hover:not(:disabled) {
+    background-color: var(--button-primary-hover-bg, #355E58);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+.submitButton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+

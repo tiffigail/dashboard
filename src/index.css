@@ -1,0 +1,267 @@
+/* src/index.css or src/global.css */
+
+/* Define color palette and other global styles */
+:root {
+    /* ======================================== */
+    /* == Base Color Palette Definitions == */
+    /* ======================================== */
+    /* These variables define the raw color values. */
+    /* Comments indicate the intended axis and shade number (lightest=1). */
+
+    /* == Physical (Reds/Corals) == */
+    --color-physical-1: #FDC1B4;      /* Physical1 (Bubblegum) */
+    --color-physical-2: #FE9179;      /* Physical2 (Ballet Slipper) */
+    --color-physical-3: #e7514c;      /* Physical3 (Original Dark Red) */
+    /* --color-physical-4: Define if needed */
+
+    /* == Financial (Purples) == */
+    --color-financial-1: #e9def4;     /* Financial1 (Light Purple) */
+    --color-financial-2: #b8a7cd;     /* Financial2 (Medium Purple) */
+    --color-financial-3: #927aaa;     /* Financial3 (Dark Purple) */
+    /* --color-financial-4: Define if needed */
+
+    /* == Gear (Blues) == */
+    --color-gear-1: #c9ebf4;          /* Gear1 (Sail) */
+    --color-gear-2: #8dc2d7;          /* Gear2 (Sky Blue - Replaced Malibu) */
+    --color-gear-3: #3280a7;          /* Gear3 (Denim) */
+    --color-gear-4: #15678D;          /* Gear4 (Matisse) */
+    --color-gear-5: #09567A;          /* Gear5 (Venice Blue) */
+
+    /* == ON TRACK N+1 (Teals) == */
+    /* --- MODIFIED: Replaced '+' with '-plus-' in names --- */
+    --color-on-track-n-plus-1-1: #BCDDDC; /* ON TRACK N+1 1 (Arctic) */
+    --color-on-track-n-plus-1-2: #72B0AB; /* ON TRACK N+1 2 (Sapphire) */
+    --color-on-track-n-plus-1-3: #355E58; /* ON TRACK N+1 3 (Spruce) */
+    --color-on-track-n-plus-1-4: #053229; /* ON TRACK N+1 4 (Peacock) */
+    /* --- End Modification --- */
+
+    /* == Environment (Yellows/Golds) == */
+    --color-environment-1: #efe5c3;    /* Environment1 (Bright Yellow) */
+    --color-environment-2: #ead6a0;    /* Environment2 (Sage) */
+    --color-environment-3: #d8bf67;    /* Environment3 (Pistachio) */
+    --color-environment-4: #d9d99c;    /* Environment4 (Muted Gold/Beige) */
+    --color-environment-5: #FFEDD1;    /* Environment5 (Lace - Very Light Beige) */
+
+    /* == Misdirect (Greens) == */
+    --color-misdirect-1: #b0e8d7;      /* Misdirect1 (Light Green) */
+    --color-misdirect-2: #6bceab;      /* Misdirect2 (Medium Green) */
+    --color-misdirect-3: #409c7c;      /* Misdirect3 (Dark Green) */
+    /* --color-misdirect-4: Define if needed */
+
+    /* == Rest and preparation (Neutrals/Greys) == */
+    --color-rest-and-preparation-1: #eaf1fa; /* Rest and preparation1 (White) */
+    --color-rest-and-preparation-2: #d6e2ed; /* Rest and preparation2 (Light Grey) */
+    --color-rest-and-preparation-3: #aec6de; /* Rest and preparation3 (Medium Grey) */
+    --color-rest-and-preparation-4: #ced4da; /* Rest and preparation4 (Border Muted) */
+    --color-rest-and-preparation-5: #6c757d; /* Rest and preparation5 (Dark Grey) */
+
+    /* == Other Shared/Utility Colors == */
+    --color-white: #FFFFFF; /* General White */
+    --color-dark-red-alt: #CECFE2;    /* Muted Purple/Blue from image right */
+    --color-light-shadow: #cecfe2; /* Shadow color from input */
+    --color-error-red: #dc3545;
+
+
+    /* ======================================== */
+    /* == Semantic Color Variables (CORRECTED) == */
+    /* ======================================== */
+    /* References updated to use defined base colors */
+    --text-primary: var(--color-on-track-n-plus-1-4); /* Was --color-peacock */
+    --text-secondary: var(--color-on-track-n-plus-1-3); /* Was --color-spruce */
+    --text-accent: var(--color-on-track-n-plus-1-2); /* Was --color-sapphire */
+    --text-light: var(--color-white);
+    --text-muted: var(--color-rest-and-preparation-5); /* Was --color-grey-dark */
+    --text-error: var(--color-error-red);
+    --text-completed: var(--color-on-track-n-plus-1-2); /* Was --color-sapphire */
+
+    --bg-main: var(--color-white);
+    --bg-panel: var(--color-on-track-n-plus-1-1); /* Was --color-arctic */
+    --bg-panel-accent: #e0f2f7; /* Lighter Arctic - Kept as is, consider defining as a variable if used often */
+    --bg-card: var(--color-white);
+    --bg-input: var(--color-white);
+    --bg-input-disabled: var(--color-rest-and-preparation-2); /* Was --color-grey-light, assuming lightest grey */
+    --bg-hover-light: #e0e0e0; /* Generic light hover - Kept as is */
+
+    --border-primary: var(--color-on-track-n-plus-1-3); /* Was --color-spruce */
+    --border-secondary: var(--color-on-track-n-plus-1-2); /* Was --color-sapphire */
+    --border-accent: var(--color-environment-2); /* Was --color-sage */
+    --border-light: var(--color-on-track-n-plus-1-1); /* Was --color-arctic */
+    --border-muted: var(--color-rest-and-preparation-4); /* Was --color-border-muted */
+    --border-dashed: var(--color-environment-2); /* Was --color-sage */
+
+    --button-primary-bg: var(--color-on-track-n-plus-1-2); /* Was --color-sapphire */
+    --button-primary-text: var(--color-white);
+    --button-primary-border: var(--color-on-track-n-plus-1-3); /* Was --color-spruce */
+    --button-primary-hover-bg: var(--color-on-track-n-plus-1-3); /* Was --color-spruce */
+
+    --button-secondary-bg: var(--color-environment-2); /* Was --color-sage */
+    --button-secondary-text: var(--color-on-track-n-plus-1-4); /* Was --color-peacock */
+    --button-secondary-border: var(--color-environment-3); /* Was --color-pistachio */
+    --button-secondary-hover-bg: var(--color-environment-3); /* Was --color-pistachio */
+
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --shadow-color-modal: rgba(0, 0, 0, 0.2);
+
+    /* ======================================== */
+    /* == Axis Color Variables (Numbered) == */
+    /* ======================================== */
+    /* These variables map the numbered base colors to semantic axis names. */
+    /* -- Usage: -- */
+    /* --axis-color-<axis-suffix>-1 : Lightest Shade */
+    /* --axis-color-<axis-suffix>-2 : Medium-Light Shade */
+    /* --axis-color-<axis-suffix>-3 : Medium-Dark Shade */
+    /* --axis-color-<axis-suffix>-4 : Darkest Shade */
+    /* --axis-color-<axis-suffix>   : Primary Accent (usually -2 or -3) */
+
+    /* Physical */
+    --axis-color-physical-1: var(--color-physical-1);
+    --axis-color-physical-2: var(--color-physical-2);
+    --axis-color-physical-3: var(--color-physical-3);
+    /* --axis-color-physical-4: Define if needed */
+    --axis-color-physical: var(--axis-color-physical-2); /* Primary Accent */
+
+    /* Financial */
+    --axis-color-financial-1: var(--color-financial-1);
+    --axis-color-financial-2: var(--color-financial-2);
+    --axis-color-financial-3: var(--color-financial-3);
+    /* --axis-color-financial-4: Define if needed */
+    --axis-color-financial: var(--axis-color-financial-3); /* Primary Accent */
+
+    /* Gear */
+    --axis-color-gear-1: var(--color-gear-1);
+    --axis-color-gear-2: var(--color-gear-2);
+    --axis-color-gear-3: var(--color-gear-3);
+    --axis-color-gear-4: var(--color-gear-4);
+    /* --axis-color-gear-5: var(--color-gear-5); */ /* Base color exists but not used here */
+    --axis-color-gear: var(--axis-color-gear-3); /* Primary Accent */
+
+    /* ON TRACK N+1 */
+    /* --- MODIFIED: Replaced '+' with '-plus-' --- */
+    --axis-color-on-track-n-plus-1-1: var(--color-on-track-n-plus-1-1);
+    --axis-color-on-track-n-plus-1-2: var(--color-on-track-n-plus-1-2);
+    --axis-color-on-track-n-plus-1-3: var(--color-on-track-n-plus-1-3);
+    --axis-color-on-track-n-plus-1-4: var(--color-on-track-n-plus-1-4);
+    --axis-color-on-track-n-plus-1: var(--axis-color-on-track-n-plus-1-3); /* Primary Accent */
+    /* --- End Modification --- */
+
+    /* Environment */
+    --axis-color-environment-1: var(--color-environment-1);
+    --axis-color-environment-2: var(--color-environment-2);
+    --axis-color-environment-3: var(--color-environment-3);
+    --axis-color-environment-4: var(--color-environment-4);
+    /* --axis-color-environment-5: var(--color-environment-5); */ /* Base color exists but not used here */
+    --axis-color-environment: var(--axis-color-environment-2); /* Primary Accent */
+
+    /* Misdirect */
+    --axis-color-misdirect-1: var(--color-misdirect-1);
+    --axis-color-misdirect-2: var(--color-misdirect-2);
+    --axis-color-misdirect-3: var(--color-misdirect-3);
+    /* --axis-color-misdirect-4: Define if needed */
+    --axis-color-misdirect: var(--axis-color-misdirect-2); /* Primary Accent */
+
+    /* Rest and preparation */
+    --axis-color-rest-and-preparation-1: var(--color-rest-and-preparation-1);
+    --axis-color-rest-and-preparation-2: var(--color-rest-and-preparation-2);
+    --axis-color-rest-and-preparation-3: var(--color-rest-and-preparation-3);
+    --axis-color-rest-and-preparation-4: var(--color-rest-and-preparation-4);
+    /* --axis-color-rest-and-preparation-5: var(--color-rest-and-preparation-5); */ /* Base color exists but not used here */
+    --axis-color-rest-and-preparation: var(--axis-color-rest-and-preparation-4); /* Primary Accent */
+
+    /* Default Fallback (CORRECTED) */
+    /* References updated to use defined base colors */
+    --axis-color-default-1: var(--color-rest-and-preparation-2); /* Was --color-grey-light */
+    --axis-color-default-2: var(--color-rest-and-preparation-3); /* Was --color-grey-medium */
+    --axis-color-default-3: var(--color-rest-and-preparation-5); /* Was --color-grey-dark */
+    --axis-color-default-4: var(--color-rest-and-preparation-5); /* Was --color-grey-dark (Repeat darkest) */
+    --axis-color-default: var(--axis-color-default-3); /* Primary Accent (using corrected -3) */
+    /* --- End Axis Colors --- */
+
+
+    /* Font */
+    --font-main: sans-serif; /* Consider specific fonts like Inter, Lato, etc. */
+
+    /* Spacing (Example) */
+    --space-xs: 0.25rem; /* 4px */
+    --space-sm: 0.5rem;  /* 8px */
+    --space-md: 1rem;    /* 16px */
+    --space-lg: 1.5rem;  /* 24px */
+    --space-xl: 2rem;    /* 32px */
+
+    /* Add other global variables as needed */
+  }
+
+  /* Apply base styles */
+  body {
+    margin: 0;
+    font-family: var(--font-main);
+    background-color: var(--bg-main);
+    color: var(--text-primary); /* Use corrected primary text color */
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased; /* Smoother fonts on WebKit */
+    -moz-osx-font-smoothing: grayscale; /* Smoother fonts on Firefox */
+  }
+
+  /* Optional: Base styles for common elements */
+  h1, h2, h3, h4, h5, h6 {
+      color: var(--text-secondary); /* Use corrected secondary text color */
+      margin-top: var(--space-lg);
+      margin-bottom: var(--space-md);
+      font-weight: 600; /* Slightly bolder headings */
+  }
+
+  button {
+      font-family: inherit; /* Use body font */
+      cursor: pointer;
+      padding: var(--space-sm) var(--space-md); /* Default padding */
+      border-radius: 4px; /* Slight rounding */
+      border: 1px solid transparent; /* Base border */
+      transition: background-color 0.2s ease, border-color 0.2s ease; /* Smooth transitions */
+  }
+
+  /* Example button styles using semantic variables */
+  .button-primary {
+      background-color: var(--button-primary-bg);
+      color: var(--button-primary-text);
+      border-color: var(--button-primary-border);
+  }
+  .button-primary:hover {
+      background-color: var(--button-primary-hover-bg);
+  }
+
+  .button-secondary {
+      background-color: var(--button-secondary-bg);
+      color: var(--button-secondary-text);
+      border-color: var(--button-secondary-border);
+  }
+   .button-secondary:hover {
+      background-color: var(--button-secondary-hover-bg);
+  }
+
+
+  input, textarea, select {
+      font-family: inherit;
+      font-size: 1em;
+      padding: var(--space-sm);
+      border: 1px solid var(--border-muted); /* Use muted border */
+      border-radius: 4px;
+      background-color: var(--bg-input);
+  }
+
+  input:disabled, textarea:disabled, select:disabled {
+      background-color: var(--bg-input-disabled); /* Use disabled background */
+      cursor: not-allowed;
+  }
+
+  /* Improve focus visibility */
+  *:focus-visible {
+      outline: 2px solid var(--border-secondary); /* Use secondary border color for focus */
+      outline-offset: 2px;
+  }
+
+
+  /* Add any other global base styles */
+
+  /* Box-sizing reset for easier layout */
+  *, *::before, *::after {
+      box-sizing: border-box;
+  }
