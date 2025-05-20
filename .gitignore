@@ -2,6 +2,8 @@
 .env
 .env.*
 !.env.example
+.venv
+serviceAccountKey.json
 
 # Dependencies (Installed packages)
 node_modules/
