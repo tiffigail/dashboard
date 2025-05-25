@@ -8,6 +8,7 @@ import FamilyCleanForm from '../FamilyCleanForm/FamilyCleanForm';
 import StudyForm from '../StudyForm/StudyForm';
 import ReadyForWorkForm from '../ReadyForWorkForm/ReadyForWorkForm'; // <<< Import ReadyForWorkForm
 import ContextMap from '../ContextMap/ContextMap';
+import BreakAnalysisChart from '../BreakAnalysisChart/BreakAnalysisChart'; // <<< IMPORT FOR THE CHART
 import { db } from '../../firebaseConfig';
 import {
     collection,
@@ -166,15 +167,13 @@ function DailyView({ onNavigate }) {
     const handleFamilyCleanSubmit = (formData) => { console.log("Family Clean Routine Submitted:", formData); closeFamilyCleanModal(); };
     const handleStudySubmit = (formData) => { console.log("Study Session Submitted:", formData); closeStudyModal(); };
     const handleBudgetSubmit = (formData) => { console.log("Budget Routine Submitted (in DailyView):", formData); closeBudgetModal(); };
-    // <<< Handler for Ready Form >>>
     const handleReadySubmit = (formData) => { console.log("Ready For Work Submitted:", formData); closeReadyModal(); };
 
     const closeAmModal = () => setIsAmModalOpen(false);
     const closePmModal = () => setIsPmModalOpen(false);
     const closeFamilyCleanModal = () => setIsFamilyCleanModalOpen(false);
     const closeStudyModal = () => setIsStudyModalOpen(false);
-    const closeBudgetModal = () => setIsBudgetModalOpen(false); // Keep Budget Modal close handler
-     // <<< Handler to close Ready Modal >>>
+    const closeBudgetModal = () => setIsBudgetModalOpen(false);
     const closeReadyModal = () => setIsReadyModalOpen(false);
 
 
@@ -211,6 +210,7 @@ function DailyView({ onNavigate }) {
     const despairColor = 'var(--axis-color-financial-3)';
 
 
+    // --- The main return statement for the component ---
     return (
         <div className={styles.dailyViewContainer}>
             {isLoading ? (
@@ -218,6 +218,7 @@ function DailyView({ onNavigate }) {
             ) : error ? (
                 <p className={styles.errorText}>{error}</p>
             ) : (
+                // Use React Fragment <> to return multiple top-level elements if needed
                 <>
                     {/* --- Header Section --- */}
                     <div className={styles.headerSection}>
@@ -308,7 +309,6 @@ function DailyView({ onNavigate }) {
                         <button className={styles.routineButton} onClick={() => setIsAmModalOpen(true)}>
                             Start AM Routine
                         </button>
-                         {/* <<< Added Ready For Work Button >>> */}
                          <button className={`${styles.routineButton} ${styles.readyButton}`} onClick={() => setIsReadyModalOpen(true)}>
                             Ready For Work
                         </button>
@@ -318,13 +318,21 @@ function DailyView({ onNavigate }) {
                         <button className={`${styles.routineButton} ${styles.familyCleanButton}`} onClick={() => setIsFamilyCleanModalOpen(true)}>
                             Start Family Clean
                         </button>
-                        {/* Keep Budget Button if needed on Daily View */}
-                        {/* <button className={`${styles.actionButton} ${styles.budgetButton}`} onClick={openBudgetModal}> Budget </button> */}
                         <button className={`${styles.routineButton} ${styles.pmButton}`} onClick={() => setIsPmModalOpen(true)}>
                             Start PM Routine
                         </button>
                     </div>
                     {/* --- End Routine Buttons --- */}
+
+                    {/* === ADDED BREAK ANALYSIS CHART SECTION === */}
+                    {/* Added a check to only render chart if not loading/erroring */}
+                    {!isLoading && !error && (
+                        <section className={styles.analysisSection}> {/* Optional wrapper class */}
+                            <BreakAnalysisChart />
+                        </section>
+                    )}
+                    {/* === END BREAK ANALYSIS CHART SECTION === */}
+
                 </>
             )}
 
@@ -362,15 +370,14 @@ function DailyView({ onNavigate }) {
                     />
                 </Modal>
             )}
-            {/* <<< Added Ready For Work Modal Rendering >>> */}
             {isReadyModalOpen && (
                 <Modal isOpen={isReadyModalOpen} onClose={closeReadyModal}>
                     <ReadyForWorkForm onSubmit={handleReadySubmit} onClose={closeReadyModal} />
                 </Modal>
             )}
             {/* --- End Modals --- */}
-        </div>
-    );
-}
+        </div> // End of the main container div
+    ); // End of the return statement
+} // End of the DailyView function component
 
 export default DailyView;

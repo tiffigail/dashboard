@@ -64,7 +64,20 @@
     accent-color: var(--text-secondary);
     flex-shrink: 0;
 }
+/* In ReadyForWorkForm.module.css */
+.recitationDisplay {
+    grid-column: span 2; /* Make it span both columns below the checklist item */
+    padding: 5px 10px 5px 30px; /* Indent similar to label */
+    margin-top: -5px; /* Adjust spacing */
+    margin-bottom: 5px;
+}
 
+.recitationText {
+    margin: 0;
+    font-size: 0.9em;
+    font-style: italic;
+    color: #555; /* Or your desired text color */
+}
 /* Grid layout for metrics */
 .metricsGrid {
     display: grid;

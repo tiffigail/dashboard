@@ -1,79 +1,49 @@
-/* src/components/DearAbiMarquee/DearAbiMarquee.module.css */
+/* DearAbiMarquee.module.css */
 
 .marqueeContainer {
-    background-color: var(--bg-secondary, #f8f9fa); /* Light background */
-    border: 1px solid var(--border-light, #dee2e6);
-    border-radius: 6px;
-    padding: var(--space-sm) var(--space-md);
-    margin-top: var(--space-md); /* Space above the marquee */
-    overflow: hidden; /* Crucial: Hides the text outside the container */
-    position: relative; /* Needed for absolute positioning if required */
-    width: 100%; /* Take full width of parent */
-    box-sizing: border-box;
+    background-color: white;
+    padding: 20px; /* Adjust padding as needed */
+    border-radius: 8px; /* Optional: for rounded corners */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Optional: for a subtle shadow */
+    overflow: hidden; /* Keep this to hide content outside the marquee's visible area */
+    width: 100%; /* Or a specific width if you prefer */
+    /* Add any other existing styles for marqueeContainer here */
 }
 
 .marqueeTitle {
+    /* Your existing styles for the title */
+    margin-bottom: 10px; /* Example: add some space below the title */
+    text-align: center; /* Or your preferred alignment */
     font-weight: bold;
-    font-style: italic;
-    color: var(--text-secondary, #6c757d);
-    margin: 0 0 var(--space-xs) 0;
-    text-align: center;
-    font-size: 0.9rem;
 }
 
 .marqueeContent {
-    display: inline-block; /* Allows animation */
-    white-space: nowrap; /* Prevents text wrapping */
-    padding-left: 100%; /* Start the text off-screen to the right */
-    /* Animation properties */
+    display: flex;
+    width: fit-content; /* Allows the content to define its own width based on children */
     animation-name: marqueeAnimation;
     animation-timing-function: linear;
     animation-iteration-count: infinite;
-    /* animation-duration is set dynamically via inline style */
-    will-change: transform; /* Optimize animation performance */
+    /* animation-duration is set by inline style in the component */
 }
 
 .quoteItem {
-    display: inline-block; /* Treat each quote as a block */
-    padding: 0 var(--space-lg); /* Space between quotes */
-    font-size: 0.9rem;
-    color: var(--text-primary);
-}
-.quoteItem::after {
-    content: "•"; /* Separator */
-    margin-left: var(--space-lg);
-    opacity: 0.5;
-}
-/* Remove separator from the very last item (in the duplicated list) */
-.marqueeContent span:last-child::after {
-    content: "";
-    margin-left: 0;
+    padding: 0 1.5em; /* Spacing between quotes */
+    white-space: nowrap;
+    flex-shrink: 0;
+    /* Your existing styles for quote items */
 }
 
-
-.loadingText {
-    font-style: italic;
-    color: var(--text-muted);
-    text-align: center;
-    padding: var(--space-sm) 0;
-}
-
-.errorText {
-    color: var(--text-error);
-    font-size: 0.85rem;
-    text-align: center;
-    padding: var(--space-sm) 0;
-}
-
-
-/* Define the scrolling animation */
 @keyframes marqueeAnimation {
     0% {
-        transform: translateX(0);
+        transform: translateX(0%);
     }
     100% {
-        /* Move text leftwards by 50% of its total width (since we duplicated it) */
-        transform: translateX(-50%);
+        transform: translateX(-50%); /* Crucial for seamless loop with duplicated content */
     }
 }
 
+.loadingText,
+.errorText {
+    text-align: center;
+    padding: 20px;
+}

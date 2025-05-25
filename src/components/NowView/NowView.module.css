@@ -2,29 +2,29 @@
 /* Styles corresponding to NowView.jsx with moment inputs and upcoming task display */
 
 /* Color Palette Reference (from global index.css):
-   --text-primary: var(--color-on-track-n-plus-1-4); (#053229 Peacock)
-   --text-secondary: var(--color-on-track-n-plus-1-3); (#355E58 Spruce)
-   --text-muted: var(--color-rest-and-preparation-5); (#6c757d Dark Grey)
-   --border-light: var(--color-on-track-n-plus-1-1); (#BCDDDC Arctic)
-   --border-secondary: var(--color-on-track-n-plus-1-2); (#72B0AB Sapphire)
-   --border-primary: var(--color-on-track-n-plus-1-3); (#355E58 Spruce)
-   --border-dashed: var(--color-environment-2); (#ead6a0 Sage)
-   --bg-card: var(--color-white); (#FFFFFF White)
-   --bg-panel: var(--color-on-track-n-plus-1-1); (#BCDDDC Arctic)
-   --bg-panel-accent: #e0f2f7;                (Lighter Arctic)
-   --bg-input: var(--color-white); (#FFFFFF White)
-   --bg-input-disabled: var(--color-rest-and-preparation-2); (#d6e2ed Light Grey)
-   --button-primary-bg: var(--color-on-track-n-plus-1-2); (#72B0AB Sapphire)
-   --button-primary-text: var(--color-white); (#FFFFFF White)
-   --button-primary-border: var(--color-on-track-n-plus-1-3); (#355E58 Spruce)
-   --button-primary-hover-bg: var(--color-on-track-n-plus-1-3); (#355E58 Spruce)
-   --button-secondary-bg: var(--color-environment-2); (#ead6a0 Sage)
-   --button-secondary-text: var(--color-on-track-n-plus-1-4); (#053229 Peacock)
-   --button-secondary-border: var(--color-environment-3); (#d8bf67 Pistachio)
-   --button-secondary-hover-bg: var(--color-environment-3); (#d8bf67 Pistachio)
-   --color-environment-1: #efe5c3; (Environment Yellow/Gold 1) - Moment Button BG
-   --color-environment-3: #d8bf67; (Environment Yellow/Gold 3) - Moment Button Border, PM Button Hover BG
-   --color-environment-2: #ead6a0; (Environment Yellow/Gold 2) - Reveal Button Color, PM Button BG
+    --text-primary: var(--color-on-track-n-plus-1-4); (#053229 Peacock)
+    --text-secondary: var(--color-on-track-n-plus-1-3); (#355E58 Spruce)
+    --text-muted: var(--color-rest-and-preparation-5); (#6c757d Dark Grey)
+    --border-light: var(--color-on-track-n-plus-1-1); (#BCDDDC Arctic)
+    --border-secondary: var(--color-on-track-n-plus-1-2); (#72B0AB Sapphire)
+    --border-primary: var(--color-on-track-n-plus-1-3); (#355E58 Spruce)
+    --border-dashed: var(--color-environment-2); (#ead6a0 Sage)
+    --bg-card: var(--color-white); (#FFFFFF White)
+    --bg-panel: var(--color-on-track-n-plus-1-1); (#BCDDDC Arctic)
+    --bg-panel-accent: #e0f2f7;                      (Lighter Arctic)
+    --bg-input: var(--color-white); (#FFFFFF White)
+    --bg-input-disabled: var(--color-rest-and-preparation-2); (#d6e2ed Light Grey)
+    --button-primary-bg: var(--color-on-track-n-plus-1-2); (#72B0AB Sapphire)
+    --button-primary-text: var(--color-white); (#FFFFFF White)
+    --button-primary-border: var(--color-on-track-n-plus-1-3); (#355E58 Spruce)
+    --button-primary-hover-bg: var(--color-on-track-n-plus-1-3); (#355E58 Spruce)
+    --button-secondary-bg: var(--color-environment-2); (#ead6a0 Sage)
+    --button-secondary-text: var(--color-on-track-n-plus-1-4); (#053229 Peacock)
+    --button-secondary-border: var(--color-environment-3); (#d8bf67 Pistachio)
+    --button-secondary-hover-bg: var(--color-environment-3); (#d8bf67 Pistachio)
+    --color-environment-1: #efe5c3; (Environment Yellow/Gold 1) - Moment Button BG
+    --color-environment-3: #d8bf67; (Environment Yellow/Gold 3) - Moment Button Border, PM Button Hover BG
+    --color-environment-2: #ead6a0; (Environment Yellow/Gold 2) - Reveal Button Color, PM Button BG
 */
 
 /* Overall Container */
@@ -179,7 +179,7 @@
   flex-shrink: 0;
 }
 .score {
-  font-size: 1.2rem;
+  font-size: 1.3rem;
   font-weight: bold;
 }
 
@@ -231,7 +231,7 @@
 }
 .saveJournalButton {
   font-size: 0.85rem;
-  align-self: flex-end;
+  align-self: center;
   background-color: var(--button-primary-bg, #72B0AB);
   color: var(--button-primary-text, #fff);
   border: 1px solid var(--button-primary-border, #355E58);
@@ -399,17 +399,17 @@
 
 /* Task Item Styling (Using ::before for Stripes) */
 .taskItem {
-  display: flex;
-  align-items: center;
+  display: flex; /* KEEP: Already a flex container */
+  align-items: center; /* KEEP: Already aligning items center */
   margin-bottom: var(--space-sm, 0.5rem);
   padding: var(--space-sm, 0.5rem) var(--space-md, 1rem);
-  padding-left: calc(10mm + var(--space-md, 1rem)); /* Space for stripes */
+  padding-left: calc(6mm + var(--space-md, 1rem)); /* Space for stripes */
   border-radius: 4px;
   transition: background-color 0.2s, box-shadow 0.2s, opacity 0.2s;
   cursor: grab;
   box-sizing: border-box;
   position: relative;
-  border: 1px solid var(--border-light, #BCDDDC);
+  border: .5px solid var(--border-light, #BCDDDC);
   background-color: var(--color-white, #fff);
   box-shadow: none;
 }
@@ -470,7 +470,7 @@
 /* Checkbox and its container */
 .checkboxContainer {
   flex-shrink: 0;
-  margin-right: var(--space-md, 1rem);
+  margin-right: var(--space-md, 1rem); /* Space between checkbox and label */
   z-index: 1;
 }
 .checkbox {
@@ -498,9 +498,9 @@
 
 /* Task Label - Basic style */
 .taskLabel {
-  font-size: 1rem;
-  flex-grow: 1;
-  transition: color 0.2s ease; /* Keep transition */
+  font-size: 1rem; /* CORRECTED: Typo from '1 rem' */
+  flex-grow: 1; /* Allows the label to take up available space */
+  transition: color 0.2s ease;
   color: var(--text-primary, #053229);
   position: relative;
   z-index: 1;
@@ -508,9 +508,10 @@
   display: inline-block;
   transform-origin: center center;
   pointer-events: none;
-  white-space: nowrap;
-  overflow: hidden; /* Keep text overflow handling */
-  text-overflow: ellipsis;
+  white-space: nowrap; /* Ensures text is on one line, enabling ellipsis */
+  overflow: hidden; /* Hides the overflowed text */
+  text-overflow: ellipsis; /* Shows ellipsis for overflowed text */
+  margin-right: var(--space-sm, 0.5rem); /* ADDED: Space between label and date input */
 }
 
 .completedTask { /* Class is on the label */ }
@@ -525,6 +526,31 @@
   font-style: italic;
   display: inline-block;
 }
+
+/* --- ADDED: Styles for the Date Input in Task List --- */
+.dueDateInput {
+    font-size: 0.75em;   /* Smaller font size */
+    padding: 3px 5px;    /* Adjust padding to make it smaller */
+    border: 1px solid var(--border-secondary, #72B0AB); /* Use existing theme border color */
+    border-radius: 4px;
+    margin-left: auto;   /* Aligns to the right, pushing itself after other flex items */
+    flex-shrink: 0;     /* Prevents the input from shrinking too much if space is tight */
+    max-width: 125px;   /* Controls the maximum width, adjust as needed */
+    height: auto;       /* Let height be determined by font and padding */
+    line-height: normal;/* Ensure line height is not too large */
+    box-sizing: border-box; /* Ensures padding and border are included in the element's total width and height */
+    background-color: var(--bg-input, #fff); /* Consistent background with other inputs */
+    color: var(--text-primary, #053229); /* Consistent text color */
+}
+
+.dueDateInput:focus {
+    border-color: var(--button-primary-hover-bg, #355E58); /* Use a theme color for focus indication */
+    box-shadow: 0 0 0 0.2rem rgba(114, 176, 171, 0.25); /* Using var(--button-primary-bg) with alpha for shadow */
+    /* You can use a direct color if a variable isn't suitable for RGBA conversion: */
+    /* box-shadow: 0 0 0 0.2rem rgba(188, 221, 220, 0.25); */ /* Example: var(--bg-panel) with alpha */
+}
+/* --- END: Styles for the Date Input --- */
+
 
 /* Ad Hoc Task Form */
 .adHocForm {
@@ -612,26 +638,62 @@
 
 
 /* Responsive adjustments */
-@media (max-width: 768px) {
+@media (max-width: 600px) {
   .nowViewContainer {
+    /* These properties might already be in your .nowViewContainer mobile rule */
     grid-template-columns: 1fr;
     grid-template-areas:
       "title"
       "center"
       "right"
       "left";
-    gap: var(--space-md, 1rem);
-    padding: var(--space-md, 1rem);
+  
+    /* MODIFIED: Reduce gap (space between panels) */
+    gap: var(--space-sm, 0.5rem); /* Was var(--space-md, 1rem) */
+  
+    /* MODIFIED: Reduce padding for the entire view container */
+    padding: var(--space-sm, 0.5rem); /* Was var(--space-md, 1rem) */
   }
-  .leftPanel, .rightPanel, .centerPanel {
-      max-width: none; /* Allow panels to fill width */
-      width: 100%;
+  
+  .leftPanel,
+  .centerPanel,
+  .rightPanel {
+    /* These properties might already be in your panel's mobile rule */
+    max-width: none;
+    width: 100%;
+  
+    /* ADDED/MODIFIED: Reduce internal padding for each panel */
+    padding: var(--space-sm, 0.5rem); /* Base style was var(--space-md, 1rem) */
   }
-  .momentsTracker, .productivityDisplay, .timerSection, .contextMapPlaceholder, .breakPlaceholder, .journalPlaceholder, .taskListContainer, .adHocForm {
+  /* .breakPlaceholder removed as it was noted as old */
+  .momentsTracker, .productivityDisplay, .timerSection, .contextMapPlaceholder, .journalPlaceholder, .taskListContainer, .adHocForm {
       max-width: 100%; /* Allow content to fill panel */
       box-sizing: border-box;
   }
   .taskList {
-      max-height: calc(6 * (var(--space-sm, 0.5rem)*2 + 1rem + var(--space-sm, 0.5rem))); /* Keep max-height */
+      max-height: calc(6 * (var(--space-sm, 0.25rem)*2 + .5rem + var(--space-sm, 0.25rem))); /* Keep max-height */
+  }
+
+  .taskItem .checkboxContainer {
+      margin-right: 0.4rem; /* Example: smaller value for less space */
+      }
+
+  .taskItem .taskLabel {
+        /* Ensure text is aligned to the left */
+      text-align: left;
+      
+        /* You might already have other mobile styles for taskLabel here, like font-size */
+      font-size: 0.9rem;
+        /* line-height: 1.3; */  /* From previous request */
+      }
+  
+  .taskItem .dueDateInput {
+    display: none; /* This line hides the date input */
+  }
+  .taskItem {
+    padding: var(--space-sm, 0.25rem) var(--space-md, .5rem);
+    padding-left: calc(.01mm + var(--space-md, .5rem)); /* Space for stripes */
+    padding-top: 0.25rem;    /* Example: smaller value */
+    padding-bottom: 0.25rem; /* Example: smaller value */
   }
 }

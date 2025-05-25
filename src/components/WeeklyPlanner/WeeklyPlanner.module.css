@@ -6,8 +6,7 @@
   padding: var(--space-lg, 1.5rem);
   background-color: var(--bg-primary, #fff);
   border-radius: 8px; /* Match modal style */
-  max-height: 90vh; /* Limit height */
-  overflow-y: auto; /* Allow scrolling if content overflows */
+  max-height: 100vh; /* Limit height */
   width: 95%;
   max-width: 900px; /* Allow wider modal for two columns */
   box-sizing: border-box;

@@ -1,21 +1,48 @@
 // src/components/DearAbiMarquee/DearAbiMarquee.jsx
 import React, { useState, useEffect } from 'react';
-import styles from './DearAbiMarquee.module.css';
+import styles from './DearAbiMarquee.module.css'; // Make sure to create/update this CSS file
 import { db } from '../../firebaseConfig';
 import {
     collection,
     query,
-    // orderBy, // Removed orderBy as we are not sorting by date anymore
     limit,
     getDocs,
-    where // <<< ADDED: Import where function
-    // Timestamp // Not currently used
+    where,
+    // orderBy, // Kept for potential future use
+    // Timestamp // Kept for potential future use
 } from "firebase/firestore";
 
-// Props:
-// - theme (optional): Filter quotes by a specific theme field in Firestore
-// - count (optional): Max number of quotes to fetch (default 5)
-function DearAbiMarquee({ theme, count = 5 }) {
+// --- Helper function to shuffle an array (Fisher-Yates) ---
+function shuffleArray(array) {
+    let currentIndex = array.length, randomIndex;
+    while (currentIndex !== 0) {
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+        [array[currentIndex], array[randomIndex]] = [
+            array[randomIndex], array[currentIndex]];
+    }
+    return array;
+}
+
+// --- Helper function to deduplicate fetched quotes by ID ---
+function deduplicateQuotes(quotesArray) {
+    const seenIds = new Set();
+    return quotesArray.filter(quote => {
+        if (!quote || typeof quote.id === 'undefined') { // Added a check for valid quote structure
+            console.warn("DeduplicateQuotes: Encountered invalid quote object", quote);
+            return false;
+        }
+        if (seenIds.has(quote.id)) {
+            return false; 
+        }
+        seenIds.add(quote.id);
+        return true; 
+    });
+}
+
+const FETCH_POOL_MULTIPLIER = 3; 
+
+function DearAbiMarquee({ currentMonthId, currentAxisName, count = 5 }) {
     const [quotes, setQuotes] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -24,77 +51,109 @@ function DearAbiMarquee({ theme, count = 5 }) {
         const fetchQuotes = async () => {
             setIsLoading(true);
             setError(null);
-            console.log("DearAbiMarquee: Fetching quotes...");
+            let candidateQuotes = []; 
+
+            const quotesCollectionRef = collection(db, "dearAbiQuotes");
+            const targetPoolSize = count * FETCH_POOL_MULTIPLIER;
 
             try {
-                const quotesCollectionRef = collection(db, "dearAbiQuotes");
-                let q; // Firestore query variable
+                let fieldToQuery = null;
+                let specificValue = null;
 
-                // Query construction based on whether a theme is provided
-                if (theme) {
-                     console.log(`DearAbiMarquee: Filtering by theme: ${theme}`);
-                     // Query by theme, limit the results
-                     // Assumes documents have a 'theme' field
-                     q = query(
-                         quotesCollectionRef,
-                         where("theme", "==", theme), // Filter by theme
-                         limit(count) // Limit the number of results
-                     );
+                if (currentAxisName) {
+                    fieldToQuery = "relatedAxes";
+                    specificValue = currentAxisName;
+                    console.log(`DearAbiMarquee: Prioritizing Axis: ${specificValue}`);
+                } else if (currentMonthId) {
+                    fieldToQuery = "relatedMonthIds";
+                    specificValue = currentMonthId;
+                    console.log(`DearAbiMarquee: Prioritizing Month: ${specificValue}`);
                 } else {
-                    // Fetch limited quotes if no theme specified, no specific order
-                     q = query(
-                         quotesCollectionRef,
-                         // REMOVED: orderBy("createdAt", "desc")
-                         limit(count) // Limit the number of results
-                     );
+                    console.log("DearAbiMarquee: No specific context, fetching general quotes.");
                 }
 
-                const querySnapshot = await getDocs(q);
-                const fetchedQuotes = [];
-                querySnapshot.forEach((doc) => {
-                    // Assumes each document has a 'text' field for the quote
-                    if (doc.data().text) {
-                        fetchedQuotes.push({ id: doc.id, text: doc.data().text });
-                    }
-                });
+                if (specificValue) {
+                    const specificQuery = query(
+                        quotesCollectionRef,
+                        where(fieldToQuery, "array-contains", specificValue),
+                        limit(targetPoolSize)
+                    );
+                    console.log(`DearAbiMarquee: Querying for specific ${fieldToQuery} containing '${specificValue}' (pool target: ${targetPoolSize})`);
+                    const specificSnapshot = await getDocs(specificQuery);
+                    specificSnapshot.forEach((doc) => {
+                        if (doc.data() && doc.data().text) { // Ensure doc.data() exists
+                            candidateQuotes.push({ id: doc.id, ...doc.data() }); 
+                        }
+                    });
+                    console.log(`DearAbiMarquee: Found ${specificSnapshot.docs.length} specific candidate quotes (raw).`);
+                }
+                
+                // Deduplicate after specific fetch before deciding if general fetch is needed
+                // This avoids over-fetching general quotes if specific ones had many duplicates not yet removed
+                let uniqueSpecificCandidates = deduplicateQuotes([...candidateQuotes]); // Use spread to avoid mutating original if needed elsewhere
 
-                if (fetchedQuotes.length === 0) {
-                    console.log("DearAbiMarquee: No quotes found matching criteria.");
-                    // Provide a default message if no quotes are fetched
-                    setQuotes([{ id: 'default', text: "Remember to add some 'Dear Abi' quotes to the database!" }]);
+                const currentUniqueCandidateCount = uniqueSpecificCandidates.length;
+                const neededForPool = targetPoolSize - currentUniqueCandidateCount;
+
+                if (neededForPool > 0 || !specificValue) {
+                    const generalLimit = !specificValue ? targetPoolSize : neededForPool;
+                    if (generalLimit > 0) { 
+                        const generalQuery = query(
+                            quotesCollectionRef,
+                            where("relatedAxes", "array-contains", "all"), 
+                            limit(generalLimit)
+                        );
+                        console.log(`DearAbiMarquee: Querying for ${generalLimit} general ('all') quotes.`);
+                        const generalSnapshot = await getDocs(generalQuery);
+                        generalSnapshot.forEach((doc) => {
+                            if (doc.data() && doc.data().text) { // Ensure doc.data() exists
+                                candidateQuotes.push({ id: doc.id, ...doc.data() });
+                            }
+                        });
+                        console.log(`DearAbiMarquee: Added ${generalSnapshot.docs.length} general candidate quotes (raw).`);
+                    }
+                }
+
+                let finalQuotes = deduplicateQuotes(candidateQuotes);
+                console.log(`DearAbiMarquee: Total unique candidates before shuffle: ${finalQuotes.length}`);
+                
+                finalQuotes = shuffleArray(finalQuotes);
+                finalQuotes = finalQuotes.slice(0, count); 
+
+                if (finalQuotes.length === 0) {
+                    console.log("DearAbiMarquee: No quotes found after processing. Setting default.");
+                    setQuotes([{ id: 'default', text: "Be the Abi you want to see in the world!" }]);
                 } else {
-                    // Optional: Shuffle results here if you want random order from the fetched set
-                    // const shuffledQuotes = shuffleArray(fetchedQuotes);
-                    // setQuotes(shuffledQuotes);
-                    setQuotes(fetchedQuotes); // Use default Firestore order (or filtered order)
-                    console.log("DearAbiMarquee: Quotes fetched:", fetchedQuotes);
+                    setQuotes(finalQuotes);
+                    console.log(`DearAbiMarquee: Final ${finalQuotes.length} quotes set (randomized):`, finalQuotes);
                 }
 
             } catch (err) {
                 console.error("DearAbiMarquee: Error fetching quotes:", err);
                 setError("Could not load quotes.");
-                // Provide an error message
-                 setQuotes([{ id: 'error', text: "Error loading quotes." }]);
+                setQuotes([{ id: 'error', text: "Error loading quotes." }]);
             } finally {
                 setIsLoading(false);
             }
         };
 
         fetchQuotes();
-        // Re-fetch if the theme or count prop changes
-    }, [theme, count]);
+    }, [currentMonthId, currentAxisName, count]);
 
-    // Calculate animation duration based on number of quotes to keep speed consistent
-    const animationDuration = `${quotes.length * 10}s`; // Adjust multiplier for speed
+    const baseSpeedPerQuote = 10; 
+    const minDuration = 10; 
+    const calculatedDuration = quotes.length * baseSpeedPerQuote;
+    const animationDuration = `${Math.max(calculatedDuration, minDuration)}s`;
 
     return (
-        <div className={styles.marqueeContainer}>
+        <div className={styles.marqueeContainer}> {/* Apply white box styles here */}
             <p className={styles.marqueeTitle}>Dear Abi,</p>
             {isLoading ? (
                 <p className={styles.loadingText}>Loading advice...</p>
+            ) : error ? (
+                <p className={styles.errorText}>{error}</p>
             ) : (
                 <div className={styles.marqueeContent} style={{ animationDuration }}>
-                    {/* Render quotes twice for seamless looping */}
                     {[...quotes, ...quotes].map((quote, index) => (
                         <span key={`${quote.id}-${index}`} className={styles.quoteItem}>
                             {quote.text}
@@ -102,21 +161,8 @@ function DearAbiMarquee({ theme, count = 5 }) {
                     ))}
                 </div>
             )}
-             {error && <p className={styles.errorText}>{error}</p>}
         </div>
     );
 }
-
-// Helper function to shuffle an array (Fisher-Yates algorithm) - Optional
-// function shuffleArray(array) {
-//     let currentIndex = array.length, randomIndex;
-//     while (currentIndex !== 0) {
-//         randomIndex = Math.floor(Math.random() * currentIndex);
-//         currentIndex--;
-//         [array[currentIndex], array[randomIndex]] = [
-//             array[randomIndex], array[currentIndex]];
-//     }
-//     return array;
-// }
 
 export default DearAbiMarquee;

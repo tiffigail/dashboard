@@ -1,15 +1,15 @@
 // src/components/AmRoutineForm/AmRoutineForm.jsx
-import React, { useState, useEffect } from 'react'; // Added useEffect
-import styles from './AmRoutineForm.module.css'; // Use AM specific styles
+import React, { useState, useEffect } from 'react';
+import styles from './AmRoutineForm.module.css';
 import { db } from '../../firebaseConfig';
 import {
     collection,
     addDoc,
     serverTimestamp,
-    query, // Added
-    where, // Added
-    limit, // Added
-    getDocs // Added
+    query,
+    where, // Keep where
+    limit,
+    getDocs
 } from "firebase/firestore";
 
 // Define the checklist items for the AM routine
@@ -44,44 +44,46 @@ function AmRoutineForm({ onSubmit, onClose }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
 
-  // --- NEW: State for Recitation ---
+  // --- State for Recitation ---
   const [currentRecitation, setCurrentRecitation] = useState("Loading recitation...");
-  // --- End Recitation State ---
 
-  // --- NEW: Effect to fetch active AM recitation ---
+  // --- Effect to fetch active AM recitation ---
   useEffect(() => {
     const fetchRecitation = async () => {
       console.log("Fetching active AM recitation...");
+      setCurrentRecitation("Loading recitation..."); // Show loading state on fetch attempt
       try {
         const recitationsRef = collection(db, "recitations");
-        // Query for the document that is active for the 'AM' context and not archived
+
+        // --- *** QUERY MODIFICATION START *** ---
+        // Query for the document where activeContext is "AM" AND isArchived is false
         const q = query(
           recitationsRef,
-          where("isActiveFor.AM", "==", true), // Find where AM map key is true
-          // where("isArchived", "==", false), // Optional: only fetch non-archived
-          limit(1) // Should only be one active
+          where("activeContext", "==", "AM"),   // Check the activeContext field
+          where("isArchived", "==", false),      // Check the isArchived field
+          limit(1)                               // Expect only one result
         );
+        // --- *** QUERY MODIFICATION END *** ---
+
         const querySnapshot = await getDocs(q);
 
         if (!querySnapshot.empty) {
           const docSnap = querySnapshot.docs[0];
           setCurrentRecitation(docSnap.data().text || "Recitation text missing."); // Set text or default
-          console.log("Found active AM recitation:", docSnap.id);
+          // Optional: Log the recitationId from your CSV for easier debugging
+          console.log("Found active AM recitation:", docSnap.id, "Recitation ID:", docSnap.data().recitationId);
         } else {
-          console.log("No active AM recitation found in Firestore.");
+          console.log("No active, non-archived AM recitation found in Firestore.");
           setCurrentRecitation("No active AM recitation set."); // Default text
         }
       } catch (error) {
         console.error("Error fetching recitation: ", error);
         setCurrentRecitation("Error loading recitation.");
-        // Optionally set an error state to display
       }
     };
 
     fetchRecitation();
   }, []); // Run once on component mount
-  // --- End Fetch Effect ---
-
 
   // == Handlers ==
   const handleCheckboxChange = (event) => {
@@ -89,7 +91,6 @@ function AmRoutineForm({ onSubmit, onClose }) {
     setCheckedItems(prevItems => ({ ...prevItems, [name]: checked }));
   };
 
-  // Update handleSubmit to save to Firebase and include journal
   const handleSubmit = async (event) => {
     event.preventDefault();
     setIsSubmitting(true);
@@ -99,19 +100,16 @@ function AmRoutineForm({ onSubmit, onClose }) {
       .filter(([key, value]) => value === true)
       .map(([key]) => key);
 
-    // Calculate completion percentage
     const completionPercentage = amRoutineItems.length > 0
       ? Math.round((completedChecklistItems.length / amRoutineItems.length) * 100)
       : 0;
 
-    const baseFormData = { // Data for the routine log
+    const baseFormData = {
       type: 'amRoutine',
       checklist: completedChecklistItems,
       completionPercentage: completionPercentage,
       gratitudes: [gratitude1, gratitude2, gratitude3].filter(g => g.trim() !== ''),
       goodThing: goodThing.trim(),
-      // Optionally include the recitation text shown at time of submit
-      // recitationText: currentRecitation !== "Loading recitation..." && currentRecitation !== "No active AM recitation set." && currentRecitation !== "Error loading recitation." ? currentRecitation : null,
       completedAt: serverTimestamp()
     };
 
@@ -124,10 +122,10 @@ function AmRoutineForm({ onSubmit, onClose }) {
       const routineDocRef = await addDoc(collection(db, "amRoutineLogs"), baseFormData);
       console.log("AM Routine Log Document written with ID: ", routineDocRef.id);
 
-      // If journal entry exists, save it to the separate journal collection
+      // If journal entry exists, save it separately
       if (journalText) {
         const now = new Date();
-        const getTodayDateString = () => { // Keep local helper for consistency
+        const getTodayDateString = () => {
             const today = new Date();
             const year = today.getFullYear();
             const month = String(today.getMonth() + 1).padStart(2, '0');
@@ -135,7 +133,7 @@ function AmRoutineForm({ onSubmit, onClose }) {
             return `${year}-${month}-${day}`;
         };
         const dateString = getTodayDateString();
-        const dayOfWeek = now.getDay();
+        const dayOfWeek = now.getDay(); // 0 = Sunday, 1 = Monday, etc.
 
         const journalData = {
           entryText: journalText, createdAt: serverTimestamp(), dateString: dateString,
@@ -153,8 +151,10 @@ function AmRoutineForm({ onSubmit, onClose }) {
       setSubmitError("Failed to save routine. Please try again.");
       setIsSubmitting(false); // Keep modal open on error
     }
+    // Note: We are not setting isSubmitting back to false on success because onClose should handle cleanup
   };
 
+  // --- Render JSX ---
   return (
     <form onSubmit={handleSubmit} className={styles.form}>
       <h3 className={styles.formTitle}>AM Orientation & Daily Input</h3>
@@ -177,14 +177,12 @@ function AmRoutineForm({ onSubmit, onClose }) {
               <label htmlFor={`am-${item.replace(/\s+/g, '-')}`}>{item}</label>
             </div>
 
-            {/* --- NEW: Display Recitation after 'Recite' item --- */}
+            {/* Display Recitation after 'Recite' item */}
             {item === "Recite" && (
               <div className={styles.recitationDisplay}>
-                {/* TODO: Add styles for .recitationDisplay and .recitationText in CSS Module */}
                 <p className={styles.recitationText}>{currentRecitation}</p>
               </div>
             )}
-            {/* --- End Recitation Display --- */}
 
             {/* Add Journal Textarea after 'Write' item */}
             {item === "Write" && (

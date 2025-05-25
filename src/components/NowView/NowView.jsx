@@ -85,7 +85,6 @@ function NowView({
     const [timerFinishedAt, setTimerFinishedAt] = useState(null);
     const [isFlashcardModalOpen, setIsFlashcardModalOpen] = useState(false);
     const [currentMonthTheme, setCurrentMonthTheme] = useState(null);
-    // <<< ADDED: State to track which task's date is being saved >>>
     const [savingDateTaskId, setSavingDateTaskId] = useState(null);
 
 
@@ -577,7 +576,21 @@ function NowView({
                                      const assignedDateValue = task.currentAssignedDate || '';
 
                                      return (
-                                         <div key={task.id} className={`${styles.taskItem} ${task.id === currentTaskId ? styles.selectedTask : ''}`} title={task.axisTheme ? `Axis: ${task.axisTheme}${task.rolloverCount > 0 ? ` (Rolled ${task.rolloverCount}d)` : ''}` : (task.type === 'recurring' ? 'Recurring Routine' : 'Task')} style={taskStyle} draggable="true" onDragStart={(e) => handleDragStart(e, task.id)} onDragEnter={(e) => handleDragEnter(e, task.id)} onDragLeave={handleDragLeave} onDragOver={handleDragOver} onDrop={handleDrop} onDragEnd={handleDragEnd} onClick={() => handleSetCurrentTask(task.id)} >
+                                        <div
+                                            key={task.id}
+                                            className={`${styles.taskItem} ${task.id === currentTaskId ? styles.selectedTask : ''}`}
+                                            // MODIFIED: Updated title attribute for full text on hover
+                                            title={`${task.text}${task.rolloverCount > 0 ? ` (Rolled ${task.rolloverCount}d)` : ''}${task.axisTheme ? `\nAxis: ${task.axisTheme}` : (task.type === 'recurring' ? '\nRecurring Routine' : '')}`}
+                                            style={taskStyle}
+                                            draggable="true"
+                                            onDragStart={(e) => handleDragStart(e, task.id)}
+                                            onDragEnter={(e) => handleDragEnter(e, task.id)}
+                                            onDragLeave={handleDragLeave}
+                                            onDragOver={handleDragOver}
+                                            onDrop={handleDrop}
+                                            onDragEnd={handleDragEnd}
+                                            onClick={() => handleSetCurrentTask(task.id)}
+                                        >
                                              {/* Checkbox Container */}
                                              <div className={styles.checkboxContainer} onClick={(e) => e.stopPropagation()}>
                                                  <input type="checkbox" id={`task-checkbox-${task.id}`} checked={false} onChange={(e) => handleTaskToggle(task.id, e)} className={styles.checkbox} disabled={isSavingTask} />
@@ -590,15 +603,15 @@ function NowView({
                                              </label>
                                              {/* Assigned Date Input */}
                                              {task.type !== 'recurring' && (
-                                                <input
-                                                    type="date"
-                                                    className={styles.dueDateInput} // Use a specific class for styling
-                                                    value={assignedDateValue}
-                                                    onChange={(e) => handleAssignedDateChange(task.originalId, e.target.value)}
-                                                    onClick={(e) => e.stopPropagation()}
-                                                    title={`Assigned: ${assignedDateValue || 'Not set'}`}
-                                                    disabled={savingDateTaskId === task.originalId}
-                                                />
+                                                 <input
+                                                     type="date"
+                                                     className={styles.dueDateInput} // This class will be styled for smaller appearance
+                                                     value={assignedDateValue}
+                                                     onChange={(e) => handleAssignedDateChange(task.originalId, e.target.value)}
+                                                     onClick={(e) => e.stopPropagation()}
+                                                     title={`Assigned: ${assignedDateValue || 'Not set'}`}
+                                                     disabled={savingDateTaskId === task.originalId}
+                                                 />
                                              )}
                                          </div>
                                      );
@@ -610,7 +623,7 @@ function NowView({
                                  <p>No tasks assigned for today.</p> // Updated message
                              )
                          }
-                     </div>
+                        </div>
                 </div>
                 {/* Ad Hoc Task Adder */}
                 <div className={styles.adHocForm}>
@@ -636,17 +649,17 @@ function NowView({
                  <div className={styles.timerSection}>
                      <p className={styles.timeLabel}>What time is it?</p>
                      <div className={styles.timerDisplay}>
-                          <img src={isTimerFinished ? "/tomato-sliced.png" : "/tomato-whole.png"} alt={isTimerFinished ? "Sliced Tomato - Time for a break!" : "Whole Tomato - Focus time"} className={styles.tomatoImage} onError={(e) => { e.target.style.display = 'none'; }} />
-                          <span className={styles.timerText}>{formatTime(timerSeconds)}</span>
-                      </div>
-                      <div className={styles.timerControls}>
-                          <button onClick={handleStartPause} className={styles.timerButton} disabled={isTimerFinished}>{isTimerRunning ? '❚❚' : '▶'}</button>
-                          <button onClick={handleReset} className={styles.timerButton}>⟳</button>
-                      </div>
-                      <div className={styles.timerConfig}>
-                           <label htmlFor="pomodoroDurationInput" className={styles.durationLabel}>Duration (min):</label>
-                           <input id="pomodoroDurationInput" type="number" value={pomodoroDurationMinutes} onChange={handleDurationChange} min="1" className={styles.durationInput} disabled={isTimerRunning} />
-                       </div>
+                         <img src={isTimerFinished ? "/tomato-sliced.png" : "/tomato-whole.png"} alt={isTimerFinished ? "Sliced Tomato - Time for a break!" : "Whole Tomato - Focus time"} className={styles.tomatoImage} onError={(e) => { e.target.style.display = 'none'; }} />
+                         <span className={styles.timerText}>{formatTime(timerSeconds)}</span>
+                     </div>
+                     <div className={styles.timerControls}>
+                         <button onClick={handleStartPause} className={styles.timerButton} disabled={isTimerFinished}>{isTimerRunning ? '❚❚' : '▶'}</button>
+                         <button onClick={handleReset} className={styles.timerButton}>⟳</button>
+                     </div>
+                     <div className={styles.timerConfig}>
+                         <label htmlFor="pomodoroDurationInput" className={styles.durationLabel}>Duration (min):</label>
+                         <input id="pomodoroDurationInput" type="number" value={pomodoroDurationMinutes} onChange={handleDurationChange} min="1" className={styles.durationInput} disabled={isTimerRunning} />
+                     </div>
                      <p className={styles.nowLabel}>NOW</p>
                  </div>
                  {/* Dear Abi Marquee Component */}
