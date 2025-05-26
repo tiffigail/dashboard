@@ -114,9 +114,14 @@ function NowView({
                 axesList.sort((a, b) => a.name.localeCompare(b.name));
                 const filteredAxesList = axesList.filter(axis => axis.name !== "Prepare");
                 setAvailableAxes(filteredAxesList);
-                if (!filteredAxesList.some(axis => axis.name === 'Rest and preparation')) {
-                    console.warn("NowView: Default axis 'Rest and preparation' not found. Resetting selection.");
-                    setSelectedAxisTheme('');
+                if (filteredAxesList.length > 0 && !filteredAxesList.some(axis => axis.name === selectedAxisTheme)) {
+                    if (filteredAxesList.some(axis => axis.name === 'Rest and preparation')) {
+                        setSelectedAxisTheme('Rest and preparation');
+                    } else {
+                        setSelectedAxisTheme(filteredAxesList[0].name);
+                    }
+                } else if (filteredAxesList.length === 0) {
+                     setSelectedAxisTheme('');
                 }
                 console.log("NowView: Axes fetched successfully.");
             } catch (error) { console.error("NowView: Error fetching axes:", error); }
@@ -155,25 +160,21 @@ function NowView({
             const dataToSave = { productivityScore: score, lastUpdated: serverTimestamp() };
             try {
                 await setDoc(docRef, dataToSave, { merge: true });
-                // console.log(`NowView: Productivity score (${score}) saved for ${today}.`);
             } catch (error) { console.error("NowView: Error saving productivity score:", error); }
         };
 
-        // Calculate score based on tasks actually assigned to today
         const todayDateStr = getTodayDateString();
         if (!isLoadingTasks && Array.isArray(tasks)) {
-             const completedTodayTasks = tasks.filter(task => task.completed && task.currentAssignedDate === todayDateStr).length;
-             if (completedTodayTasks !== productivityScore) {
-                 setProductivityScore(completedTodayTasks);
-                 saveProductivityScore(completedTodayTasks);
-             }
-        } else if (!isLoadingTasks) {
-             if (productivityScore !== 0) {
-                 setProductivityScore(0); saveProductivityScore(0);
-             }
+             const completedTodayTasksCount = tasks.filter(task => task.completed && task.currentAssignedDate === todayDateStr).length;
+            if (completedTodayTasksCount !== productivityScore) {
+                setProductivityScore(completedTodayTasksCount);
+                saveProductivityScore(completedTodayTasksCount);
+            }
+        } else if (!isLoadingTasks && productivityScore !== 0) {
+            setProductivityScore(0);
+            saveProductivityScore(0);
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [tasks, isLoadingTasks]);
+    }, [tasks, isLoadingTasks, productivityScore]);
 
     // Effect 3: Handle Timer Finished Prop Change
     useEffect(() => {
@@ -199,114 +200,226 @@ function NowView({
             isProcessingRollover.current = true;
             setIsLoadingTasks(true);
             console.log("NowView: Starting data load and rollover process...");
+
             const todayDayIndex = getTodayDayIndex();
             const todayDateString = getTodayDateString();
-            const currentWeekId = getWeekId();
+            const currentIsoWeekId = getWeekId(); // ISO week ID for today
+
             let initialTasksStatus = {};
             let initialEpiphanyCount = 0;
             let initialDespairCount = 0;
-            let initialProductivityScore = 0;
+
             const tasksFromFirestore = [];
-            const taskIdsAdded = new Set();
+            const taskIdsAdded = new Set(); // Tracks Firestore original IDs to prevent duplicates
 
             try {
-                // 1. Load metrics
+                // 1. Load metrics for today
                 const metricsDocRef = doc(db, "dailyMetrics", todayDateString);
                 const metricsDocSnap = await getDoc(metricsDocRef);
                 if (metricsDocSnap.exists()) {
                     const data = metricsDocSnap.data();
-                    initialTasksStatus = data.tasksStatus || {};
+                    initialTasksStatus = data.tasksStatus || {}; // Stores completion status for task IDs for *today*
                     initialEpiphanyCount = data.epiphanyCount || 0;
                     initialDespairCount = data.despairCount || 0;
-                    initialProductivityScore = data.productivityScore !== undefined ? data.productivityScore : 0;
                 }
                 setEpiphanyCount(initialEpiphanyCount);
                 setDespairCount(initialDespairCount);
-                setProductivityScore(initialProductivityScore);
 
-                // 2. Fetch tasks assigned to today
-                const todayTasksQuery = query(tasksCollectionRef, where("taskType", "in", ["planned", "ad-hoc"]), where("currentAssignedDate", "==", todayDateString));
+                // --- START OF ENHANCED WEEKLY STEP ACTIVATION BLOCK ---
+                const weekIdsToQuerySet = new Set([currentIsoWeekId]);
+                if (todayDayIndex === 0) { // If it's Sunday
+                    const tomorrow = new Date();
+                    tomorrow.setDate(tomorrow.getDate() + 1);
+                    const nextIsoWeekId = getWeekId(tomorrow);
+                    if (nextIsoWeekId !== currentIsoWeekId) {
+                        weekIdsToQuerySet.add(nextIsoWeekId);
+                        console.log(`NowView: Sunday - also checking tasks from next ISO week (${nextIsoWeekId}) assigned to Sunday.`);
+                    }
+                }
+
+                const batchForWeeklyStepActivation = writeBatch(db);
+                let newWeeklyTasksFoundInBatch = false;
+
+                for (const queryWeekId of Array.from(weekIdsToQuerySet)) {
+                    console.log(`NowView: Querying planned steps for weekId: ${queryWeekId}, for today (dayIndex: ${todayDayIndex})`);
+                    const plannedStepsQuery = query(
+                        tasksCollectionRef,
+                        where("weekId", "==", queryWeekId),
+                        where("taskType", "==", "planned")
+                    );
+                    const plannedStepsSnapshot = await getDocs(plannedStepsQuery);
+
+                    plannedStepsSnapshot.forEach((docSnap) => {
+                        const data = docSnap.data();
+                        const originalId = docSnap.id; // Firestore document ID
+                        const localTaskId = `task-${originalId}`; // ID used in local state & dailyMetrics
+
+                        // console.log(`Reviewing Firestore Task for Activation: ID=${originalId}, Text="${data.plannedSteps}", TaskWeekID=${data.weekId}, QueryingForWeekID=${queryWeekId}, AssignedDays=${JSON.stringify(data.assignedDays)}, Status=${data.status}`);
+
+                        if (
+                            Array.isArray(data.assignedDays) &&
+                            data.assignedDays.includes(todayDayIndex) &&
+                            !taskIdsAdded.has(localTaskId) // Check if this task (by its local ID) is already added
+                        ) {
+                            console.log(`NowView: Activating weekly step "${data.plannedSteps}" (ID: ${originalId}) for today from week ${queryWeekId}.`);
+                            tasksFromFirestore.push({
+                                id: localTaskId,
+                                originalId: originalId,
+                                text: data.plannedSteps,
+                                completed: initialTasksStatus[localTaskId]?.completed || false, // Check dailyMetrics for *today's* completion
+                                completedAt: initialTasksStatus[localTaskId]?.completedAt || null,
+                                type: 'weekly',
+                                axisTheme: data.axisTheme,
+                                rolloverCount: data.rolloverCount || 0, // Should be 0 if freshly activated
+                                currentAssignedDate: todayDateString, // Mark as active for today
+                            });
+                            taskIdsAdded.add(localTaskId);
+
+                            // Update the main Firestore weeklyStep document
+                            // Set its currentAssignedDate to today and status to 'pending'
+                            // This ensures it's correctly seen as "active for today" by other queries/logic
+                            if (data.currentAssignedDate !== todayDateString || data.status !== 'pending') {
+                                batchForWeeklyStepActivation.update(docSnap.ref, {
+                                    currentAssignedDate: todayDateString,
+                                    status: 'pending'
+                                });
+                                newWeeklyTasksFoundInBatch = true;
+                            }
+                        }
+                    });
+                }
+
+                if (newWeeklyTasksFoundInBatch) {
+                    console.log("NowView: Committing Firestore updates for newly activated/reset weekly steps.");
+                    await batchForWeeklyStepActivation.commit();
+                }
+                // --- END OF ENHANCED WEEKLY STEP ACTIVATION BLOCK ---
+
+                // 2. Fetch tasks ALREADY explicitly assigned to today's DATE (e.g., ad-hoc, or weekly tasks already processed/activated by prior logic)
+                // This query might now pick up tasks activated by the block above if their currentAssignedDate was updated.
+                // The taskIdsAdded.has(localTaskId) check is crucial.
+                const todayTasksQuery = query(tasksCollectionRef,
+                    where("taskType", "in", ["planned", "ad-hoc"]),
+                    where("currentAssignedDate", "==", todayDateString)
+                );
                 const todayTasksSnapshot = await getDocs(todayTasksQuery);
-                todayTasksSnapshot.forEach((doc) => {
-                    const data = doc.data();
-                    const taskId = `task-${doc.id}`;
-                    if (!taskIdsAdded.has(taskId)) {
-                        const completedStatus = initialTasksStatus[taskId]?.completed || false;
+                todayTasksSnapshot.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    const originalId = docSnap.id;
+                    const localTaskId = `task-${originalId}`;
+                    if (!taskIdsAdded.has(localTaskId)) {
                         tasksFromFirestore.push({
-                            id: taskId, originalId: doc.id, text: data.plannedSteps,
-                            completed: completedStatus, completedAt: initialTasksStatus[taskId]?.completedAt || null,
+                            id: localTaskId, originalId: originalId, text: data.plannedSteps || data.text,
+                            completed: initialTasksStatus[localTaskId]?.completed || false, // Check dailyMetrics
+                            completedAt: initialTasksStatus[localTaskId]?.completedAt || null,
                             type: data.taskType === 'ad-hoc' ? 'adhoc' : 'weekly',
                             axisTheme: data.axisTheme, rolloverCount: data.rolloverCount || 0,
-                            currentAssignedDate: data.currentAssignedDate || null // Read date
+                            currentAssignedDate: data.currentAssignedDate
                         });
-                        taskIdsAdded.add(taskId);
+                        taskIdsAdded.add(localTaskId);
                     }
                 });
 
-                // 3. Process rollovers
+                // 3. Process rollovers (tasks from past dates that are still 'pending')
                 const rolloverCandidates = [];
-                const rolloverQuery = query(tasksCollectionRef, where("status", "==", "pending"), where("taskType", "in", ["planned", "ad-hoc"]), where("currentAssignedDate", "<", todayDateString));
+                const rolloverQuery = query(tasksCollectionRef,
+                    where("status", "==", "pending"),
+                    where("taskType", "in", ["planned", "ad-hoc"]),
+                    where("currentAssignedDate", "<", todayDateString)
+                );
                 const rolloverSnapshot = await getDocs(rolloverQuery);
                 if (!rolloverSnapshot.empty) {
-                    const batch = writeBatch(db);
-                    rolloverSnapshot.forEach((doc) => {
-                        const data = doc.data();
-                        const taskId = `task-${doc.id}`;
-                        batch.update(doc.ref, { currentAssignedDate: todayDateString, rolloverCount: increment(1) });
-                        if (!taskIdsAdded.has(taskId)) {
+                    const batchForRollovers = writeBatch(db);
+                    rolloverSnapshot.forEach((docSnap) => {
+                        const data = docSnap.data();
+                        const originalId = docSnap.id;
+                        const localTaskId = `task-${originalId}`;
+                        
+                        batchForRollovers.update(docSnap.ref, {
+                            currentAssignedDate: todayDateString,
+                            rolloverCount: increment(1),
+                            status: 'pending' // Ensure status is pending on rollover
+                        });
+                        
+                        if (!taskIdsAdded.has(localTaskId)) {
                             rolloverCandidates.push({
-                                id: taskId, originalId: doc.id, text: data.plannedSteps,
-                                completed: false, completedAt: null,
+                                id: localTaskId, originalId: originalId, text: data.plannedSteps || data.text,
+                                completed: false, // Rolled over tasks are always initially pending for the new day
+                                completedAt: null,
                                 type: data.taskType === 'ad-hoc' ? 'adhoc' : 'weekly',
                                 axisTheme: data.axisTheme,
                                 rolloverCount: (data.rolloverCount || 0) + 1,
-                                currentAssignedDate: todayDateString // Rolled over tasks get today's date
+                                currentAssignedDate: todayDateString
                             });
-                            taskIdsAdded.add(taskId);
+                            taskIdsAdded.add(localTaskId);
                         }
                     });
-                    await batch.commit();
+                    await batchForRollovers.commit();
                     tasksFromFirestore.push(...rolloverCandidates);
                 }
 
-                // 4. Add recurring routines
+                // 4. Add recurring routines (defined client-side)
                 const routinePlaceholdersForToday = [];
-                for (const routineId in recurringRoutineDefinitions) {
+                for (const routineId in recurringRoutineDefinitions) { // routineId is like 'routine_am'
                     const definition = recurringRoutineDefinitions[routineId];
                     if (definition.assignedDays.includes(todayDayIndex)) {
-                        const statusFromMetrics = initialTasksStatus[routineId];
-                        const isCompleted = statusFromMetrics?.completed || false;
-                        if (!taskIdsAdded.has(routineId)) {
+                        // For recurring routines, their 'taskId' in dailyMetrics is the routineId itself.
+                        const isCompleted = initialTasksStatus[routineId]?.completed || false;
+                        const completedAtTime = initialTasksStatus[routineId]?.completedAt || null;
+                        if (!taskIdsAdded.has(routineId)) { // Check if this exact ID was already added (e.g. if a Firestore doc had this ID)
                             routinePlaceholdersForToday.push({
                                 id: routineId, originalId: null, text: definition.text,
-                                completed: isCompleted, completedAt: statusFromMetrics?.completedAt || null,
+                                completed: isCompleted, completedAt: completedAtTime,
                                 type: 'recurring', axisTheme: definition.axisTheme, rolloverCount: 0,
-                                currentAssignedDate: todayDateString // Assign today's date
+                                currentAssignedDate: todayDateString
                             });
-                            taskIdsAdded.add(routineId);
+                            taskIdsAdded.add(routineId); // Add recurring task ID to set
                         }
                     }
                 }
 
                 // 5. Combine & Apply Order
-                let allTasksForToday = [...routinePlaceholdersForToday, ...tasksFromFirestore];
-                const uniqueTasksMap = new Map(allTasksForToday.map(task => [task.id, task]));
+                let allTasksForToday = [...tasksFromFirestore, ...routinePlaceholdersForToday];
+
+                // Deduplicate one last time, though previous checks should handle most cases
+                const finalUniqueTasksMap = new Map();
+                allTasksForToday.forEach(task => {
+                    if (!finalUniqueTasksMap.has(task.id)) {
+                        finalUniqueTasksMap.set(task.id, task);
+                    }
+                });
+                let combinedTasks = Array.from(finalUniqueTasksMap.values());
+
                 let finalOrderedTasks = [];
                 const savedOrderJson = localStorage.getItem(TASK_ORDER_LS_KEY);
                 if (savedOrderJson) {
                     try {
                         const orderedIds = JSON.parse(savedOrderJson);
-                        orderedIds.forEach(id => { if (uniqueTasksMap.has(id)) { finalOrderedTasks.push(uniqueTasksMap.get(id)); uniqueTasksMap.delete(id); }});
-                        finalOrderedTasks = [...finalOrderedTasks, ...Array.from(uniqueTasksMap.values())];
+                        const tasksInSavedOrder = [];
+                        const remainingTasksMap = new Map(combinedTasks.map(task => [task.id, task]));
+
+                        orderedIds.forEach(id => {
+                            if (remainingTasksMap.has(id)) {
+                                tasksInSavedOrder.push(remainingTasksMap.get(id));
+                                remainingTasksMap.delete(id);
+                            }
+                        });
+                        finalOrderedTasks = [...tasksInSavedOrder, ...Array.from(remainingTasksMap.values())];
                     } catch (e) {
-                         console.error("Error parsing saved task order, using default sort.", e);
-                         finalOrderedTasks = Array.from(uniqueTasksMap.values());
-                         finalOrderedTasks.sort((a, b) => { if (a.completed !== b.completed) return a.completed ? 1 : -1; if (a.type === 'recurring' && b.type !== 'recurring') return -1; if (a.type !== 'recurring' && b.type === 'recurring') return 1; return (a.text || '').localeCompare(b.text || ''); });
+                        console.error("Error parsing saved task order, using default sort.", e);
+                        finalOrderedTasks = [...combinedTasks];
                     }
                 } else {
-                    finalOrderedTasks = Array.from(uniqueTasksMap.values());
-                    finalOrderedTasks.sort((a, b) => { if (a.completed !== b.completed) return a.completed ? 1 : -1; if (a.type === 'recurring' && b.type !== 'recurring') return -1; if (a.type !== 'recurring' && b.type === 'recurring') return 1; return (a.text || '').localeCompare(b.text || ''); });
+                    finalOrderedTasks = [...combinedTasks];
                 }
+
+                finalOrderedTasks.sort((a, b) => {
+                    if (a.completed !== b.completed) return a.completed ? 1 : -1;
+                    if (a.type === 'recurring' && b.type !== 'recurring') return -1;
+                    if (a.type !== 'recurring' && b.type === 'recurring') return 1;
+                    return (a.text || '').localeCompare(b.text || '');
+                });
+
                 setTasks(finalOrderedTasks);
                 previousTaskCount.current = finalOrderedTasks.length;
 
@@ -320,6 +433,7 @@ function NowView({
                 console.log("NowView: Data load and rollover process finished.");
             }
         };
+
         loadDataAndProcessRollovers();
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -341,39 +455,56 @@ function NowView({
         const newCompletedStatus = !currentTaskLocal.completed;
         const newCompletedTimestamp = newCompletedStatus ? Timestamp.now() : null;
         console.log(`NowView: Toggling task ${taskId} to completed: ${newCompletedStatus}`);
+        
         setTasks(prevTasks => {
-            const otherTasks = prevTasks.filter(t => t.id !== taskId);
-            const updatedTask = { ...currentTaskLocal, completed: newCompletedStatus, completedAt: newCompletedTimestamp };
-            const newTasks = newCompletedStatus ? [...otherTasks, updatedTask] : [updatedTask, ...otherTasks];
-            localStorage.setItem(TASK_ORDER_LS_KEY, JSON.stringify(newTasks.map(t => t.id)));
-            return newTasks;
+            const updatedTasks = prevTasks.map(t =>
+                t.id === taskId ? { ...t, completed: newCompletedStatus, completedAt: newCompletedTimestamp } : t
+            );
+            updatedTasks.sort((a, b) => {
+                if (a.completed !== b.completed) return a.completed ? 1 : -1;
+                const aIndex = prevTasks.findIndex(pt => pt.id === a.id);
+                const bIndex = prevTasks.findIndex(pt => pt.id === b.id);
+                return aIndex - bIndex;
+            });
+            localStorage.setItem(TASK_ORDER_LS_KEY, JSON.stringify(updatedTasks.map(t => t.id)));
+            return updatedTasks;
         });
+
         setIsSavingTask(true);
         try {
             const todayDateString = getTodayDateString();
             const metricsDocRef = doc(db, "dailyMetrics", todayDateString);
+            
             const metricsSnap = await getDoc(metricsDocRef);
-            const currentMetricsData = metricsSnap.data() || {};
+            const currentMetricsData = metricsSnap.exists() ? metricsSnap.data() : {};
             const currentTasksStatus = currentMetricsData.tasksStatus || {};
             currentTasksStatus[taskId] = { completed: newCompletedStatus, completedAt: newCompletedTimestamp };
+
             const completedCount = Object.values(currentTasksStatus).filter(status => status.completed).length;
-            const dataToSaveInMetrics = { tasksStatus: currentTasksStatus, productivityScore: completedCount, lastUpdated: serverTimestamp() };
+
+            const dataToSaveInMetrics = {
+                tasksStatus: currentTasksStatus,
+                productivityScore: completedCount,
+                lastUpdated: serverTimestamp()
+            };
             await setDoc(metricsDocRef, dataToSaveInMetrics, { merge: true });
-            const originalId = currentTaskLocal.originalId;
-            if (originalId && currentTaskLocal.type !== 'recurring') {
-                const taskDocRef = doc(tasksCollectionRef, originalId);
-                const taskUpdateData = { status: newCompletedStatus ? 'completed' : 'pending', completedAt: newCompletedTimestamp };
+
+            if (currentTaskLocal.originalId && currentTaskLocal.type !== 'recurring') {
+                const taskDocRef = doc(tasksCollectionRef, currentTaskLocal.originalId);
+                const taskUpdateData = {
+                    status: newCompletedStatus ? 'completed' : 'pending',
+                    completedAt: newCompletedTimestamp,
+                };
                 await updateDoc(taskDocRef, taskUpdateData);
             }
         } catch (error) {
             console.error("NowView: Error saving task status to Firestore:", error);
-            alert("Error saving task status. Please try again.");
             setTasks(prevTasks => {
                  const revertedTasks = prevTasks.map(task =>
-                     task.id === taskId ? { ...currentTaskLocal, completed: !newCompletedStatus, completedAt: currentTaskLocal.completedAt } : task
-                 );
-                 localStorage.setItem(TASK_ORDER_LS_KEY, JSON.stringify(revertedTasks.map(t => t.id)));
-                 return revertedTasks;
+                    task.id === taskId ? { ...currentTaskLocal } : task
+                );
+                localStorage.setItem(TASK_ORDER_LS_KEY, JSON.stringify(revertedTasks.map(t => t.id)));
+                return revertedTasks;
             });
         } finally {
             setIsSavingTask(false);
@@ -391,7 +522,6 @@ function NowView({
         try { await setDoc(metricsDocRef, countDataToSave, { merge: true }); }
         catch (error) {
             console.error(`NowView: Error saving ${type} count:`, error);
-            alert(`Error saving ${type} count.`);
             if (type === 'epiphany') setEpiphanyCount(currentCount);
             if (type === 'despair') setDespairCount(currentCount);
         } finally { setIsSavingMoments(false); }
@@ -404,7 +534,7 @@ function NowView({
                 await addDoc(momentsLogCollectionRef, detailData);
                 if (type === 'epiphany') setEpiphanyDetail('');
                 if (type === 'despair') setDespairDetail('');
-            } catch (error) { console.error(`NowView: Error saving ${type} detail:`, error); alert(`Error saving ${type} detail.`); }
+            } catch (error) { console.error(`NowView: Error saving ${type} detail:`, error); }
             finally { setIsSavingDetail(false); }
         }
     };
@@ -413,7 +543,7 @@ function NowView({
     const handleStartPause = () => { onSetIsTimerRunning(!isTimerRunning); };
     const handleReset = () => { onSetIsTimerRunning(false); onSetIsTimerFinished(false); onSetTimerSeconds(pomodoroDurationMinutes * 60); };
     const formatTime = (seconds) => { const mins = Math.floor(seconds / 60); const secs = seconds % 60; return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`; };
-    const handleDurationChange = (event) => { const newDuration = parseInt(event.target.value, 10); if (!isNaN(newDuration) && newDuration > 0) { onSetPomodoroDurationMinutes(newDuration); } };
+    const handleDurationChange = (event) => { const newDuration = parseInt(event.target.value, 10); if (!isNaN(newDuration) && newDuration > 0) { onSetPomodoroDurationMinutes(newDuration); if (!isTimerRunning && !isTimerFinished) {onSetTimerSeconds(newDuration * 60);}} };
     const handleJournalChange = (event) => { setJournalText(event.target.value); };
     const handleJournalSave = async () => {
         if (!journalText.trim() || isSavingJournal) return;
@@ -425,26 +555,47 @@ function NowView({
             const journalCollectionRef = collection(db, "journalEntries");
             await addDoc(journalCollectionRef, journalData);
             setJournalText('');
-        } catch (e) { console.error("NowView: Error adding journal entry: ", e); alert("Failed to save journal entry."); }
+        } catch (e) { console.error("NowView: Error adding journal entry: ", e); }
         finally { setIsSavingJournal(false); }
     };
     const handleBreakReviewSubmit = (breakLogData) => { closeBreakModal(); };
-    const closeBreakModal = () => { setIsBreakModalOpen(false); setCurrentBreakIdea(''); setTimerFinishedAt(null); onSetIsTimerFinished(false); };
+    const closeBreakModal = () => { setIsBreakModalOpen(false); setCurrentBreakIdea(''); setTimerFinishedAt(null); onSetIsTimerFinished(false); handleReset(); };
     const handleAddAdHocTask = async () => {
         const text = adHocTaskText.trim();
-        const axisToSave = selectedAxisTheme || 'Rest and preparation';
-        if (!text || !axisToSave) { alert("Please enter task text and select an axis."); return; }
+        const axisToSave = selectedAxisTheme || (availableAxes.length > 0 ? availableAxes[0].name : 'Rest and preparation');
+        if (!text) { return; }
+        if (!axisToSave) { return; }
         if (isSavingAdHoc) return;
         setIsSavingAdHoc(true);
         const todayDateString = getTodayDateString();
-        const currentWeekId = getWeekId();
-        const adHocData = { taskType: 'ad-hoc', plannedSteps: text, axisTheme: axisToSave, weekId: currentWeekId, assignedDays: [], originalAssignedDate: todayDateString, currentAssignedDate: todayDateString, createdAt: serverTimestamp(), status: 'pending', completedAt: null, rolloverCount: 0, };
+        const currentWeekIdValue = getWeekId();
+        const adHocData = {
+            taskType: 'ad-hoc',
+            plannedSteps: text,
+            axisTheme: axisToSave,
+            weekId: currentWeekIdValue,
+            assignedDays: [],
+            originalAssignedDate: todayDateString,
+            currentAssignedDate: todayDateString,
+            createdAt: serverTimestamp(),
+            status: 'pending',
+            completedAt: null,
+            rolloverCount: 0,
+        };
         try {
             const newDocRef = await addDoc(tasksCollectionRef, adHocData);
-            const newTaskObject = { id: `task-${newDocRef.id}`, originalId: newDocRef.id, text: adHocData.plannedSteps, completed: false, completedAt: null, type: 'adhoc', axisTheme: adHocData.axisTheme, rolloverCount: 0, currentAssignedDate: todayDateString }; // Add currentAssignedDate
-            setTasks(prevTasks => { const updatedTasks = [newTaskObject, ...prevTasks]; localStorage.setItem(TASK_ORDER_LS_KEY, JSON.stringify(updatedTasks.map(t => t.id))); return updatedTasks; });
+            const newTaskObject = {
+                id: `task-${newDocRef.id}`, originalId: newDocRef.id, text: adHocData.plannedSteps,
+                completed: false, completedAt: null, type: 'adhoc', axisTheme: adHocData.axisTheme,
+                rolloverCount: 0, currentAssignedDate: todayDateString
+            };
+            setTasks(prevTasks => {
+                const updatedTasks = [newTaskObject, ...prevTasks];
+                localStorage.setItem(TASK_ORDER_LS_KEY, JSON.stringify(updatedTasks.map(t => t.id)));
+                return updatedTasks;
+            });
             setAdHocTaskText('');
-        } catch (error) { console.error("NowView: Error saving ad hoc task:", error); alert("Failed to save ad hoc task. Please try again."); }
+        } catch (error) { console.error("NowView: Error saving ad hoc task:", error); }
         finally { setIsSavingAdHoc(false); }
     };
     const handleAdHocKeyDown = (event) => { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); handleAddAdHocTask(); } };
@@ -454,6 +605,7 @@ function NowView({
         setTasks(prevTasks => {
             const clickedIndex = prevTasks.findIndex(task => task.id === taskId);
             if (clickedIndex === -1 || clickedIndex === 0) return prevTasks;
+
             const newTasks = [...prevTasks];
             const [clickedItem] = newTasks.splice(clickedIndex, 1);
             newTasks.unshift(clickedItem);
@@ -469,26 +621,47 @@ function NowView({
         e.preventDefault();
         const draggedItemId = dragItem.current;
         const targetItemId = dragOverItem.current;
+        
         const targetElement = e.currentTarget;
         if (targetElement) { targetElement.classList.remove(styles.dragOver); }
-        if (!draggedItemId || !targetItemId || draggedItemId === targetItemId) { dragItem.current = null; dragOverItem.current = null; return; }
-        const dragIndex = tasks.findIndex(task => task.id === draggedItemId);
-        const targetIndex = tasks.findIndex(task => task.id === targetItemId);
-        if (dragIndex === -1 || targetIndex === -1) { console.error("NowView: Error finding dragged or target item index during drop."); dragItem.current = null; dragOverItem.current = null; return; }
-        const newTasks = [...tasks];
-        const [draggedItem] = newTasks.splice(dragIndex, 1);
-        newTasks.splice(targetIndex, 0, draggedItem);
-        setTasks(newTasks);
-        localStorage.setItem(TASK_ORDER_LS_KEY, JSON.stringify(newTasks.map(t => t.id)));
+
+        if (!draggedItemId || !targetItemId || draggedItemId === targetItemId) {
+            dragItem.current = null; dragOverItem.current = null; return;
+        }
+
+        setTasks(prevTasks => {
+            const dragIndex = prevTasks.findIndex(task => task.id === draggedItemId);
+            let targetIndex = prevTasks.findIndex(task => task.id === targetItemId);
+
+            if (dragIndex === -1 || targetIndex === -1) {
+                 console.error("NowView: Error finding dragged or target item index during drop."); return prevTasks;
+            }
+            const newTasks = [...prevTasks];
+            const [draggedItemValue] = newTasks.splice(dragIndex, 1);
+            newTasks.splice(targetIndex, 0, draggedItemValue);
+
+            localStorage.setItem(TASK_ORDER_LS_KEY, JSON.stringify(newTasks.map(t => t.id)));
+            return newTasks;
+        });
         dragItem.current = null; dragOverItem.current = null;
     };
-    const handleDragEnd = (e) => { console.log('NowView Drag End'); if (e.currentTarget) { e.currentTarget.classList.remove(styles.dragging); } else { const draggedElement = document.querySelector(`.${styles.dragging}`); if (draggedElement) { draggedElement.classList.remove(styles.dragging); } } const dragOverElements = document.querySelectorAll(`.${styles.dragOver}`); dragOverElements.forEach(el => el.classList.remove(styles.dragOver)); dragItem.current = null; dragOverItem.current = null; };
+    const handleDragEnd = (e) => {
+        console.log('NowView Drag End');
+        if (e.currentTarget) { e.currentTarget.classList.remove(styles.dragging); }
+        else {
+            const draggedElement = document.querySelector(`.${styles.dragging}`);
+            if (draggedElement) { draggedElement.classList.remove(styles.dragging); }
+        }
+        const dragOverElements = document.querySelectorAll(`.${styles.dragOver}`);
+        dragOverElements.forEach(el => el.classList.remove(styles.dragOver));
 
-    // --- Handler for Assigned Date Change ---
+        dragItem.current = null; dragOverItem.current = null;
+    };
+
     const handleAssignedDateChange = async (originalFirestoreId, newDateString) => {
         if (!originalFirestoreId) { console.error("Cannot update assigned date: missing original Firestore ID."); return; }
         const task = tasks.find(t => t.originalId === originalFirestoreId);
-        if (task?.type === 'recurring') { console.warn("Cannot set assigned date for recurring task:", task.id); alert("Cannot change the date for recurring routines."); return; }
+        if (task?.type === 'recurring') { console.warn("Cannot set assigned date for recurring task:", task.id); return; }
 
         setSavingDateTaskId(originalFirestoreId);
         console.log(`Updating currentAssignedDate for ${originalFirestoreId} to ${newDateString}`);
@@ -497,25 +670,26 @@ function NowView({
             const taskDocRef = doc(db, "weeklySteps", originalFirestoreId);
             await updateDoc(taskDocRef, { currentAssignedDate: newDateString || null });
 
-            // Update local state optimistically
-            setTasks(prevTasks => prevTasks.map(t =>
-                t.originalId === originalFirestoreId
-                    ? { ...t, currentAssignedDate: newDateString || null }
-                    : t
-            ));
+            setTasks(prevTasks => {
+                const updatedTasks = prevTasks.map(t =>
+                    t.originalId === originalFirestoreId
+                        ? { ...t, currentAssignedDate: newDateString || null }
+                        : t
+                );
+                // If the date was changed *from* today, it should be removed from tasksForTodayDisplay
+                // If it was changed *to* today, it should be added (if not completed)
+                // The filter for tasksForTodayDisplay will handle this automatically based on the updated currentAssignedDate
+                return updatedTasks;
+            });
             console.log(`Successfully updated currentAssignedDate for ${originalFirestoreId}`);
 
         } catch (error) {
             console.error("Error updating assigned date:", error);
-            alert(`Failed to update assigned date for task. Error: ${error.message}`);
         } finally {
             setSavingDateTaskId(null);
         }
     };
-    // --- End Handlers ---
 
-    // == JSX Rendering ==
-    // Filter tasks to display only those assigned to today and not completed
     const todayDateStr = getTodayDateString();
     const tasksForTodayDisplay = tasks.filter(task =>
         task.currentAssignedDate === todayDateStr && !task.completed
@@ -526,9 +700,7 @@ function NowView({
         <div className={styles.nowViewContainer}>
             <h2 className={styles.viewTitle}>Now</h2>
 
-            {/* Left Panel */}
             <div className={styles.leftPanel}>
-                {/* Moments Tracker */}
                 <div className={styles.momentsTracker}>
                     <div className={styles.momentEntry}>
                         <div className={styles.momentCounter}><span>Epiphany: {epiphanyCount}</span><button onClick={incrementEpiphany} className={styles.momentButton} disabled={isSavingMoments || isSavingDetail}>+</button></div>
@@ -539,26 +711,21 @@ function NowView({
                         <input type="text" value={despairDetail} onChange={(e) => setDespairDetail(e.target.value)} placeholder="Despair detail..." className={styles.momentInput} disabled={isSavingMoments || isSavingDetail}/>
                     </div>
                 </div>
-                {/* Productivity */}
                 <div className={styles.productivityDisplay}>Productivity: <span className={styles.score}>{productivityScore}</span></div>
-                {/* Journal */}
                 <div className={styles.journalPlaceholder}>
                     <label htmlFor="nowJournal" className={styles.journalLabel}>Quick Thought:</label>
                     <textarea id="nowJournal" value={journalText} onChange={handleJournalChange} placeholder="Jot down quick thoughts..." rows="3" className={styles.journalTextarea} disabled={isSavingJournal} />
                     <button onClick={handleJournalSave} disabled={isSavingJournal || !journalText.trim()} className={styles.saveJournalButton}>{isSavingJournal ? 'Saving...' : 'Save Thought'}</button>
-                    {/* Flashcard Button */}
                     <button type="button" onClick={() => setIsFlashcardModalOpen(true)} className={styles.flashcardButton} style={{ marginTop: '0.5rem', width: '100%' }} > Study Flashcards </button>
                 </div>
             </div>
 
-            {/* Center Panel */}
             <div className={styles.centerPanel}>
-                {/* Task List Section */}
                 <div className={styles.taskListContainer}>
                     <h3 className={styles.sectionTitle}>Today's Tasks</h3>
-                    {/* Current Task Display Box */}
                     <div className={styles.currentTaskDisplay}>
-                        {tasksToShowInDisplayBox.length === 0 && !isLoadingTasks && ( <span className={styles.noTasksMessage}>No tasks for today!</span> )}
+                        {isLoadingTasks && tasksToShowInDisplayBox.length === 0 && (<span className={styles.noTasksMessage}>Loading...</span>)}
+                        {!isLoadingTasks && tasksToShowInDisplayBox.length === 0 && ( <span className={styles.noTasksMessage}>No tasks for today!</span> )}
                         {tasksToShowInDisplayBox.map((task, index) => (
                             <div key={task.id} className={`${styles.upcomingTaskItem} ${styles[`upcomingTaskItem${index}`]}`}>
                                 {task.text}
@@ -566,109 +733,98 @@ function NowView({
                             </div>
                         ))}
                     </div>
-                    {/* Scrollable Task List */}
                     <div className={styles.taskList} >
                          {isLoadingTasks ? ( <p>Loading tasks...</p> ) :
-                             tasksForTodayDisplay.length > 0 ? ( // Map over the filtered list
-                                 tasksForTodayDisplay.map((task) => {
-                                     const cssSuffix = axisNameToCssVarSuffix(task.axisTheme);
-                                     const taskStyle = { '--task-color-dark': `var(--axis-color-${cssSuffix}-3, var(--axis-color-default-3))`, '--task-color-medium': `var(--axis-color-${cssSuffix}-2, var(--axis-color-default-2))`, '--task-color-light': `var(--axis-color-${cssSuffix}-1, var(--axis-color-default-1))` };
-                                     const assignedDateValue = task.currentAssignedDate || '';
+                           tasksForTodayDisplay.length > 0 ? (
+                                tasksForTodayDisplay.map((task) => {
+                                    const cssSuffix = axisNameToCssVarSuffix(task.axisTheme);
+                                    const taskStyle = { '--task-color-dark': `var(--axis-color-${cssSuffix}-3, var(--axis-color-default-3))`, '--task-color-medium': `var(--axis-color-${cssSuffix}-2, var(--axis-color-default-2))`, '--task-color-light': `var(--axis-color-${cssSuffix}-1, var(--axis-color-default-1))` };
+                                    const assignedDateValue = task.currentAssignedDate || '';
 
-                                     return (
+                                    return (
                                         <div
                                             key={task.id}
-                                            className={`${styles.taskItem} ${task.id === currentTaskId ? styles.selectedTask : ''}`}
-                                            // MODIFIED: Updated title attribute for full text on hover
+                                            className={`${styles.taskItem} ${task.completed ? styles.completedTask : ''} ${task.id === currentTaskId ? styles.selectedTask : ''}`}
                                             title={`${task.text}${task.rolloverCount > 0 ? ` (Rolled ${task.rolloverCount}d)` : ''}${task.axisTheme ? `\nAxis: ${task.axisTheme}` : (task.type === 'recurring' ? '\nRecurring Routine' : '')}`}
                                             style={taskStyle}
-                                            draggable="true"
-                                            onDragStart={(e) => handleDragStart(e, task.id)}
-                                            onDragEnter={(e) => handleDragEnter(e, task.id)}
+                                            draggable={!task.completed}
+                                            onDragStart={(e) => !task.completed && handleDragStart(e, task.id)}
+                                            onDragEnter={(e) => !task.completed && handleDragEnter(e, task.id)}
                                             onDragLeave={handleDragLeave}
                                             onDragOver={handleDragOver}
-                                            onDrop={handleDrop}
+                                            onDrop={(e) => !task.completed && handleDrop(e)}
                                             onDragEnd={handleDragEnd}
-                                            onClick={() => handleSetCurrentTask(task.id)}
+                                            onClick={() => !task.completed && handleSetCurrentTask(task.id)}
                                         >
-                                             {/* Checkbox Container */}
-                                             <div className={styles.checkboxContainer} onClick={(e) => e.stopPropagation()}>
-                                                 <input type="checkbox" id={`task-checkbox-${task.id}`} checked={false} onChange={(e) => handleTaskToggle(task.id, e)} className={styles.checkbox} disabled={isSavingTask} />
-                                                 <label htmlFor={`task-checkbox-${task.id}`} className={styles.checkboxCustom}></label>
-                                             </div>
-                                             {/* Task Label */}
-                                             <label className={styles.taskLabel}>
-                                                 {task.text}
-                                                 {task.rolloverCount > 0 && <span className={styles.rolloverIndicator}> ({task.rolloverCount}d)</span>}
-                                             </label>
-                                             {/* Assigned Date Input */}
-                                             {task.type !== 'recurring' && (
-                                                 <input
-                                                     type="date"
-                                                     className={styles.dueDateInput} // This class will be styled for smaller appearance
-                                                     value={assignedDateValue}
-                                                     onChange={(e) => handleAssignedDateChange(task.originalId, e.target.value)}
-                                                     onClick={(e) => e.stopPropagation()}
-                                                     title={`Assigned: ${assignedDateValue || 'Not set'}`}
-                                                     disabled={savingDateTaskId === task.originalId}
-                                                 />
-                                             )}
-                                         </div>
-                                     );
-                                 })
-                             // Check original tasks array for completed message
-                             ) : !isLoadingTasks && tasks.length > 0 && tasks.every(task => task.completed || task.currentAssignedDate !== todayDateStr) ? (
-                                 <p className={styles.allTasksDoneMessage}>All tasks completed or moved!</p>
-                             ) : (
-                                 <p>No tasks assigned for today.</p> // Updated message
-                             )
-                         }
+                                            <div className={styles.checkboxContainer} onClick={(e) => e.stopPropagation()}>
+                                                <input type="checkbox" id={`task-checkbox-${task.id}`} checked={task.completed} onChange={(e) => handleTaskToggle(task.id, e)} className={styles.checkbox} disabled={isSavingTask} />
+                                                <label htmlFor={`task-checkbox-${task.id}`} className={styles.checkboxCustom}></label>
+                                            </div>
+                                            <label className={styles.taskLabel}>
+                                                {task.text}
+                                                {task.rolloverCount > 0 && <span className={styles.rolloverIndicator}> ({task.rolloverCount}d)</span>}
+                                            </label>
+                                            {task.type !== 'recurring' && (
+                                                <input
+                                                    type="date"
+                                                    className={styles.dueDateInput}
+                                                    value={assignedDateValue}
+                                                    onChange={(e) => handleAssignedDateChange(task.originalId, e.target.value)}
+                                                    onClick={(e) => e.stopPropagation()}
+                                                    title={`Assigned: ${assignedDateValue || 'Not set'}`}
+                                                    disabled={savingDateTaskId === task.originalId || task.completed}
+                                                />
+                                            )}
+                                        </div>
+                                    );
+                                })
+                            ) : !isLoadingTasks && tasks.length > 0 && tasks.every(task => task.completed || task.currentAssignedDate !== todayDateStr) ? (
+                                <p className={styles.allTasksDoneMessage}>All tasks for today completed or moved!</p>
+                            ) : (
+                                <p>No tasks assigned for today.</p>
+                            )
+                        }
                         </div>
                 </div>
-                {/* Ad Hoc Task Adder */}
                 <div className={styles.adHocForm}>
                     <h4 className={styles.adHocTitle}>Add Task</h4>
                     <textarea ref={adHocInputRef} rows="2" placeholder="Enter new task..." value={adHocTaskText} onChange={(e) => setAdHocTaskText(e.target.value)} onKeyDown={handleAdHocKeyDown} className={styles.adHocTextarea} disabled={isSavingAdHoc} />
                     <div className={styles.adHocControls}>
                         <select value={selectedAxisTheme} onChange={(e) => setSelectedAxisTheme(e.target.value)} className={styles.adHocSelect} disabled={isSavingAdHoc || availableAxes.length === 0} >
-                            <option value="" disabled>Select Axis</option>
-                            {availableAxes.map(axis => ( <option key={axis.name} value={axis.name}>{axis.name}</option> ))}
+                            <option value="" disabled={selectedAxisTheme !== ""}>Select Axis</option>
+                            {availableAxes.map(axis => ( <option key={axis.id} value={axis.name}>{axis.name}</option> ))}
                         </select>
                         <button onClick={handleAddAdHocTask} disabled={!adHocTaskText.trim() || !selectedAxisTheme || isSavingAdHoc || availableAxes.length === 0} className={styles.adHocButton} >
                             {isSavingAdHoc ? 'Adding...' : 'Add Task'}
                         </button>
                     </div>
-                    {availableAxes.length === 0 && isLoadingTasks && <p className={styles.adHocWarning}>Loading axes...</p>}
-                 </div>
-                 {/* Context Map */}
-                 <ContextMap axisName={selectedAxisTheme} />
+                    {availableAxes.length === 0 && !isLoadingTasks && <p className={styles.adHocWarning}>No axes available. Please define axes.</p>}
+                </div>
+                <ContextMap axisName={selectedAxisTheme} />
             </div>
 
-            {/* Right Panel */}
             <div className={styles.rightPanel}>
-                 <div className={styles.timerSection}>
-                     <p className={styles.timeLabel}>What time is it?</p>
-                     <div className={styles.timerDisplay}>
-                         <img src={isTimerFinished ? "/tomato-sliced.png" : "/tomato-whole.png"} alt={isTimerFinished ? "Sliced Tomato - Time for a break!" : "Whole Tomato - Focus time"} className={styles.tomatoImage} onError={(e) => { e.target.style.display = 'none'; }} />
-                         <span className={styles.timerText}>{formatTime(timerSeconds)}</span>
-                     </div>
-                     <div className={styles.timerControls}>
-                         <button onClick={handleStartPause} className={styles.timerButton} disabled={isTimerFinished}>{isTimerRunning ? '❚❚' : '▶'}</button>
-                         <button onClick={handleReset} className={styles.timerButton}>⟳</button>
-                     </div>
-                     <div className={styles.timerConfig}>
-                         <label htmlFor="pomodoroDurationInput" className={styles.durationLabel}>Duration (min):</label>
-                         <input id="pomodoroDurationInput" type="number" value={pomodoroDurationMinutes} onChange={handleDurationChange} min="1" className={styles.durationInput} disabled={isTimerRunning} />
-                     </div>
-                     <p className={styles.nowLabel}>NOW</p>
-                 </div>
-                 {/* Dear Abi Marquee Component */}
-                 <DearAbiMarquee theme={currentMonthTheme} />
+                <div className={styles.timerSection}>
+                    <p className={styles.timeLabel}>What time is it?</p>
+                    <div className={styles.timerDisplay}>
+                        <img src={isTimerFinished ? "/tomato-sliced.png" : "/tomato-whole.png"} alt={isTimerFinished ? "Sliced Tomato - Time for a break!" : "Whole Tomato - Focus time"} className={styles.tomatoImage} onError={(e) => { e.target.style.display = 'none'; }} />
+                        <span className={styles.timerText}>{formatTime(timerSeconds)}</span>
+                    </div>
+                    <div className={styles.timerControls}>
+                        <button onClick={handleStartPause} className={styles.timerButton} disabled={isTimerFinished}>{isTimerRunning ? '❚❚' : '▶'}</button>
+                        <button onClick={handleReset} className={styles.timerButton}>⟳</button>
+                    </div>
+                    <div className={styles.timerConfig}>
+                        <label htmlFor="pomodoroDurationInput" className={styles.durationLabel}>Duration (min):</label>
+                        <input id="pomodoroDurationInput" type="number" value={pomodoroDurationMinutes} onChange={handleDurationChange} min="1" className={styles.durationInput} disabled={isTimerRunning} />
+                    </div>
+                    <p className={styles.nowLabel}>NOW</p>
+                </div>
+                <DearAbiMarquee theme={currentMonthTheme} />
             </div>
 
-             {/* Modals */}
-             {isBreakModalOpen && ( <Modal isOpen={isBreakModalOpen} onClose={closeBreakModal}> <BreakReviewForm onSubmit={handleBreakReviewSubmit} onClose={closeBreakModal} pomodoroDuration={pomodoroDurationMinutes} timerFinishedTimestamp={timerFinishedAt} /> </Modal> )}
-             {isFlashcardModalOpen && ( <StudyFlashcardsModal isOpen={isFlashcardModalOpen} onClose={() => setIsFlashcardModalOpen(false)} /> )}
+            {isBreakModalOpen && ( <Modal isOpen={isBreakModalOpen} onClose={closeBreakModal}> <BreakReviewForm onSubmit={handleBreakReviewSubmit} onClose={closeBreakModal} pomodoroDuration={pomodoroDurationMinutes} timerFinishedTimestamp={timerFinishedAt} currentTask={tasks.find(t => t.id === currentTaskId)} /> </Modal> )}
+            {isFlashcardModalOpen && ( <StudyFlashcardsModal isOpen={isFlashcardModalOpen} onClose={() => setIsFlashcardModalOpen(false)} /> )}
         </div>
     );
 }

@@ -13,7 +13,7 @@ import {
     query,
     where,
     updateDoc,
-    limit
+    // limit // limit was imported but not used in the provided code. Kept for now.
 } from "firebase/firestore";
 
 // --- Helper Functions ---
@@ -21,7 +21,7 @@ import {
 // Get Week ID (ISO 8601 - Monday Start)
 function getWeekId(date = new Date()) {
     const d = new Date(date.valueOf());
-    const dayNum = d.getUTCDay() || 7; // Sunday (0) becomes 7
+    const dayNum = d.getUTCDay() || 7; // Sunday (0) becomes 7 for ISO 8601 calculation
     d.setUTCDate(d.getUTCDate() + 4 - dayNum); // Adjust to Thursday of the week
     const yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
     const weekNo = Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1)/7);
@@ -32,22 +32,48 @@ function getWeekId(date = new Date()) {
 function getWeekDates(weekId) {
     try {
         const [year, week] = weekId.split('-W').map(Number);
+        // Create a date for the first day of the year (Jan 1st) in UTC
         const firstDayOfYear = new Date(Date.UTC(year, 0, 1));
-        const firstDayOfWeek = firstDayOfYear.getUTCDay(); // 0=Sun, 1=Mon,...
-        // Calculate offset to find the first Monday of the year
-        const dayOffset = (firstDayOfWeek <= 1) ? (1 - firstDayOfWeek) : (8 - firstDayOfWeek);
-        const firstMondayOfYear = new Date(Date.UTC(year, 0, 1 + dayOffset));
-        // Calculate the start date (Monday) of the target week
-        const startDate = new Date(firstMondayOfYear.getTime() + (week - 1) * 7 * 24 * 60 * 60 * 1000);
-        // Calculate the end date (Sunday) of the target week
-        const endDate = new Date(startDate.getTime() + 6 * 24 * 60 * 60 * 1000);
+        // Get the day of the week for Jan 1st (0 for Sunday, 1 for Monday, ..., 6 for Saturday)
+        const firstDayOfWeekOfYear = firstDayOfYear.getUTCDay();
+
+        // Calculate the offset to find the first Monday of the year.
+        // ISO 8601 weeks start on Monday.
+        // If Jan 1st is Monday (1), offset is 0.
+        // If Jan 1st is Tuesday (2), offset is -1 (to get to Monday).
+        // If Jan 1st is Sunday (0), offset is +1 (to get to Monday).
+        let dayOffset = 1 - firstDayOfWeekOfYear; // Default offset to get to Monday
+        if (firstDayOfWeekOfYear === 0) { // If Jan 1st is Sunday
+            dayOffset = 1;
+        } else if (firstDayOfWeekOfYear > 1) { // If Jan 1st is Tue-Sat
+             // No, this is simpler: (1 - dayOfWeek) will give days to subtract to get to Monday
+             // Or (8 - dayOfWeek) % 7 if we want to go forward to the first Monday.
+             // Let's use the logic: first day of ISO week 1 is the Monday of the week containing Jan 4th.
+        }
+
+
+        // A simpler way for ISO 8601:
+        // The first day of week 1 is the Monday of the week containing January 4th.
+        // Or, the Thursday of week 1 is January 4th.
+        // Let's find the date of the Thursday of the target week.
+        const thursdayOfTargetWeek = new Date(Date.UTC(year, 0, 4 + (week - 1) * 7)); // Jan 4th + (week-1)*7 days
+        
+        // The Monday of that week is Thursday - 3 days
+        const startDate = new Date(thursdayOfTargetWeek);
+        startDate.setUTCDate(thursdayOfTargetWeek.getUTCDate() - 3);
+
+        // The Sunday of that week is Monday + 6 days
+        const endDate = new Date(startDate);
+        endDate.setUTCDate(startDate.getUTCDate() + 6);
+
         const options = { month: 'short', day: 'numeric' };
+        // Ensure we use UTC dates for formatting to avoid timezone shifts from the UTC calculations
         return {
-            start: startDate.toLocaleDateString(undefined, options),
-            end: endDate.toLocaleDateString(undefined, options),
+            start: new Date(Date.UTC(startDate.getUTCFullYear(), startDate.getUTCMonth(), startDate.getUTCDate())).toLocaleDateString(undefined, options),
+            end: new Date(Date.UTC(endDate.getUTCFullYear(), endDate.getUTCMonth(), endDate.getUTCDate())).toLocaleDateString(undefined, options),
         };
     } catch (e) {
-        console.error("Error parsing week ID:", weekId, e);
+        console.error("Error parsing week ID for getWeekDates:", weekId, e);
         return { start: 'N/A', end: 'N/A' };
     }
 }
@@ -64,8 +90,8 @@ const axisNameToCssVarSuffix = (axisName) => {
 };
 
 const axisDisplayOrder = [
-  "Rest and preparation", "Physical", "Financial", "Gear",
-  "ON TRACK N+1", "Misdirect", "Environment"
+    "Rest and preparation", "Physical", "Financial", "Gear",
+    "ON TRACK N+1", "Misdirect", "Environment"
 ];
 
 // Day/Axis Mapping (0=Sun, 6=Sat - still used for data lookup)
@@ -92,8 +118,8 @@ function WeeklyView({ onNavigate }) {
     const [displayWeekDates, setDisplayWeekDates] = useState({ start: '', end: '' });
     const [weeklyPlanData, setWeeklyPlanData] = useState(null);
     const [allAxesData, setAllAxesData] = useState({});
-    const [weeklyStepsData, setWeeklyStepsData] = useState({});
-    const [allWeeklyStepsFlat, setAllWeeklyStepsFlat] = useState([]);
+    const [weeklyStepsData, setWeeklyStepsData] = useState({}); // Grouped by axis
+    const [allWeeklyStepsFlat, setAllWeeklyStepsFlat] = useState([]); // Flat list for daily viz
     const [isSavingGoal, setIsSavingGoal] = useState(false);
 
     // Fetch data on mount
@@ -102,26 +128,26 @@ function WeeklyView({ onNavigate }) {
             setIsLoading(true);
             setError(null);
             const today = new Date();
-            // --- MODIFIED: Calculate LAST week's date and ID ---
-            const lastWeekDate = new Date(today);
-            lastWeekDate.setDate(today.getDate() - 7); // Subtract 7 days
-            const targetWeekId = getWeekId(lastWeekDate); // Use last week's date
+            
+            // --- MODIFIED: Calculate CURRENT week's date and ID ---
+            const targetWeekId = getWeekId(today); // Use today's date for current week
             // --- End Modification ---
-            setDisplayWeekId(targetWeekId); // Set state with last week's ID
-            setDisplayWeekDates(getWeekDates(targetWeekId)); // Get dates for last week
+            
+            setDisplayWeekId(targetWeekId); 
+            setDisplayWeekDates(getWeekDates(targetWeekId)); 
 
             // --- MODIFIED: Updated log message ---
-            console.log(`Fetching weekly data for LAST week (ISO): ${targetWeekId}`);
+            console.log(`WeeklyView: Fetching weekly data for CURRENT week (ISO): ${targetWeekId}`);
             // --- End Modification ---
             try {
                 // Fetch Weekly Plan, All Axes, and Planned Weekly Steps concurrently
-                // Queries will now use the LAST week ID stored in targetWeekId
+                // Queries will now use the CURRENT week ID stored in targetWeekId
                 const weeklyPlanRef = doc(db, "weeklyPlan", targetWeekId);
                 const axesCollectionRef = collection(db, "axes");
                 const stepsCollectionRef = collection(db, "weeklySteps");
                 const stepsQuery = query(
                     stepsCollectionRef,
-                    where("weekId", "==", targetWeekId), // Uses last week's ID
+                    where("weekId", "==", targetWeekId), // Uses current week's ID
                     where("taskType", "==", "planned")
                 );
 
@@ -134,7 +160,7 @@ function WeeklyView({ onNavigate }) {
                 // Process Weekly Plan
                 const planData = weeklyPlanSnap.exists() ? weeklyPlanSnap.data() : { axisGoals: {}, axisGoalStatus: {} };
                 setWeeklyPlanData(planData);
-                console.log("Last Week's Plan Data:", planData);
+                console.log("WeeklyView: Current Week's Plan Data:", planData);
 
                 // Process Axes Definitions
                 const axesDataMap = {};
@@ -145,7 +171,7 @@ function WeeklyView({ onNavigate }) {
                     }
                 });
                 setAllAxesData(axesDataMap);
-                console.log("All Axes Data:", axesDataMap);
+                console.log("WeeklyView: All Axes Data:", axesDataMap);
 
                 // Process steps into BOTH grouped and flat structures
                 const stepsDataGrouped = {};
@@ -161,16 +187,16 @@ function WeeklyView({ onNavigate }) {
                         }
                         stepsDataGrouped[axis].push(stepData);
                     } else {
-                        console.warn(`Step ${doc.id} missing axisTheme.`);
+                        console.warn(`WeeklyView: Step ${doc.id} missing axisTheme.`);
                     }
                 });
                 setWeeklyStepsData(stepsDataGrouped); // For lower grid
                 setAllWeeklyStepsFlat(stepsListFlat); // For top visualization
-                console.log("Last Week's Steps Data (Grouped by Axis):", stepsDataGrouped);
-                console.log("Last Week's All Steps Data (Flat):", stepsListFlat);
+                console.log("WeeklyView: Current Week's Steps Data (Grouped by Axis):", stepsDataGrouped);
+                console.log("WeeklyView: Current Week's All Steps Data (Flat):", stepsListFlat);
 
             } catch (err) {
-                console.error("Error fetching weekly data:", err);
+                console.error("WeeklyView: Error fetching weekly data:", err);
                 setError("Failed to load weekly data. Check console.");
                 setWeeklyPlanData(null); setAllAxesData({}); setWeeklyStepsData({}); setAllWeeklyStepsFlat([]);
             } finally {
@@ -183,11 +209,11 @@ function WeeklyView({ onNavigate }) {
 
     // Handler for toggling weekly goal completion status
     const handleGoalToggle = async (axisName, currentStatus) => {
-        // --- MODIFIED: Ensure we use the correct week ID (should be last week's ID stored in state) ---
+        // Ensure we use the correct week ID (should be current week's ID stored in state)
         if (isSavingGoal || !weeklyPlanData || !displayWeekId) return;
         setIsSavingGoal(true);
         const newStatus = currentStatus === 'completed' ? 'pending' : 'completed';
-        const weeklyPlanRef = doc(db, "weeklyPlan", displayWeekId); // Use week ID from state
+        const weeklyPlanRef = doc(db, "weeklyPlan", displayWeekId); // Use week ID from state (now current week)
         const previousPlanData = { ...weeklyPlanData };
 
         try {
@@ -196,9 +222,9 @@ function WeeklyView({ onNavigate }) {
                 axisGoalStatus: { ...(prevData?.axisGoalStatus || {}), [axisName]: newStatus }
             }));
             await updateDoc(weeklyPlanRef, { [`axisGoalStatus.${axisName}`]: newStatus });
-            console.log(`Updated status for goal '${axisName}' to '${newStatus}' for week ${displayWeekId}`);
+            console.log(`WeeklyView: Updated status for goal '${axisName}' to '${newStatus}' for week ${displayWeekId}`);
         } catch (error) {
-            console.error(`Error updating goal status for ${axisName}:`, error);
+            console.error(`WeeklyView: Error updating goal status for ${axisName}:`, error);
             setError(`Failed to update status for ${axisName}.`);
             setWeeklyPlanData(previousPlanData);
         } finally {
@@ -223,7 +249,7 @@ function WeeklyView({ onNavigate }) {
             </h2>
 
             {/* --- Weekday Visualization (Horizontal) --- */}
-            {/* This section uses allWeeklyStepsFlat from the fetched week */}
+            {/* This section uses allWeeklyStepsFlat from the fetched week (now current week) */}
             {isLoading ? (
                 <p>Loading daily visualization...</p>
             ) : !error && weeklyPlanData ? (
@@ -239,10 +265,10 @@ function WeeklyView({ onNavigate }) {
                         const plannedStepsForDay = allWeeklyStepsFlat.filter(step =>
                             Array.isArray(step.assignedDays) && step.assignedDays.includes(dayIndex)
                         );
-                        const hardcodedTasks = [];
-                        if (dayIndex === 0) hardcodedTasks.push({ id: 'prepare', text: 'Prepare' });
-                        if (dayIndex === 2) hardcodedTasks.push({ id: 'budget', text: 'Budget' });
-                        if (dayIndex === 4) hardcodedTasks.push({ id: 'reset', text: 'Reset' });
+                        const hardcodedTasks = []; // These are display-only for WeeklyView
+                        if (dayIndex === 0) hardcodedTasks.push({ id: 'prepare', text: 'Prepare Day' });
+                        if (dayIndex === 2) hardcodedTasks.push({ id: 'budget', text: 'Budget Review' });
+                        if (dayIndex === 4) hardcodedTasks.push({ id: 'reset', text: 'Mid-Week Reset' });
 
                         const dayCardStyle = {
                             backgroundColor: `var(--axis-color-${axisCssSuffix}-1, var(--axis-color-default-1))`,
@@ -272,7 +298,7 @@ function WeeklyView({ onNavigate }) {
                                     )}
                                     {hardcodedTasks.length > 0 && (
                                         <div className={styles.daySection}>
-                                            <strong className={styles.daySectionTitle}>Tasks:</strong>
+                                            <strong className={styles.daySectionTitle}>Focus:</strong>
                                             <ul className={styles.dayTaskList}>
                                                 {hardcodedTasks.map(task => (
                                                     <li key={task.id}>{task.text}</li>
@@ -290,7 +316,7 @@ function WeeklyView({ onNavigate }) {
 
 
             {/* --- Existing Axis Grid Section (Lower Section) --- */}
-            {/* This section uses weeklyStepsData (grouped by axis) from the fetched week */}
+            {/* This section uses weeklyStepsData (grouped by axis) from the fetched week (now current week) */}
             {isLoading ? (
                 <p>Loading weekly axes...</p>
             ) : error ? (
@@ -341,15 +367,15 @@ function WeeklyView({ onNavigate }) {
                                         </div>
                                          {/* Steps Display */}
                                         <div className={styles.stepsDisplay}>
-                                             <span className={styles.label}>Steps:</span>
-                                             {steps.length > 0 ? (
-                                                 <span className={styles.value}>
-                                                     {steps.map(step => step.plannedSteps).join(' | ')}
-                                                 </span>
-                                             ) : (
-                                                 <i className={styles.notSet}>None planned</i>
-                                             )}
-                                         </div>
+                                            <span className={styles.label}>Steps:</span>
+                                            {steps.length > 0 ? (
+                                                <span className={styles.value}>
+                                                    {steps.map(step => step.plannedSteps).join(' | ')}
+                                                </span>
+                                            ) : (
+                                                <i className={styles.notSet}>None planned</i>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -360,38 +386,38 @@ function WeeklyView({ onNavigate }) {
             {/* --- End Axis Grid Section --- */}
 
 
-             {/* Buttons container at the bottom */}
-             <div className={styles.topButtonContainer}>
-                 <button
-                     className={styles.actionButton}
-                     onClick={() => setIsPlannerModalOpen(true)}
-                 >
-                     Plan Next Week
-                 </button>
-                  <button
-                     className={`${styles.actionButton} ${styles.budgetButton}`}
-                     onClick={openBudgetModal}
-                 >
-                     Budget
-                 </button>
-             </div>
+            {/* Buttons container at the bottom */}
+            <div className={styles.topButtonContainer}>
+                <button
+                    className={styles.actionButton}
+                    onClick={() => setIsPlannerModalOpen(true)}
+                >
+                    Plan Next Week
+                </button>
+                <button
+                    className={`${styles.actionButton} ${styles.budgetButton}`}
+                    onClick={openBudgetModal}
+                >
+                    Budget
+                </button>
+            </div>
 
 
-             {/* Modals */}
-             {isPlannerModalOpen && (
-                 <Modal isOpen={isPlannerModalOpen} onClose={closePlannerModal}>
-                     <WeeklyPlanner onClose={closePlannerModal} />
-                 </Modal>
-             )}
-             {isBudgetModalOpen && (
-                 <Modal isOpen={isBudgetModalOpen} onClose={closeBudgetModal}>
-                     <BudgetForm
-                         onSubmit={handleBudgetSubmit}
-                         onClose={closeBudgetModal}
-                         onNavigate={onNavigate}
-                     />
-                 </Modal>
-             )}
+            {/* Modals */}
+            {isPlannerModalOpen && (
+                <Modal isOpen={isPlannerModalOpen} onClose={closePlannerModal}>
+                    <WeeklyPlanner onClose={closePlannerModal} />
+                </Modal>
+            )}
+            {isBudgetModalOpen && (
+                <Modal isOpen={isBudgetModalOpen} onClose={closeBudgetModal}>
+                    <BudgetForm
+                        onSubmit={handleBudgetSubmit}
+                        onClose={closeBudgetModal}
+                        onNavigate={onNavigate}
+                    />
+                </Modal>
+            )}
         </div>
     );
 }

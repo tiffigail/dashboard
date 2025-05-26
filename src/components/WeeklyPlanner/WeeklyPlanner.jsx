@@ -15,7 +15,7 @@ import ContextMap from '../ContextMap/ContextMap';
 const LOCAL_STORAGE_KEY = 'weeklyPlanInProgress_v4'; // Updated key for new structure
 
 // --- Date Helper Functions ---
-function getWeekId(date = new Date()) {
+function getWeekId(date = new Date()) { // ISO Week ID (Week starts Monday)
     const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
     const dayNum = d.getUTCDay() || 7;
     d.setUTCDate(d.getUTCDate() + 4 - dayNum);
@@ -30,7 +30,7 @@ function getDateStringForDayInWeek(weekStartDate, targetDayIndex) {
         return null;
     }
     const targetDate = new Date(weekStartDate);
-    // Adjust day index for Sunday start (0=Sun) to add correct days
+    // weekStartDate is expected to be Sunday. targetDayIndex is 0 for Sun, 1 for Mon, etc.
     targetDate.setDate(weekStartDate.getDate() + targetDayIndex);
     const year = targetDate.getFullYear();
     const month = String(targetDate.getMonth() + 1).padStart(2, '0');
@@ -39,35 +39,47 @@ function getDateStringForDayInWeek(weekStartDate, targetDayIndex) {
 }
 
 
-function getCurrentWeekStartDate(date = new Date()) {
+function getCurrentWeekStartDate(date = new Date()) { // Returns Sunday of the current week
     const current = new Date(date);
     const dayOfWeek = current.getDay(); // 0 = Sunday
     const diff = current.getDate() - dayOfWeek;
     const sundayDate = new Date(current.setDate(diff));
+    sundayDate.setHours(0, 0, 0, 0); // Normalize to start of day
     return sundayDate;
 }
 
 
-function getUpcomingMondaySundayRange(date = new Date()) {
+function getUpcomingMondaySundayRange(date = new Date()) { // For display string
     const today = new Date(date);
-    const currentDay = today.getDay();
-    const daysUntilMonday = (currentDay === 0) ? 1 : (8 - currentDay);
+    const currentDay = today.getDay(); // 0 = Sunday, 1 = Monday...
+    // Days until the *next* Monday (could be tomorrow if today is Sun, or next week's Mon if today is Mon)
+    let daysUntilMonday;
+    if (currentDay === 0) { // Sunday
+        daysUntilMonday = 1;
+    } else {
+        daysUntilMonday = 8 - currentDay;
+    }
     const upcomingMonday = new Date(today);
     upcomingMonday.setDate(today.getDate() + daysUntilMonday);
+    upcomingMonday.setHours(0,0,0,0);
+
     const followingSunday = new Date(upcomingMonday);
     followingSunday.setDate(upcomingMonday.getDate() + 6);
+    followingSunday.setHours(0,0,0,0);
+
     const options = { month: 'long', day: 'numeric' };
     return {
         monday: upcomingMonday.toLocaleDateString(undefined, options),
-        sunday: followingSunday.toLocaleDateString(undefined, options)
+        sunday: followingSunday.toLocaleDateString(undefined, options),
+        mondayDateObj: upcomingMonday // Return the Monday Date object
     };
 }
 // --- End Date Helper Functions ---
 
 // Mapping from Day of Week (0=Sun) to Axis Theme Name
 const dayToAxisThemeMapping = [
-  "Rest and preparation", "Physical", "Financial", "Gear",
-  "ON TRACK N+1", "Misdirect", "Environment"
+    "Rest and preparation", "Physical", "Financial", "Gear",
+    "ON TRACK N+1", "Misdirect", "Environment"
 ];
 
 // Days of the week for checkboxes
@@ -77,28 +89,23 @@ const daysOfWeek = [
     { label: 'Sat', value: 6 },
 ];
 
-// Helper to load state from localStorage, ensuring steps is an array of objects
 const loadFromLocalStorage = (key, defaultValue) => {
     try {
         const saved = localStorage.getItem(key);
         if (saved === null) return defaultValue;
         const parsed = JSON.parse(saved);
-        // Sanitize loaded data: ensure steps is always an array of objects
         for (const axis in parsed) {
             if (parsed[axis] && !Array.isArray(parsed[axis].steps)) {
-                 parsed[axis].steps = [{ text: '', assignedDays: [] }]; // Default step object
+                parsed[axis].steps = [{ text: '', assignedDays: [] }];
             } else if (parsed[axis] && parsed[axis].steps.length === 0) {
-                 parsed[axis].steps = [{ text: '', assignedDays: [] }]; // Ensure at least one step object
+                parsed[axis].steps = [{ text: '', assignedDays: [] }];
             } else if (parsed[axis]) {
-                // Ensure each step is an object with text and assignedDays array
                 parsed[axis].steps = parsed[axis].steps.map(step =>
                     (typeof step === 'object' && step !== null && Array.isArray(step.assignedDays))
                         ? step
                         : { text: typeof step === 'string' ? step : '', assignedDays: [] }
                 );
             }
-            // Ensure days (legacy?) is removed or handled if needed - removing for clarity
-            // delete parsed[axis]?.days;
         }
         return parsed;
     } catch (error) {
@@ -107,34 +114,49 @@ const loadFromLocalStorage = (key, defaultValue) => {
     }
 };
 
-
-// Props: onClose
 function WeeklyPlanner({ onClose }) {
     const [currentAxisIndex, setCurrentAxisIndex] = useState(() => loadFromLocalStorage('weeklyPlanner_currentAxisIndex', 0));
-    // State structure updated: steps is now an array of {text: string, assignedDays: number[]}
     const [inProgressPlan, setInProgressPlan] = useState(() => loadFromLocalStorage(LOCAL_STORAGE_KEY, {}));
     const [isFinishing, setIsFinishing] = useState(false);
     const [error, setError] = useState(null);
 
     const currentAxisTheme = dayToAxisThemeMapping[currentAxisIndex];
-    const currentWeekStartDate = getCurrentWeekStartDate();
+    
+    // Determine the target planning week (next week)
+    // currentWeekSundayAtMidnight is the Sunday of the week the planner is opened.
+    const currentWeekSundayAtMidnight = getCurrentWeekStartDate(new Date());
 
-    const upcomingWeek = getUpcomingMondaySundayRange();
-    const weekRangeString = `Week of ${upcomingWeek.monday} to ${upcomingWeek.sunday}`;
+    // nextWeekSundayAtMidnight is the Sunday the user will be planning FOR.
+    const nextWeekSundayAtMidnight = new Date(currentWeekSundayAtMidnight);
+    nextWeekSundayAtMidnight.setDate(currentWeekSundayAtMidnight.getDate() + 7);
 
-    // Effect to save in-progress plan to localStorage
+    // For display, use the Mon-Sun range of the ISO week we are planning FOR.
+    // The targetISOWeekId will be based on the Monday of the week that nextWeekSundayAtMidnight is part of.
+    const mondayOfTargetPlanningISOWeek = new Date(nextWeekSundayAtMidnight);
+    if (mondayOfTargetPlanningISOWeek.getUTCDay() === 0) { // If Sunday
+        mondayOfTargetPlanningISOWeek.setUTCDate(mondayOfTargetPlanningISOWeek.getUTCDate() + 1);
+    } else { // If not Sunday, find that week's Monday
+        const day = mondayOfTargetPlanningISOWeek.getUTCDay();
+        const diff = mondayOfTargetPlanningISOWeek.getUTCDate() - day + (day === 0 ? -6 : 1);
+        mondayOfTargetPlanningISOWeek.setUTCDate(diff);
+    }
+    const endOfTargetPlanningISOWeek = new Date(mondayOfTargetPlanningISOWeek);
+    endOfTargetPlanningISOWeek.setUTCDate(mondayOfTargetPlanningISOWeek.getUTCDate() + 6);
+    
+    const options = { month: 'long', day: 'numeric' };
+    const weekRangeString = `Planning for: ${nextWeekSundayAtMidnight.toLocaleDateString(undefined, options)} (Sun) to ${new Date(new Date(nextWeekSundayAtMidnight).setDate(nextWeekSundayAtMidnight.getDate() + 6)).toLocaleDateString(undefined, options)} (Sat)`;
+
+
     useEffect(() => {
         try {
-            // Filter out empty steps before saving
             const planToSave = {};
             for (const axis in inProgressPlan) {
                 const stepsToSave = (inProgressPlan[axis].steps || [])
-                                    .filter(step => step && step.text.trim() !== '');
-                // If filtering results in empty steps, add back one empty object for the UI
+                                        .filter(step => step && typeof step.text === 'string' && step.text.trim() !== '');
                 if (stepsToSave.length === 0) {
                     stepsToSave.push({ text: '', assignedDays: [] });
                 }
-                 planToSave[axis] = {
+                planToSave[axis] = {
                     ...inProgressPlan[axis],
                     steps: stepsToSave
                 };
@@ -146,8 +168,6 @@ function WeeklyPlanner({ onClose }) {
         }
     }, [inProgressPlan, currentAxisIndex]);
 
-
-    // Navigation Handlers
     const handlePrevious = () => {
         setCurrentAxisIndex(prev => (prev > 0 ? prev - 1 : dayToAxisThemeMapping.length - 1));
     };
@@ -155,7 +175,6 @@ function WeeklyPlanner({ onClose }) {
         setCurrentAxisIndex(prev => (prev < dayToAxisThemeMapping.length - 1 ? prev + 1 : 0));
     };
 
-    // Form Input Handlers
     const handleAxisGoalChange = (e) => {
         const goal = e.target.value;
         setInProgressPlan(prevPlan => ({
@@ -164,36 +183,30 @@ function WeeklyPlanner({ onClose }) {
         }));
     };
 
-    // --- Handler for individual step input changes ---
     const handleStepInputChange = (index, value) => {
-         setInProgressPlan(prevPlan => {
+        setInProgressPlan(prevPlan => {
             const currentAxisPlan = prevPlan[currentAxisTheme] || { steps: [{ text: '', assignedDays: [] }], goal: '' };
             const updatedSteps = [...currentAxisPlan.steps];
-            // Ensure the step object exists
             if (!updatedSteps[index]) {
-                 updatedSteps[index] = { text: '', assignedDays: [] };
+                updatedSteps[index] = { text: '', assignedDays: [] };
             }
-            updatedSteps[index].text = value; // Update the text property
+            updatedSteps[index].text = value;
             return { ...prevPlan, [currentAxisTheme]: { ...currentAxisPlan, steps: updatedSteps } };
         });
     };
 
-    // --- Handler to add a new empty step input field ---
     const handleAddStepInput = () => {
         setInProgressPlan(prevPlan => {
             const currentAxisPlan = prevPlan[currentAxisTheme] || { steps: [], goal: '' };
-            // Add a new empty step object
             const updatedSteps = [...currentAxisPlan.steps, { text: '', assignedDays: [] }];
             return { ...prevPlan, [currentAxisTheme]: { ...currentAxisPlan, steps: updatedSteps } };
         });
     };
 
-     // --- Handler to remove a step input field ---
-     const handleRemoveStepInput = (indexToRemove) => {
+    const handleRemoveStepInput = (indexToRemove) => {
         setInProgressPlan(prevPlan => {
             const currentAxisPlan = prevPlan[currentAxisTheme] || { steps: [], goal: '' };
             let updatedSteps = currentAxisPlan.steps.filter((_, index) => index !== indexToRemove);
-            // Ensure at least one step input remains (can be empty)
             if (updatedSteps.length === 0) {
                 updatedSteps = [{ text: '', assignedDays: [] }];
             }
@@ -201,14 +214,12 @@ function WeeklyPlanner({ onClose }) {
         });
     };
 
-    // --- Handler for day selection checkboxes for a SPECIFIC step ---
     const handleStepDayChange = (stepIndex, dayValue, isChecked) => {
         setInProgressPlan(prevPlan => {
             const currentAxisPlan = prevPlan[currentAxisTheme] || { steps: [], goal: '' };
             const updatedSteps = [...currentAxisPlan.steps];
-            // Ensure the step object and its assignedDays array exist
             if (!updatedSteps[stepIndex]) {
-                 updatedSteps[stepIndex] = { text: '', assignedDays: [] };
+                updatedSteps[stepIndex] = { text: '', assignedDays: [] };
             }
             const currentDays = updatedSteps[stepIndex].assignedDays || [];
             let newDays;
@@ -217,13 +228,11 @@ function WeeklyPlanner({ onClose }) {
             } else {
                 newDays = currentDays.filter(day => day !== dayValue);
             }
-            updatedSteps[stepIndex].assignedDays = newDays; // Update assignedDays for the specific step
+            updatedSteps[stepIndex].assignedDays = newDays;
             return { ...prevPlan, [currentAxisTheme]: { ...currentAxisPlan, steps: updatedSteps } };
         });
     };
 
-
-    // Final Save Handler
     const handleFinish = async () => {
         console.log("Weekly planning finished. Saving overall weekly plan and steps...");
         setIsFinishing(true);
@@ -231,8 +240,28 @@ function WeeklyPlanner({ onClose }) {
 
         const finalGoals = {};
         const stepsToAdd = [];
-        const nextWeekStartDate = new Date(currentWeekStartDate);
-        nextWeekStartDate.setDate(nextWeekStartDate.getDate() + 7);
+
+        // *** MODIFICATION START: Determine the target ISO Week ID for the plan ***
+        // nextWeekSundayAtMidnight is the Sunday the user is planning FOR (e.g., May 25th)
+        // We need the ISO Week ID of the week that *contains the Monday of this planning period*.
+        const mondayOfTargetUserWeek = new Date(nextWeekSundayAtMidnight); // Start with the Sunday
+        if (mondayOfTargetUserWeek.getUTCDay() !== 1) { // If it's not already Monday (1 in UTC)
+             // Adjust to find the Monday of the week this Sunday (nextWeekSundayAtMidnight) belongs to,
+             // or rather, the Monday of the user's perceived week starting this Sunday.
+             // If nextWeekSundayAtMidnight is Sunday, its corresponding Monday is the next day.
+            if (mondayOfTargetUserWeek.getUTCDay() === 0) { // If it's Sunday
+                mondayOfTargetUserWeek.setUTCDate(mondayOfTargetUserWeek.getUTCDate() + 1);
+            } else { // For any other day, find the Monday of that week (this path is less likely if nextWeekSundayAtMidnight is always Sunday)
+                let day = mondayOfTargetUserWeek.getUTCDay();
+                let diffToMonday = 1 - day; // e.g. if Tuesday (2), diff is -1.
+                if (day === 0) diffToMonday = 1; // if Sunday (0), diff is 1.
+                mondayOfTargetUserWeek.setUTCDate(mondayOfTargetUserWeek.getUTCDate() + diffToMonday);
+            }
+        }
+        const targetPlanFirestoreWeekId = getWeekId(mondayOfTargetUserWeek);
+        console.log(`Targeting Firestore Week ID: ${targetPlanFirestoreWeekId} (based on Monday: ${mondayOfTargetUserWeek.toISOString()}) for plans starting on Sunday: ${nextWeekSundayAtMidnight.toISOString()}`);
+        // *** MODIFICATION END ***
+
 
         for (const axisName in inProgressPlan) {
             const plan = inProgressPlan[axisName];
@@ -240,59 +269,58 @@ function WeeklyPlanner({ onClose }) {
                 finalGoals[axisName] = plan.goal.trim();
             }
 
-            // Iterate through each step object for the axis
             if (plan.steps && Array.isArray(plan.steps)) {
                 plan.steps.forEach(step => {
-                    // Only save steps with actual text and assigned days
                     if (step.text && step.text.trim() && Array.isArray(step.assignedDays) && step.assignedDays.length > 0) {
                         const earliestDayIndex = Math.min(...step.assignedDays);
-                        const initialAssignedDateString = getDateStringForDayInWeek(nextWeekStartDate, earliestDayIndex);
+                        // Use nextWeekSundayAtMidnight (actual start of user's week) to calculate the date string
+                        const initialAssignedDateString = getDateStringForDayInWeek(nextWeekSundayAtMidnight, earliestDayIndex);
+                        
                         if (!initialAssignedDateString) {
                             console.error(`Could not calculate initial assigned date for step "${step.text}" in axis ${axisName}`);
-                            return; // Skip this step if date calculation fails
+                            return;
                         }
 
                         stepsToAdd.push({
                             taskType: 'planned',
                             plannedSteps: step.text.trim(),
                             axisTheme: axisName,
-                            weekId: getWeekId(nextWeekStartDate),
-                            assignedDays: step.assignedDays, // Use days specific to this step
+                            weekId: targetPlanFirestoreWeekId, // *** USE MODIFIED Week ID ***
+                            assignedDays: step.assignedDays,
                             createdAt: serverTimestamp(),
                             status: 'pending',
                             completedAt: null,
                             rolloverCount: 0,
-                            currentAssignedDate: initialAssignedDateString,
+                            currentAssignedDate: initialAssignedDateString, // Date of first assignment in the planned week
                         });
                     }
                 });
             }
         }
 
-        const nextWeekId = getWeekId(nextWeekStartDate);
         const weeklyPlanData = {
-            weekId: nextWeekId,
+            weekId: targetPlanFirestoreWeekId, // *** USE MODIFIED Week ID ***
             axisGoals: finalGoals,
-            axisGoalStatus: {},
+            axisGoalStatus: {}, // Initialize as empty or with default statuses
             createdAt: serverTimestamp(),
             lastUpdatedAt: serverTimestamp()
         };
 
         const batch = writeBatch(db);
-        const weeklyPlanDocRef = doc(db, "weeklyPlan", nextWeekId);
+        const weeklyPlanDocRef = doc(db, "weeklyPlan", targetPlanFirestoreWeekId); // *** USE MODIFIED Week ID ***
         batch.set(weeklyPlanDocRef, weeklyPlanData, { merge: true });
 
         const stepsCollectionRef = collection(db, "weeklySteps");
         stepsToAdd.forEach(stepData => {
-            const newStepDocRef = doc(stepsCollectionRef);
+            const newStepDocRef = doc(stepsCollectionRef); // Auto-generate ID for each step
             batch.set(newStepDocRef, stepData);
         });
 
-        console.log(`Prepared batch: Setting weeklyPlan/${nextWeekId} and adding ${stepsToAdd.length} individual steps.`);
+        console.log(`Prepared batch: Setting weeklyPlan/${targetPlanFirestoreWeekId} and adding ${stepsToAdd.length} individual steps.`);
 
         try {
             await batch.commit();
-            console.log(`Batch write successful for week ${nextWeekId}`);
+            console.log(`Batch write successful for week ${targetPlanFirestoreWeekId}`);
             alert("Weekly plan and all steps saved successfully!");
             localStorage.removeItem(LOCAL_STORAGE_KEY);
             localStorage.removeItem('weeklyPlanner_currentAxisIndex');
@@ -301,34 +329,28 @@ function WeeklyPlanner({ onClose }) {
             onClose();
         } catch (err) {
             console.error("Error committing batch write:", err);
-            setError(`Failed to save the weekly plan/steps for ${nextWeekId}. Please try again.`);
+            setError(`Failed to save the weekly plan/steps for ${targetPlanFirestoreWeekId}. Please try again.`);
             alert(`Error: Failed to save the weekly plan/steps.`);
         } finally {
             setIsFinishing(false);
         }
     };
 
-
-    // == JSX Rendering ==
-    const currentPlanData = inProgressPlan[currentAxisTheme] || { steps: [{ text: '', assignedDays: [] }], goal: '' }; // Ensure default structure
+    const currentPlanData = inProgressPlan[currentAxisTheme] || { steps: [{ text: '', assignedDays: [] }], goal: '' };
     const displayGoal = currentPlanData.goal || '';
-    // Ensure displayStepsArray is always an array of objects, with at least one empty object if none exist
     let displayStepsArray = Array.isArray(currentPlanData.steps) ? currentPlanData.steps : [];
     if (displayStepsArray.length === 0 || displayStepsArray.every(step => typeof step !== 'object')) {
         displayStepsArray = [{ text: '', assignedDays: [] }];
     } else {
-        // Ensure every item is an object with the correct structure
         displayStepsArray = displayStepsArray.map(step =>
              (typeof step === 'object' && step !== null && Array.isArray(step.assignedDays))
                  ? step
                  : { text: typeof step === 'string' ? step : '', assignedDays: [] }
          );
-         // Ensure at least one input field if all existing steps were somehow invalid
-         if (displayStepsArray.length === 0) {
-             displayStepsArray.push({ text: '', assignedDays: [] });
-         }
+        if (displayStepsArray.length === 0) {
+            displayStepsArray.push({ text: '', assignedDays: [] });
+        }
     }
-
 
     return (
         <div className={styles.weeklyPlannerModalContent}>
@@ -336,15 +358,12 @@ function WeeklyPlanner({ onClose }) {
             <p className={styles.weekRange}>{weekRangeString}</p>
 
             <div className={styles.plannerLayout}>
-                {/* Left Side: Context Map */}
                 <div className={styles.contextMapArea}>
                     <ContextMap axisName={currentAxisTheme} />
                 </div>
 
-                {/* Right Side: Inputs */}
                 <div className={styles.inputsArea}>
                     {error && <p className={styles.errorText}>{error}</p>}
-                    {/* Weekly Axis Goal Input */}
                     <div className={styles.axisGoalSection}>
                         <label htmlFor={`axisGoalInput-${currentAxisIndex}`} className={styles.axisGoalLabel}>
                             Goal for {currentAxisTheme} this week:
@@ -359,17 +378,12 @@ function WeeklyPlanner({ onClose }) {
                             disabled={isFinishing}
                         />
                     </div>
-
                     <hr className={styles.divider} />
-
-                    {/* Input Section: Weekly steps and day assignment */}
                     <div className={styles.nextStepsSection}>
                         <label className={styles.nextStepsLabel}>Weekly Steps for {currentAxisTheme}:</label>
-
-                        {/* --- UPDATED: Dynamic Step Inputs with Individual Day Checkboxes --- */}
                         <div className={styles.stepInputContainer}>
                             {displayStepsArray.map((step, index) => (
-                                <div key={index} className={styles.stepEntry}> {/* Container for step + days */}
+                                <div key={index} className={styles.stepEntry}>
                                     <div className={styles.stepInputRow}>
                                         <input
                                             type="text"
@@ -379,7 +393,6 @@ function WeeklyPlanner({ onClose }) {
                                             className={styles.stepInput}
                                             disabled={isFinishing}
                                         />
-                                        {/* Show remove button only if there's more than one step input */}
                                         {displayStepsArray.length > 1 && (
                                             <button
                                                 type="button"
@@ -392,17 +405,14 @@ function WeeklyPlanner({ onClose }) {
                                             </button>
                                         )}
                                     </div>
-                                    {/* Day Assignment Checkboxes FOR THIS STEP */}
                                     <div className={styles.dayCheckboxes}>
                                         {daysOfWeek.map(day => (
                                             <div key={day.value} className={styles.dayCheckboxItem}>
                                                 <input
                                                     type="checkbox"
-                                                    id={`day-${day.value}-step-${index}-${currentAxisIndex}`} // More specific ID
+                                                    id={`day-${day.value}-step-${index}-${currentAxisIndex}`}
                                                     value={day.value}
-                                                    // Check if this step's assignedDays includes the current day value
                                                     checked={(step.assignedDays || []).includes(day.value)}
-                                                    // Pass step index and day value to handler
                                                     onChange={(e) => handleStepDayChange(index, day.value, e.target.checked)}
                                                     disabled={isFinishing}
                                                     className={styles.dayCheckbox}
@@ -414,7 +424,6 @@ function WeeklyPlanner({ onClose }) {
                                 </div>
                             ))}
                         </div>
-                        {/* Button to add another step input */}
                         <button
                             type="button"
                             onClick={handleAddStepInput}
@@ -424,15 +433,10 @@ function WeeklyPlanner({ onClose }) {
                         >
                             + Add Step
                         </button>
-                        {/* --- END UPDATED --- */}
-
-                        {/* --- REMOVED: Old Day Assignment Section --- */}
-                        {/* <div className={styles.dayAssignmentSection}> ... </div> */}
                     </div>
                 </div>
             </div>
 
-            {/* Navigation Buttons */}
             <div className={styles.navigation}>
                 <button type="button" onClick={handlePrevious} className={styles.navButton} disabled={isFinishing}>
                     &larr; Previous Axis
