@@ -1,68 +1,58 @@
 // src/components/BreakAnalysisChart/BreakAnalysisChart.jsx
 import React, { useState, useEffect, useMemo } from 'react';
-import { Scatter, Bar, Bubble } from 'react-chartjs-2';
+import { Bar, Bubble } from 'react-chartjs-2';
 import {
     Chart as ChartJS,
     CategoryScale,
     LinearScale,
     PointElement,
-    LineElement,
     BarElement,
     BubbleController,
     Title,
     Tooltip,
     Legend,
-    TimeScale,
 } from 'chart.js';
-// Make sure chartjs-plugin-datalabels is installed if you want to use it for Chart 2, 3
-import ChartDataLabels from 'chartjs-plugin-datalabels'; 
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { db } from '../../firebaseConfig';
-import { collection, query, orderBy, limit, getDocs, doc, getDoc } from "firebase/firestore";
+import { collection, query, orderBy, limit, getDocs } from "firebase/firestore";
 
 // Register Chart.js components
 ChartJS.register(
     CategoryScale,
     LinearScale,
     PointElement,
-    LineElement,
     BarElement,
     BubbleController,
     Title,
     Tooltip,
     Legend,
-    TimeScale,
-    ChartDataLabels // Register if using for any chart
+    ChartDataLabels
 );
 
-// Helper to get color based on rating (e.g., breakEffectivenessRating or postBreakEfficacy)
-const getRatingColor = (rating) => {
-    const roundedRating = Math.round(rating);
-    if (roundedRating <= 1) return 'rgba(255, 99, 132, 0.7)'; // Poor
-    if (roundedRating === 2) return 'rgba(255, 159, 64, 0.7)'; // Fair
-    if (roundedRating === 3) return 'rgba(255, 205, 86, 0.7)'; // Average
-    if (roundedRating === 4) return 'rgba(75, 192, 192, 0.7)'; // Good
-    if (roundedRating >= 5) return 'rgba(54, 162, 235, 0.7)'; // Excellent
-    return 'rgba(201, 203, 207, 0.7)'; // Default/Unknown
+// Helper to get color based on rating (e.g., efficacy) for Charts 4 & 5
+// Palette: Red (Poor) -> Orange (Fair) -> Distinct Blue (Avg) -> Purple (Good) -> Jungle Green (Exc)
+const getModifiedRatingColor = (rating) => {
+    const roundedRating = Math.max(1, Math.min(5, Math.round(rating))); // Ensure 1-5
+    if (roundedRating === 1) return 'rgb(246, 132, 45)';  // Purple
+    if (roundedRating === 2) return 'rgb(229, 248, 30)';   // Softer Red
+    if (roundedRating === 3) return 'rgb(144, 228, 65)';  // Orange
+    if (roundedRating === 4) return 'rgb(7, 229, 44)';   // Bootstrap Primary Blue
+    if (roundedRating === 5) return 'rgba(6, 196, 164, 0.88)';   // Jungle/Bootstrap Success Green
+    return 'rgba(201, 203, 207, 0.7)'; // Default
 };
 
-// Specific colors for awareness levels
+
+// Specific colors for awareness levels (Used in Charts 1 & 2)
 const awarenessLevelColors = {
     "N-1": 'rgba(255, 99, 132, 0.8)', // Red
     "N": 'rgba(255, 205, 86, 0.8)',   // Yellow
     "N+1": 'rgba(75, 192, 192, 0.8)', // Teal
     "N/A": 'rgba(150, 150, 150, 0.8)' // Grey for N/A or other
 };
-
-
-// Helper to format date as YYYY-MM-DD
-const formatDate = (date) => {
-    if (!(date instanceof Date) || isNaN(date)) return "Invalid Date";
-    return date.toISOString().split('T')[0];
-};
+const awarenessLevelsOrdered = ["N-1", "N", "N+1", "N/A"];
 
 function BreakAnalysisChart() {
     const [processedCycleLogs, setProcessedCycleLogs] = useState([]);
-    const [dailyMetricsScores, setDailyMetricsScores] = useState({}); 
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -71,80 +61,47 @@ function BreakAnalysisChart() {
             setIsLoading(true);
             setError(null);
             const tempProcessedLogs = [];
-            const fetchedDailyMetrics = {};
 
             try {
-                const logsRef = collection(db, "pomodoroCycleLogs"); 
-                const qLogs = query(logsRef, orderBy("logSubmittedAt", "desc"), limit(200)); 
+                const logsRef = collection(db, "pomodoroCycleLogs");
+                const qLogs = query(logsRef, orderBy("logSubmittedAt", "desc"), limit(300));
                 const logsSnapshot = await getDocs(qLogs);
-
-                const datesForMetrics = new Set();
 
                 logsSnapshot.forEach((docSnapshot) => {
                     const log = docSnapshot.data();
-
                     const logSubmittedAt = log.logSubmittedAt?.toDate();
                     const pomodoroTimerFinishedAt = log.pomodoroTimerFinishedAt?.toDate();
                     const workPeriodDurationMinutes = typeof log.workPeriodDurationMinutes === 'number' ? log.workPeriodDurationMinutes : 0;
                     const breakDurationMinutesData = typeof log.breakDurationMinutes === 'number' ? log.breakDurationMinutes : 0;
                     const breakEffectivenessRating = typeof log.breakEffectivenessRating === 'number' ? log.breakEffectivenessRating : 0;
-                    
                     const breakActivityText = typeof log.breakActivityText === 'string' && log.breakActivityText.trim() !== '' ? log.breakActivityText : "Unknown";
-                    const postBreakEfficacy = typeof log.postBreakEfficacy === 'number' ? log.postBreakEfficacy : 0;
-                    const postBreakEnergy = typeof log.postBreakEnergy === 'number' ? log.postBreakEnergy : 0;
-                    const postBreakFrustration = typeof log.postBreakFrustration === 'number' ? log.postBreakFrustration : 0; 
+                    const postBreakEfficacy = typeof log.postBreakEfficacy === 'number' ? Math.max(1, Math.min(5, Math.round(log.postBreakEfficacy))) : 0;
+                    const postBreakEnergy = typeof log.postBreakEnergy === 'number' ? Math.max(1, Math.min(5, Math.round(log.postBreakEnergy))) : 0;
+                    const postBreakFrustration = typeof log.postBreakFrustration === 'number' ? log.postBreakFrustration : 0;
                     const breakActivityAwarenessLevel = log.breakActivityAwarenessLevel || "N/A";
-                    const plannedNextWorkNature = log.plannedNextWorkNature || "N/A";
                     const workPeriodTasksCompleted = typeof log.workPeriodTasksCompleted === 'number' ? log.workPeriodTasksCompleted : 0;
 
-
-                    if (logSubmittedAt instanceof Date && pomodoroTimerFinishedAt instanceof Date && workPeriodDurationMinutes > 0 ) { 
-                        if (breakDurationMinutesData <= 0 || breakDurationMinutesData > 180) return;
-
-                        const workBreakRatio = breakDurationMinutesData / workPeriodDurationMinutes;
-
+                    if (logSubmittedAt instanceof Date && pomodoroTimerFinishedAt instanceof Date &&
+                        workPeriodDurationMinutes > 0 && workPeriodDurationMinutes < 240 &&
+                        breakDurationMinutesData > 0 && breakDurationMinutesData < 180) {
                         tempProcessedLogs.push({
                             id: docSnapshot.id,
-                            workBreakRatio,
-                            rating: breakEffectivenessRating, 
+                            rating: breakEffectivenessRating,
                             pomodoroDurationMinutes: workPeriodDurationMinutes,
                             breakDurationMinutes: breakDurationMinutesData,
-                            breakType: breakActivityText, 
-                            submittedAt: logSubmittedAt,
+                            breakType: breakActivityText,
                             postBreakEfficacy,
                             postBreakEnergy,
                             postBreakFrustration,
                             breakActivityAwarenessLevel,
-                            plannedNextWorkNature,
                             workPeriodTasksCompleted,
                         });
-                        datesForMetrics.add(formatDate(logSubmittedAt));
                     }
                 });
-                setProcessedCycleLogs(tempProcessedLogs); 
-
-                if (datesForMetrics.size > 0) {
-                    for (const dateStr of datesForMetrics) {
-                        if (dateStr === "Invalid Date") continue;
-                        try {
-                            const dailyMetricDocRef = doc(db, "dailyMetrics", dateStr);
-                            const dailyMetricSnap = await getDoc(dailyMetricDocRef);
-                            if (dailyMetricSnap.exists()) {
-                                const data = dailyMetricSnap.data();
-                                if (typeof data.productivityScore === 'number') {
-                                    fetchedDailyMetrics[dateStr] = data.productivityScore;
-                                }
-                            }
-                        } catch (dailyErr) {
-                            console.error(`Error fetching dailyMetric for ${dateStr}:`, dailyErr);
-                        }
-                    }
-                    setDailyMetricsScores(fetchedDailyMetrics);
-                }
-
+                setProcessedCycleLogs(tempProcessedLogs);
             } catch (err) {
                 console.error("BreakAnalysisChart: Error during data fetching:", err);
-                setError("Failed to load analysis data from pomodoroCycleLogs.");
+                setError("Failed to load analysis data. Please check console for details.");
             } finally {
                 setIsLoading(false);
             }
@@ -152,57 +109,67 @@ function BreakAnalysisChart() {
         fetchAllData();
     }, []);
 
-    // --- Chart 1: Tasks Completed vs. Break Duration by Awareness Level (Scatter) ---
+    // --- Chart 1: Productivity After Break vs. Break Duration (Bubble by Awareness during Break) ---
     const chart1Data = useMemo(() => {
         if (processedCycleLogs.length < 2) return { datasets: [] };
-        const dataByAwareness = {};
-
+        const aggregatedDataByAwareness = {};
         for (let i = 0; i < processedCycleLogs.length - 1; i++) {
-            const currentLog = processedCycleLogs[i]; 
-            const previousLog = processedCycleLogs[i+1]; 
-
+            const currentLog = processedCycleLogs[i];
+            const previousLog = processedCycleLogs[i + 1];
             const awarenessLevel = previousLog.breakActivityAwarenessLevel || "N/A";
-            if (!dataByAwareness[awarenessLevel]) {
-                dataByAwareness[awarenessLevel] = [];
+            const xValue = previousLog.breakDurationMinutes;
+            const yValue = currentLog.workPeriodTasksCompleted;
+            const key = `${xValue}-${yValue}-${awarenessLevel}`;
+            if (!aggregatedDataByAwareness[awarenessLevel]) aggregatedDataByAwareness[awarenessLevel] = {};
+            if (!aggregatedDataByAwareness[awarenessLevel][key]) {
+                aggregatedDataByAwareness[awarenessLevel][key] = {
+                    x: xValue, y: yValue, count: 0, sumBreakRating: 0, sumPostBreakEfficacyFromPrev: 0,
+                    awareness: awarenessLevel,
+                    prevWorkDuration: previousLog.pomodoroDurationMinutes,
+                    prevBreakDuration: previousLog.breakDurationMinutes,
+                    nextWorkDuration: currentLog.pomodoroDurationMinutes,
+                };
             }
-
-            dataByAwareness[awarenessLevel].push({
-                x: previousLog.breakDurationMinutes, 
-                y: currentLog.workPeriodTasksCompleted, 
-                awareness: awarenessLevel,
-                breakRating: previousLog.rating, 
-                postBreakEfficacy: previousLog.postBreakEfficacy, 
-                workDurationBeforeBreak: previousLog.pomodoroDurationMinutes,
-                workDurationAfterBreak: currentLog.pomodoroDurationMinutes,
-            });
+            aggregatedDataByAwareness[awarenessLevel][key].count++;
+            aggregatedDataByAwareness[awarenessLevel][key].sumBreakRating += previousLog.rating;
+            aggregatedDataByAwareness[awarenessLevel][key].sumPostBreakEfficacyFromPrev += previousLog.postBreakEfficacy;
         }
-        
-        const datasets = Object.keys(dataByAwareness).map(level => ({
-            label: `Awareness: ${level}`,
-            data: dataByAwareness[level],
-            backgroundColor: awarenessLevelColors[level] || awarenessLevelColors["N/A"],
-            pointRadius: 6,
-        }));
-
+        const datasets = awarenessLevelsOrdered
+            .filter(level => aggregatedDataByAwareness[level])
+            .map(level => ({
+                label: `Awareness: ${level}`,
+                data: Object.values(aggregatedDataByAwareness[level]).map(item => ({
+                    x: item.x, y: item.y,
+                    r: Math.sqrt(item.count) * 3.5 + 4,
+                    avgBreakRating: item.count > 0 ? item.sumBreakRating / item.count : 0,
+                    avgPostBreakEfficacyFromPrev: item.count > 0 ? item.sumPostBreakEfficacyFromPrev / item.count : 0,
+                    count: item.count, awareness: item.awareness,
+                    prevWorkDuration: item.prevWorkDuration, prevBreakDuration: item.prevBreakDuration,
+                    nextWorkDuration: item.nextWorkDuration,
+                })),
+                backgroundColor: awarenessLevelColors[level] || awarenessLevelColors["N/A"],
+            }));
         return { datasets };
     }, [processedCycleLogs]);
 
     const chart1Options = {
         responsive: true, maintainAspectRatio: false,
         plugins: {
-            title: { display: true, text: 'Tasks Completed vs. Break Duration by Awareness Level', font: { size: 16 } },
+            title: { display: true, text: 'Productivity After Break vs. Break Duration (Bubble by Awareness during Break)', font: { size: 16 } },
             legend: { display: true, position: 'top' },
             tooltip: {
                 callbacks: {
                     label: (c) => {
                         const raw = c.raw;
                         return [
-                            `Awareness: ${raw.awareness}`,
-                            `Tasks Completed: ${raw.y}`,
-                            `Break Duration: ${raw.x}m`,
-                            `Break Rating: ${raw.breakRating}★`,
-                            `Post-Break Efficacy (of this break): ${raw.postBreakEfficacy}★`,
-                            `Work Before Break: ${raw.workDurationBeforeBreak}m, Work After Break: ${raw.workDurationAfterBreak}m`,
+                            `Awareness during Break: ${raw.awareness}`,
+                            `Tasks Completed After Break: ${raw.y}`,
+                            `Break Duration: ${raw.x}m (this break)`,
+                            `Avg Rating of This Break: ${raw.avgBreakRating.toFixed(1)}★`,
+                            `Avg Efficacy After This Break: ${raw.avgPostBreakEfficacyFromPrev.toFixed(1)}★`,
+                            `Work Before Break: ${raw.prevWorkDuration}m`,
+                            `Work After Break: ${raw.nextWorkDuration}m`,
+                            `Cycles at this point: ${raw.count}`,
                         ];
                     }
                 }
@@ -210,289 +177,247 @@ function BreakAnalysisChart() {
             datalabels: { display: false }
         },
         scales: {
-            y: { 
-                beginAtZero: true, 
-                title: { display: true, text: 'Tasks Completed (in work period after break)' } 
-            },
-            x: { 
-                beginAtZero: true, 
-                title: { display: true, text: 'Break Duration (Minutes)' } 
-            }
+            y: { beginAtZero: true, title: { display: true, text: 'Tasks Completed (in Work Period After Break)' } },
+            x: { beginAtZero: true, title: { display: true, text: 'Break Duration (Minutes)' } }
         }
     };
 
-    // --- Chart 2: Post-Break Efficacy vs. Post-Break Energy (All Cycles by Awareness Level - Scatter Plot) ---
+    // --- Chart 2: Total Tasks Completed by Post-Break Efficacy, Stacked by Awareness Level ---
     const chart2Data = useMemo(() => {
         if (!processedCycleLogs.length) return { datasets: [] };
-        
-        // Group individual logs by awareness level for separate datasets
-        const dataByAwareness = processedCycleLogs.reduce((acc, log) => {
-            const level = log.breakActivityAwarenessLevel || "N/A";
-            if (!acc[level]) {
-                acc[level] = [];
-            }
-            acc[level].push({
-                x: log.postBreakEnergy,       // Individual energy for this cycle
-                y: log.postBreakEfficacy,     // Individual efficacy for this cycle
-                awarenessLevel: level,
-                tasksCompleted: log.workPeriodTasksCompleted,
-                frustration: log.postBreakFrustration,
-                breakRating: log.rating,
-                breakDuration: log.breakDurationMinutes,
-                workDuration: log.pomodoroDurationMinutes,
-            });
-            return acc;
-        }, {});
+        const efficacyLevels = [1, 2, 3, 4, 5];
+        const tasksByEfficacyAndAwareness = {}; // Stores { "1-N": totalTasks, "1-N+1": totalTasks, ... }
 
-        const datasets = Object.keys(dataByAwareness).map(level => ({
-            label: `Awareness: ${level}`, // Used for legend
-            data: dataByAwareness[level],
-            backgroundColor: awarenessLevelColors[level] || awarenessLevelColors["N/A"],
-            pointRadius: 5, // Fixed radius for individual points
+        processedCycleLogs.forEach(log => {
+            const efficacy = log.postBreakEfficacy;
+            const awareness = log.breakActivityAwarenessLevel || "N/A";
+            // We sum tasks completed in the work period *following* this break's efficacy.
+            // This requires linking current log's tasks to previous log's (break) efficacy.
+            // For simplicity here, if we assume tasks completed are from the *current* log's work period
+            // (i.e., tasks in work period leading to the break whose efficacy is 'efficacy'),
+            // then we can use log.workPeriodTasksCompleted directly.
+            // Let's adjust to sum tasks completed in the work period *of the cycle being analyzed for efficacy*.
+            
+            // Find the log that represents the work period *after* a break with 'efficacy' and 'awareness'
+            // This is tricky as `processedCycleLogs` is just one flat list.
+            // A simpler interpretation: Sum tasks completed IN THE SAME CYCLE where postBreakEfficacy was rated.
+            // This means `log.workPeriodTasksCompleted` refers to tasks completed *before* the break whose efficacy is `log.postBreakEfficacy`.
+            const tasksCompletedInThisCycle = log.workPeriodTasksCompleted;
+
+            const key = `${efficacy}-${awareness}`;
+            tasksByEfficacyAndAwareness[key] = (tasksByEfficacyAndAwareness[key] || 0) + tasksCompletedInThisCycle;
+        });
+
+        const datasets = awarenessLevelsOrdered.map(awareness => ({
+            label: `Awareness: ${awareness}`,
+            data: efficacyLevels.map(efficacy => tasksByEfficacyAndAwareness[`${efficacy}-${awareness}`] || 0),
+            backgroundColor: awarenessLevelColors[awareness] || awarenessLevelColors["N/A"],
         }));
 
-        return { datasets };
+        return {
+            labels: efficacyLevels.map(e => `${e}★ Efficacy`),
+            datasets
+        };
     }, [processedCycleLogs]);
 
     const chart2Options = {
         responsive: true, maintainAspectRatio: false,
         plugins: {
-            title: { display: true, text: 'Post-Break Efficacy vs. Energy (All Cycles by Awareness)', font: { size: 16 } },
-            legend: { 
-                display: true, 
-                position: 'top',
-            }, 
-            tooltip: {
+            title: { display: true, text: 'Total Tasks Completed by Post-Break Efficacy (Stacked by Awareness during Break)', font: { size: 16 } },
+            legend: { display: true, position: 'top' },
+            tooltip: { 
+                mode: 'index', 
+                intersect: false,
                 callbacks: {
                     label: function(context) {
-                        const raw = context.raw;
-                        return [
-                            `Awareness: ${raw.awarenessLevel}`,
-                            `Efficacy: ${raw.y}★`,
-                            `Energy: ${raw.x}★`,
-                            `Frustration: ${raw.frustration}`,
-                            `Tasks Before Break: ${raw.tasksCompleted}`,
-                            `Break: ${raw.breakDuration}m, Work: ${raw.workDuration}m`,
-                            `Break Rating: ${raw.breakRating}★`
-                        ];
+                        let label = context.dataset.label || '';
+                        if (label) {
+                            label += ': ';
+                        }
+                        if (context.parsed.y !== null) {
+                            label += `${context.parsed.y} tasks`;
+                        }
+                        return label;
                     }
                 }
             },
-            datalabels: { display: false } 
+            datalabels: { display: false }
         },
         scales: {
-            y: { 
-                beginAtZero: true, 
-                min:0, 
-                max: 5, 
-                title: { display: true, text: 'Post-Break Efficacy (1-5)' } 
-            },
-            x: { 
-                beginAtZero: true,
-                min: 0,
-                max: 5,
-                title: { display: true, text: 'Post-Break Energy (1-5)' } 
-            }
+            y: { stacked: true, beginAtZero: true, title: { display: true, text: 'Total Tasks Completed' } },
+            x: { stacked: true, title: { display: true, text: 'Post-Break Efficacy Rating' } }
         }
     };
 
     // --- Chart 3: Average Post-Break Efficacy by Break Activity (Bar) ---
     const chart3Data = useMemo(() => {
         if (!processedCycleLogs.length) return { datasets: [] };
-        
         const groupedByBreakType = processedCycleLogs.reduce((acc, log) => {
-            const type = log.breakType; 
-            if (!acc[type]) acc[type] = { totalEfficacy: 0, count: 0, totalTasks: 0 };
-            acc[type].totalEfficacy += log.postBreakEfficacy;
-            acc[type].totalTasks += log.workPeriodTasksCompleted;
+            const type = log.breakType;
+            if (!acc[type]) acc[type] = { sumEfficacy: 0, count: 0, sumTasksBefore: 0 };
+            acc[type].sumEfficacy += log.postBreakEfficacy;
+            acc[type].sumTasksBefore += log.workPeriodTasksCompleted;
             acc[type].count++;
             return acc;
         }, {});
-
-        const labels = Object.keys(groupedByBreakType).filter(type => groupedByBreakType[type].count > 0).sort();
+        const labels = Object.keys(groupedByBreakType)
+            .filter(type => groupedByBreakType[type].count > 2)
+            .sort((a, b) => (groupedByBreakType[b].sumEfficacy / groupedByBreakType[b].count) - (groupedByBreakType[a].sumEfficacy / groupedByBreakType[a].count));
         if (labels.length === 0) return { datasets: [] };
-
         return {
             labels,
             datasets: [{
                 label: 'Average Post-Break Efficacy',
-                data: labels.map(type => parseFloat((groupedByBreakType[type].totalEfficacy / groupedByBreakType[type].count).toFixed(1))),
+                data: labels.map(type => parseFloat((groupedByBreakType[type].sumEfficacy / groupedByBreakType[type].count).toFixed(1))),
+                // REVERTED COLORING to original dynamic hue
                 backgroundColor: labels.map((_, i) => `hsla(${(i * 360 / (labels.length || 1)) + 200}, 70%, 65%, 0.7)`),
                 borderColor: labels.map((_, i) => `hsla(${(i * 360 / (labels.length || 1)) + 200}, 70%, 50%, 1)`),
                 borderWidth: 1,
-                avgTasks: labels.map(type => 
-                    parseFloat((groupedByBreakType[type].totalTasks / groupedByBreakType[type].count).toFixed(1))
-                ),
+                avgTasksBefore: labels.map(type => parseFloat((groupedByBreakType[type].sumTasksBefore / groupedByBreakType[type].count).toFixed(1))),
+                counts: labels.map(type => groupedByBreakType[type].count)
             }],
         };
     }, [processedCycleLogs]);
 
     const chart3Options = {
         responsive: true, maintainAspectRatio: false,
-        indexAxis: 'y', 
+        indexAxis: 'y',
         plugins: {
-            title: { display: true, text: 'Average Post-Break Efficacy by Break Activity', font: { size: 16 } },
+            title: { display: true, text: 'Average Post-Break Efficacy by Break Activity (Min. 3 Cycles)', font: { size: 16 } },
             legend: { display: false },
             tooltip: {
                 callbacks: {
                     label: function(context) {
                         const dataset = context.dataset;
-                        const avgTasks = dataset.avgTasks[context.dataIndex];
-                        return `Avg Efficacy: ${context.raw.toFixed(1)}★ (Avg Tasks Before: ${avgTasks})`;
+                        const avgTasksBefore = dataset.avgTasksBefore[context.dataIndex];
+                        const count = dataset.counts[context.dataIndex];
+                        return `Avg Efficacy: ${context.raw.toFixed(1)}★ (from ${count} cycles, avg tasks before: ${avgTasksBefore})`;
                     }
                 }
             },
             datalabels: {
                 display: true, anchor: 'end', align: 'end', color: '#333',
                 font: { weight: 'bold', size: 10 },
-                formatter: (value) => value.toFixed(1) + '★',
+                formatter: (value, context) => value.toFixed(1) + '★\n(' + context.dataset.counts[context.dataIndex] + ')',
             }
         },
         scales: {
-            x: { beginAtZero: true, min:0, max: 5, title: { display: true, text: 'Average Post-Break Efficacy (1-5)' } },
+            x: { beginAtZero: true, min: 0, max: 5, title: { display: true, text: 'Average Post-Break Efficacy (1-5)' } },
             y: { title: { display: true, text: 'Break Activity' } }
         }
     };
 
-    // --- Chart 4: Post-Break Metrics by Work & Break Duration (Grouped Bar) ---
+    // --- Chart 4: Impact of Work & Break Duration on Post-Break State (Bubble Chart) ---
     const chart4Data = useMemo(() => {
         if (!processedCycleLogs.length) return { datasets: [] };
-        
-        const aggregated = processedCycleLogs.reduce((acc, log) => {
-            const workKey = log.pomodoroDurationMinutes;
-            const breakKey = Math.max(5, Math.round(log.breakDurationMinutes / 5) * 5); 
-            const key = `${workKey}m Work - ${breakKey}m Break`; 
-            
-            if (!acc[key]) {
-                acc[key] = { 
-                    totalEfficacy: 0, 
-                    totalEnergy: 0, 
-                    totalFrustration: 0, 
-                    count: 0,
-                    workDuration: workKey, 
-                    breakDuration: breakKey 
+        const aggregatedData = {};
+        processedCycleLogs.forEach(log => {
+            const key = `${log.pomodoroDurationMinutes}-${log.breakDurationMinutes}`;
+            if (!aggregatedData[key]) {
+                aggregatedData[key] = {
+                    x: log.pomodoroDurationMinutes, y: log.breakDurationMinutes,
+                    sumEfficacy: 0, sumEnergy: 0, sumFrustration: 0, count: 0,
                 };
             }
-            acc[key].totalEfficacy += log.postBreakEfficacy;
-            acc[key].totalEnergy += log.postBreakEnergy;
-            acc[key].totalFrustration += log.postBreakFrustration;
-            acc[key].count++;
-            return acc;
-        }, {});
-
-        const sortedKeys = Object.keys(aggregated).sort((a, b) => {
-            const itemA = aggregated[a];
-            const itemB = aggregated[b];
-            if (itemA.workDuration !== itemB.workDuration) {
-                return itemA.workDuration - itemB.workDuration;
-            }
-            return itemA.breakDuration - itemB.breakDuration;
+            aggregatedData[key].sumEfficacy += log.postBreakEfficacy;
+            aggregatedData[key].sumEnergy += log.postBreakEnergy;
+            aggregatedData[key].sumFrustration += log.postBreakFrustration;
+            aggregatedData[key].count++;
         });
-        
-        if (sortedKeys.length === 0) return { datasets: [] };
-
-        const labels = sortedKeys;
-        const avgEfficacyData = [];
-        const avgEnergyData = [];
-        const avgFrustrationData = [];
-
-        labels.forEach(key => {
-            const item = aggregated[key];
-            avgEfficacyData.push(parseFloat((item.totalEfficacy / item.count).toFixed(1)));
-            avgEnergyData.push(parseFloat((item.totalEnergy / item.count).toFixed(1)));
-            avgFrustrationData.push(parseFloat((item.totalFrustration / item.count).toFixed(1)));
-        });
-
         return {
-            labels,
-            datasets: [
-                {
-                    label: 'Avg Post-Break Efficacy',
-                    data: avgEfficacyData,
-                    backgroundColor: 'rgba(75, 192, 192, 0.7)', 
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 1,
-                },
-                {
-                    label: 'Avg Post-Break Energy',
-                    data: avgEnergyData,
-                    backgroundColor: 'rgba(54, 162, 235, 0.7)', 
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    borderWidth: 1,
-                },
-                {
-                    label: 'Avg Post-Break Frustration',
-                    data: avgFrustrationData,
-                    backgroundColor: 'rgba(255, 99, 132, 0.7)', 
-                    borderColor: 'rgba(255, 99, 132, 1)',
-                    borderWidth: 1,
-                }
-            ]
+            datasets: [{
+                label: 'Avg Post-Break Efficacy',
+                data: Object.values(aggregatedData).map(item => ({
+                    x: item.x, y: item.y,
+                    r: Math.sqrt(item.count) * 3 + 3,
+                    efficacy: item.count > 0 ? parseFloat((item.sumEfficacy / item.count).toFixed(1)) : 0,
+                    energy: item.count > 0 ? parseFloat((item.sumEnergy / item.count).toFixed(1)) : 0,
+                    frustration: item.count > 0 ? parseFloat((item.sumFrustration / item.count).toFixed(1)) : 0,
+                    count: item.count
+                })),
+                // USING MODIFIED RATING COLORS
+                backgroundColor: (context) => getModifiedRatingColor(context.raw.efficacy),
+            }]
         };
     }, [processedCycleLogs]);
-    
+
     const chart4Options = {
         responsive: true, maintainAspectRatio: false,
         plugins: {
-            title: { display: true, text: 'Post-Break Metrics by Work & Break Duration', font: { size: 16 } },
-            legend: { display: true, position: 'top' },
+            title: { display: true, text: 'Post-Break State by Work & Break Duration (Bubble)', font: { size: 16 } },
+            legend: { display: false },
             tooltip: {
-                mode: 'index', 
-                intersect: false,
+                callbacks: {
+                    label: (c) => {
+                        const raw = c.raw;
+                        return [
+                            `Work: ${raw.x}m, Break: ${raw.y}m`,
+                            `Avg Efficacy: ${raw.efficacy}★`,
+                            `Avg Energy: ${raw.energy}★`,
+                            `Avg Frustration: ${raw.frustration}`,
+                            `Cycles at this point: ${raw.count}`,
+                        ];
+                    }
+                }
             },
-            datalabels: { display: false } 
+            datalabels: { display: false }
         },
         scales: {
-            y: { 
-                beginAtZero: true, 
-                min: 0,
-                max: 5, 
-                title: { display: true, text: 'Average Rating (1-5)' } 
-            },
-            x: { 
-                title: { display: true, text: 'Work Duration - Break Duration' },
-                ticks: {
-                    autoSkip: false, 
-                    maxRotation: 70, 
-                    minRotation: 45
-                }
-            }
+            y: { beginAtZero: true, title: { display: true, text: 'Break Duration (Minutes)' } },
+            x: { beginAtZero: true, title: { display: true, text: 'Work Duration (Minutes)' } }
         }
     };
 
-    // --- Chart 5: Tasks Completed vs. Previous Break Metrics (Scatter) ---
-    const linkedProductivityData = useMemo(() => {
-        if (processedCycleLogs.length < 2) return { datasets: [] }; 
+    // --- Chart 5: Tasks Completed vs. Work-to-Break Ratio (Bubble Chart) ---
+    const chart5Data = useMemo(() => {
+        if (!processedCycleLogs.length) return { datasets: [] };
+        const aggregatedRatioData = {};
+        processedCycleLogs.forEach(log => {
+            if (log.breakDurationMinutes <= 0 || log.pomodoroDurationMinutes <= 0) return;
+            const ratio = parseFloat((log.pomodoroDurationMinutes / log.breakDurationMinutes).toFixed(2));
+            const tasks = log.workPeriodTasksCompleted;
+            if (ratio < 0.2 || ratio > 20) return;
+            const key = `${ratio}-${tasks}`;
+            if (!aggregatedRatioData[key]) {
+                aggregatedRatioData[key] = {
+                    x: ratio, y: tasks, count: 0, sumPostBreakEfficacy: 0,
+                    pomodoroDurations: [], breakDurations: [], awarenessLevels: {}
+                };
+            }
+            aggregatedRatioData[key].count++;
+            aggregatedRatioData[key].sumPostBreakEfficacy += log.postBreakEfficacy;
+            aggregatedRatioData[key].pomodoroDurations.push(log.pomodoroDurationMinutes);
+            aggregatedRatioData[key].breakDurations.push(log.breakDurationMinutes);
+            const awareness = log.breakActivityAwarenessLevel || "N/A";
+            aggregatedRatioData[key].awarenessLevels[awareness] = (aggregatedRatioData[key].awarenessLevels[awareness] || 0) + 1;
+        });
+        const dataPoints = Object.values(aggregatedRatioData).map(item => {
+            const avgWork = item.pomodoroDurations.reduce((a, b) => a + b, 0) / item.count;
+            const avgBreak = item.breakDurations.reduce((a, b) => a + b, 0) / item.count;
+            let dominantAwareness = "Mixed";
+            if (Object.keys(item.awarenessLevels).length === 1) {
+                dominantAwareness = Object.keys(item.awarenessLevels)[0];
+            } else if (Object.keys(item.awarenessLevels).length > 1) {
+                dominantAwareness = Object.entries(item.awarenessLevels).sort(([,a],[,b]) => b-a)[0][0];
+            }
 
-        const linkedData = [];
-        for (let i = 0; i < processedCycleLogs.length - 1; i++) {
-            const currentLog = processedCycleLogs[i]; 
-            const previousLog = processedCycleLogs[i+1]; 
-
-            linkedData.push({
-                y: currentLog.workPeriodTasksCompleted, 
-                
-                x: previousLog.postBreakEfficacy, 
-                
-                previousBreakRating: previousLog.rating, 
-                
-                currentWorkDuration: currentLog.pomodoroDurationMinutes, 
-                
-                previousBreakDuration: previousLog.breakDurationMinutes,
-                previousWorkDuration: previousLog.pomodoroDurationMinutes, 
-                previousBreakType: previousLog.breakType,
-                previousPostBreakEnergy: previousLog.postBreakEnergy,
-                previousPostBreakFrustration: previousLog.postBreakFrustration,
-                previousAwareness: previousLog.breakActivityAwarenessLevel,
-            });
-        }
-        if(linkedData.length === 0) return {datasets: []};
+            return {
+                x: item.x, y: item.y,
+                r: Math.sqrt(item.count) * 3.5 + 4,
+                avgPostBreakEfficacy: item.count > 0 ? parseFloat((item.sumPostBreakEfficacy / item.count).toFixed(1)) : 0,
+                count: item.count,
+                avgWorkDuration: avgWork.toFixed(0),
+                avgBreakDuration: avgBreak.toFixed(0),
+                dominantAwareness: dominantAwareness,
+            };
+        });
+        if (dataPoints.length === 0) return { datasets: [] };
         return {
             datasets: [{
-                label: 'Tasks Completed vs. Previous Break\'s Efficacy', 
-                data: linkedData,
-                pointBackgroundColor: (context) => getRatingColor(context.raw.previousBreakRating),
-                pointRadius: 7,
+                label: 'Tasks Completed vs. Work/Break Ratio',
+                data: dataPoints,
+                // USING MODIFIED RATING COLORS
+                backgroundColor: (context) => getModifiedRatingColor(context.raw.avgPostBreakEfficacy),
             }]
         };
     }, [processedCycleLogs]);
@@ -500,41 +425,35 @@ function BreakAnalysisChart() {
     const chart5Options = {
         responsive: true, maintainAspectRatio: false,
         plugins: {
-            title: { display: true, text: 'Tasks Completed vs. Previous Break\'s Efficacy', font: { size: 16 } }, 
-            legend: { display: true, labels: { boxWidth: 0 } }, 
+            title: { display: true, text: 'Productivity by Work/Break Ratio (Colored by Post-Break Efficacy)', font: { size: 16 } },
+            legend: { display: false },
             tooltip: {
                 callbacks: {
-                    label: (context) => {
-                        const raw = context.raw;
+                    label: (c) => {
+                        const raw = c.raw;
                         return [
-                            `Tasks Completed (Y): ${raw.y} (after previous break)`, 
-                            `Previous Break Efficacy (X): ${raw.x}★`,
-                            `Previous Break Rating (Color): ${raw.previousBreakRating}★`,
-                            `--- Work Period (Y-axis tasks) ---`,
-                            ` Duration: ${raw.currentWorkDuration}m`,
-                            `--- Previous Break (X-axis metrics) ---`,
-                            ` Work Before: ${raw.previousWorkDuration}m, Break: ${raw.previousBreakDuration}m`,
-                            ` Type: ${raw.previousBreakType}, Awareness: ${raw.previousAwareness}`,
-                            ` Energy: ${raw.previousPostBreakEnergy}★, Frust: ${raw.previousPostBreakFrustration}`,
+                            `Work/Break Ratio: ${raw.x.toFixed(2)}`,
+                            `Tasks Completed: ${raw.y}`,
+                            `Avg Post-Break Efficacy: ${raw.avgPostBreakEfficacy.toFixed(1)}★`,
+                            `Avg Work Duration: ${raw.avgWorkDuration}m`,
+                            `Avg Break Duration: ${raw.avgBreakDuration}m`,
+                            `Awareness (Dominant): ${raw.dominantAwareness}`,
+                            `Cycles at this point: ${raw.count}`,
                         ];
                     }
                 }
             },
-            datalabels: { display: false } 
+            datalabels: { display: false }
         },
         scales: {
-            y: { 
-                beginAtZero: true, 
-                title: { display: true, text: 'Tasks Completed (in work period after previous break)' }  
-            },
-            x: { 
-                beginAtZero: true, 
-                min: 0, max: 5, 
-                title: { display: true, text: 'Previous Break\'s Post-Break Efficacy' } 
+            y: { beginAtZero: true, title: { display: true, text: 'Tasks Completed in Work Period' } },
+            x: {
+                type: 'linear',
+                beginAtZero: true,
+                title: { display: true, text: 'Work Duration / Break Duration Ratio' }
             }
         }
     };
-
 
     // --- Render Logic ---
     if (isLoading) return <div style={{ padding: '20px', textAlign: 'center', fontSize: '1.2em' }}>Loading Break Analysis Charts from Pomodoro Cycles...</div>;
@@ -544,70 +463,119 @@ function BreakAnalysisChart() {
     const chartPageStyle = { padding: '20px', fontFamily: 'Arial, sans-serif' };
     const mainTitleStyle = { textAlign: 'center', marginBottom: '40px', fontSize: '1.8em', color: '#333' };
     const chartWrapperStyle = { marginBottom: '60px', paddingBottom: '20px', borderBottom: '1px solid #eee' };
-    const chartCanvasContainerStyle = { position: 'relative', height: '450px', width: '100%', marginBottom: '15px' }; 
+    const chartCanvasContainerStyle = { position: 'relative', height: '480px', width: '100%', marginBottom: '15px' };
     const captionStyle = { textAlign: 'center', fontSize: '0.95em', color: '#444', maxWidth: '900px', margin: '0 auto', lineHeight: '1.6', padding: '0 10px' };
+    
+    const colorKeyStyle = {
+        marginTop: '10px',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        flexWrap: 'wrap', // Allow wrapping if many items
+        gap: '15px', // Space between items
+        fontSize: '0.9em'
+    };
+    const colorKeyItemStyle = (color) => ({
+        display: 'flex',
+        alignItems: 'center',
+        gap: '5px' // Space between color swatch and text
+    });
+    const colorSwatchStyle = (color) => ({
+        width: '15px',
+        height: '15px',
+        backgroundColor: color,
+        border: '1px solid #ccc',
+        borderRadius: '3px'
+    });
+
+    const ModifiedRatingColorKey = () => (
+        <div style={colorKeyStyle}>
+            <div style={colorKeyItemStyle(getModifiedRatingColor(1))}><span style={colorSwatchStyle(getModifiedRatingColor(1))}></span> 1★ (Poor)</div>
+            <div style={colorKeyItemStyle(getModifiedRatingColor(2))}><span style={colorSwatchStyle(getModifiedRatingColor(2))}></span> 2★ (Fair)</div>
+            <div style={colorKeyItemStyle(getModifiedRatingColor(3))}><span style={colorSwatchStyle(getModifiedRatingColor(3))}></span> 3★ (Average)</div>
+            <div style={colorKeyItemStyle(getModifiedRatingColor(4))}><span style={colorSwatchStyle(getModifiedRatingColor(4))}></span> 4★ (Good)</div>
+            <div style={colorKeyItemStyle(getModifiedRatingColor(5))}><span style={colorSwatchStyle(getModifiedRatingColor(5))}></span> 5★ (Excellent)</div>
+        </div>
+    );
+
 
     return (
         <div style={chartPageStyle}>
             <h2 style={mainTitleStyle}>Pomodoro Cycle & Break Analysis</h2>
-            {processedCycleLogs.length > 0 && (
-                <>
-                    {chart1Data.datasets.length > 0 && (
-                        <div style={chartWrapperStyle}>
-                            <div style={chartCanvasContainerStyle}>
-                                <Scatter options={chart1Options} data={chart1Data} />
-                            </div>
-                            <p style={captionStyle}>
-                                <strong>Chart 1: Tasks Completed vs. Break Duration by Awareness Level.</strong> This chart shows how many tasks were completed in the work period following a break, plotted against the duration of that break. Points are colored by the awareness level (N-1, N, N+1) during that preceding break. This helps identify if certain break durations, under specific awareness conditions, lead to higher task completion.
-                            </p>
-                        </div>
-                    )}
 
-                    {/* UPDATED CHART 2 RENDER */}
-                    {chart2Data.datasets.length > 0 && chart2Data.datasets.some(ds => ds.data.length > 0) && (
-                        <div style={chartWrapperStyle}>
-                            <div style={chartCanvasContainerStyle}>
-                                <Scatter options={chart2Options} data={chart2Data} /> 
-                            </div>
-                            <p style={captionStyle}>
-                                <strong>Chart 2: Post-Break Efficacy vs. Energy (All Cycles by Awareness).</strong> Each point represents an individual pomodoro cycle. X-axis: Post-Break Energy. Y-axis: Post-Break Efficacy. Points are colored by the awareness level during the break. This helps visualize the direct relationship between energy and efficacy for each cycle, segmented by awareness.
-                            </p>
-                        </div>
-                    )}
+            {/* Chart 1 */}
+            {chart1Data.datasets.length > 0 && chart1Data.datasets.some(ds => ds.data.length > 0) && (
+                <div style={chartWrapperStyle}>
+                    <div style={chartCanvasContainerStyle}>
+                        <Bubble options={chart1Options} data={chart1Data} />
+                    </div>
+                    <p style={captionStyle}>
+                        <strong>Chart 1: Productivity After Break vs. Break Duration (Bubble by Awareness during Break).</strong>
+                        This bubble chart explores the relationship between the duration of a break and the number of tasks completed in the <em>subsequent</em> work period.
+                        Bubbles are colored by the self-reported awareness level (N-1: Red, N: Yellow, N+1: Teal) <em>during</em> the break. The size of each bubble indicates how many pomodoro cycles fall into that specific combination of break duration and tasks completed.
+                        This helps identify if certain break durations, under specific awareness conditions, tend to precede more productive work sessions.
+                    </p>
+                </div>
+            )}
 
-                    {chart3Data.datasets.length > 0 && chart3Data.datasets[0].data.length > 0 && (
-                        <div style={chartWrapperStyle}>
-                            <div style={chartCanvasContainerStyle}>
-                                <Bar options={chart3Options} data={chart3Data} />
-                            </div>
-                            <p style={captionStyle}>
-                                <strong>Chart 3: Average Post-Break Efficacy by Break Activity.</strong> Average 'Post-Break Efficacy' for different break activities. Helps identify which break types you find most effective.
-                            </p>
-                        </div>
-                    )}
+            {/* Chart 2 */}
+            {chart2Data.datasets.length > 0 && chart2Data.datasets.some(ds => ds.data.some(val => val > 0)) && (
+                <div style={chartWrapperStyle}>
+                    <div style={chartCanvasContainerStyle}>
+                        <Bar options={chart2Options} data={chart2Data} />
+                    </div>
+                    <p style={captionStyle}>
+                        <strong>Chart 2: Total Tasks Completed by Post-Break Efficacy (Stacked by Awareness during Break).</strong>
+                        This stacked bar chart shows the total number of tasks completed associated with different post-break efficacy ratings (1★ to 5★). Tasks are summed for work periods that led to a break with the given efficacy. Each bar represents an efficacy rating, and its segments show the total tasks completed, broken down by the awareness level reported <em>during</em> the break (N-1: Red, N: Yellow, N+1: Teal).
+                        This helps visualize which awareness levels during breaks are associated with higher task completion when a certain level of post-break efficacy is achieved.
+                    </p>
+                </div>
+            )}
 
-                    {chart4Data.labels && chart4Data.labels.length > 0 && (
-                         <div style={chartWrapperStyle}>
-                            <div style={chartCanvasContainerStyle}>
-                                <Bar options={chart4Options} data={chart4Data} />
-                            </div>
-                            <p style={captionStyle}>
-                                <strong>Chart 4: Post-Break Metrics by Work & Break Duration.</strong> This chart displays average Post-Break Efficacy (Teal), Energy (Blue), and Frustration (Red) for different combinations of Work Period and Break Durations. This helps identify optimal work/break length pairings for overall well-being and effectiveness.
-                            </p>
-                        </div>
-                    )}
+            {/* Chart 3 */}
+            {chart3Data.datasets.length > 0 && chart3Data.datasets[0].data.length > 0 && (
+                <div style={chartWrapperStyle}>
+                    <div style={chartCanvasContainerStyle}>
+                        <Bar options={chart3Options} data={chart3Data} />
+                    </div>
+                    <p style={captionStyle}>
+                        <strong>Chart 3: Average Post-Break Efficacy by Break Activity (Min. 3 Cycles).</strong>
+                        This horizontal bar chart displays the average 'Post-Break Efficacy' for different types of break activities. Only activities with at least 3 recorded cycles are shown, sorted by average efficacy.
+                        The color of the bar dynamically reflects the average efficacy value. This helps identify which break activities you generally find most effective for recovery.
+                    </p>
+                </div>
+            )}
 
-                    {linkedProductivityData.datasets.length > 0 && linkedProductivityData.datasets[0].data.length > 0 && (
-                         <div style={{ ...chartWrapperStyle, borderBottom: 'none' }}>
-                            <div style={chartCanvasContainerStyle}>
-                                <Scatter options={chart5Options} data={linkedProductivityData} />
-                            </div>
-                            <p style={captionStyle}>
-                                <strong>Chart 5: Tasks Completed vs. Previous Break's Efficacy.</strong> This chart explores if the quality of a previous break influences the tasks completed in the subsequent work period. Y-axis is 'Tasks Completed'. X-axis is the 'Post-Break Efficacy' of the break cycle that occurred immediately before that work period. Point color indicates the 'Break Effectiveness Rating' of that previous break.
-                            </p>
-                        </div>
-                    )}
-                </>
+            {/* Chart 4 */}
+            {chart4Data.datasets.length > 0 && chart4Data.datasets[0].data.length > 0 && (
+                 <div style={chartWrapperStyle}>
+                    <div style={chartCanvasContainerStyle}>
+                        <Bubble options={chart4Options} data={chart4Data} />
+                    </div>
+                     <ModifiedRatingColorKey />
+                    <p style={captionStyle}>
+                        <strong>Chart 4: Post-Break State by Work & Break Duration (Bubble).</strong>
+                        This bubble chart plots work duration (X-axis) against break duration (Y-axis). Each bubble represents a unique combination of work and break lengths.
+                        The size of the bubble indicates the number of cycles with that specific duration pairing. The color of the bubble represents the average 'Post-Break Efficacy' (see key above) achieved after those breaks.
+                        This helps identify potentially optimal work/break length pairings for maximizing efficacy.
+                    </p>
+                </div>
+            )}
+
+            {/* Chart 5 */}
+            {chart5Data.datasets.length > 0 && chart5Data.datasets[0].data.length > 0 && (
+                 <div style={{ ...chartWrapperStyle, borderBottom: 'none' }}>
+                    <div style={chartCanvasContainerStyle}>
+                        <Bubble options={chart5Options} data={chart5Data} />
+                    </div>
+                    <ModifiedRatingColorKey />
+                    <p style={captionStyle}>
+                        <strong>Chart 5: Productivity by Work/Break Ratio (Colored by Post-Break Efficacy).</strong>
+                        This bubble chart investigates how the ratio of work duration to break duration impacts the number of tasks completed <em>within that same work period</em>.
+                        The X-axis shows the Work/Break Ratio, and the Y-axis shows 'Tasks Completed'. Bubble size indicates the number of cycles at that specific ratio and task count.
+                        The color of the bubble represents the average 'Post-Break Efficacy' (see key above) reported after the break component of that ratio. This helps explore if a certain balance between work and break time correlates with higher output.
+                    </p>
+                </div>
             )}
         </div>
     );

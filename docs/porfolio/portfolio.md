@@ -253,3 +253,17 @@ Here are some screenshots of the web application:
 ![Study_Modal_5.24.25](portfolio_assets/Study_Modal_5.24.25.png)
 ![StudySession_1_5.23.25](portfolio_assets/StudySession_1_5.23.25.png)
 ![StudySession_2_5.23.25](portfolio_assets/StudySession_2_5.23.25.png)
+
+---
+
+## Development Iterations & Feature Deep Dive
+
+For those interested in the iterative development process and a detailed breakdown of specific features, you can explore the following:
+
+### Pomodoro Break Analysis Feature
+
+This feature underwent several iterations to refine its data collection, analysis, and visualization, aiming to provide actionable insights into optimizing work/break cycles.
+
+*   **[View All Pomodoro Break Feature Iterations](../feature_iterations/pomodoro_break_feature/)**
+
+This link will take you to the directory containing detailed logs and analyses for each development iteration of this specific feature.

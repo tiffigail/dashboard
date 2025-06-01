@@ -6,169 +6,153 @@ import AmRoutineForm from '../AmRoutineForm/AmRoutineForm';
 import PmRoutineForm from '../PmRoutineForm/PmRoutineForm';
 import FamilyCleanForm from '../FamilyCleanForm/FamilyCleanForm';
 import StudyForm from '../StudyForm/StudyForm';
-import ReadyForWorkForm from '../ReadyForWorkForm/ReadyForWorkForm'; // <<< Import ReadyForWorkForm
+import ReadyForWorkForm from '../ReadyForWorkForm/ReadyForWorkForm';
+// Assuming BudgetForm is correctly imported if isBudgetModalOpen is used
+// import BudgetForm from '../BudgetForm/BudgetForm'; // If you have this, uncomment
 import ContextMap from '../ContextMap/ContextMap';
-import BreakAnalysisChart from '../BreakAnalysisChart/BreakAnalysisChart'; // <<< IMPORT FOR THE CHART
+import BreakAnalysisChart from '../BreakAnalysisChart/BreakAnalysisChart';
 import { db } from '../../firebaseConfig';
 import {
-    collection,
-    doc,
-    getDoc,
-    getDocs,
-    query,
-    where,
-    limit,
-    orderBy,
-    Timestamp,
-    documentId,
-    updateDoc // Added updateDoc back
+    collection, doc, getDoc, getDocs, query,
+    where, limit, orderBy, Timestamp, documentId, updateDoc
 } from "firebase/firestore";
 import {
     ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend
 } from 'recharts';
 
 // --- Helper Functions ---
-const getWeekId = (date = new Date()) => {
+const getWeekId = (date = new Date()) => { /* ... same as your original ... */ 
     const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-    const dayNum = d.getUTCDay() || 7;
-    d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+    const dayNum = d.getUTCDay() || 7; d.setUTCDate(d.getUTCDate() + 4 - dayNum);
     const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
     const weekNo = Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
     return `${d.getUTCFullYear()}-W${String(weekNo).padStart(2, '0')}`;
 };
-const getTodayDateString = () => {
-    const today = new Date();
-    const year = today.getFullYear();
+const getTodayDateString = () => { /* ... same as your original ... */
+    const today = new Date(); const year = today.getFullYear();
     const month = String(today.getMonth() + 1).padStart(2, '0');
     const day = String(today.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
 };
-const dayToAxisThemeMapping = [
-    "Rest and preparation",
-    "Physical",
-    "Financial",
-    "Gear",
-    "ON TRACK N+1",
-    "Misdirect",
-    "Environment"
+const dayToAxisThemeMapping = [ /* ... same as your original ... */
+    "Rest and preparation", "Physical", "Financial", "Gear", "ON TRACK N+1", "Misdirect", "Environment"
 ];
-function findUpcomingMilestone(milestones) {
+function findUpcomingMilestone(milestones) { /* ... same as your original ... */
     if (!Array.isArray(milestones)) return null;
     return milestones.find(m => m.completionDate === null || m.completionDate === undefined) || null;
 }
-function formatDisplayDate(date) {
+function formatDisplayDate(date) { /* ... same as your original ... */
     const options = { weekday: 'long', month: 'long', day: 'numeric' };
     return date.toLocaleDateString(undefined, options);
 }
-function formatChartDateLabel(dateString_YYYY_MM_DD) {
-    try {
-        const parts = dateString_YYYY_MM_DD.split('-');
-        if (parts.length === 3) {
-            return `${parts[1]}/${parts[2]}`;
-        }
-        return dateString_YYYY_MM_DD;
-    } catch (e) {
-        return dateString_YYYY_MM_DD;
-    }
+function formatChartDateLabel(dateString_YYYY_MM_DD) { /* ... same as your original ... */
+    try { const parts = dateString_YYYY_MM_DD.split('-'); if (parts.length === 3) return `${parts[1]}/${parts[2]}`; return dateString_YYYY_MM_DD; }
+    catch (e) { return dateString_YYYY_MM_DD; }
 }
-const axisNameToCssVarSuffix = (axisName) => {
+const axisNameToCssVarSuffix = (axisName) => { /* ... same as your original ... */
     if (!axisName || typeof axisName !== 'string') return 'default';
     return axisName.trim().toLowerCase().replace(/\s+/g, '-').replace(/\+/g, '-plus-');
 };
+
+// Helper to get a fully resolved color string from CSS variable or fallback
+const getCssVariableValue = (variableName, fallbackColor = 'rgba(100,100,100,1)') => {
+    if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+        const value = getComputedStyle(document.documentElement).getPropertyValue(variableName)?.trim();
+        if (value) {
+            if (value.startsWith('rgb') || value.startsWith('#') || /^[a-zA-Z]+$/.test(value)) {
+                return value; // Already a full color string
+            }
+            return `rgba(${value}, 1)`; // Assuming RGB triplet "R, G, B"
+        }
+    }
+    return fallbackColor;
+};
+
+// Helper to get axis theme color specifically for chart lines, using preferred suffixes
+const getAxisThemeColorForDailyChart = (axisName, fallbackColor = 'rgba(108, 117, 125, 1)') => {
+    if (!axisName || typeof axisName !== 'string') return fallbackColor;
+    const cssVarSuffix = axisNameToCssVarSuffix(axisName);
+    return getCssVariableValue(`--axis-color-${cssVarSuffix}-3`, 
+               getCssVariableValue(`--axis-color-${cssVarSuffix}-2`, fallbackColor));
+};
 // --- End Helper Functions ---
 
-// <<< Accept onNavigate prop if needed by BudgetForm >>>
 function DailyView({ onNavigate }) {
     // == State ==
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     const [todayDate, setTodayDate] = useState(new Date());
-    const [axisName, setAxisName] = useState("Loading...");
-    const [axisData, setAxisData] = useState(null);
-    const [chartData, setChartData] = useState([]);
+    const [axisName, setAxisName] = useState("Loading..."); // This is the "Axis Theme of the Day"
+    const [axisData, setAxisData] = useState(null); // Roadmap data for the current axis
+    const [chartData, setChartData] = useState([]); // Data for the recharts chart
     const [isAmModalOpen, setIsAmModalOpen] = useState(false);
     const [isPmModalOpen, setIsPmModalOpen] = useState(false);
     const [isFamilyCleanModalOpen, setIsFamilyCleanModalOpen] = useState(false);
     const [isStudyModalOpen, setIsStudyModalOpen] = useState(false);
-    const [isBudgetModalOpen, setIsBudgetModalOpen] = useState(false); // Keep Budget Modal state
-    const [isReadyModalOpen, setIsReadyModalOpen] = useState(false); // <<< State for Ready Modal
+    const [isBudgetModalOpen, setIsBudgetModalOpen] = useState(false);
+    const [isReadyModalOpen, setIsReadyModalOpen] = useState(false);
     const [axisCssSuffix, setAxisCssSuffix] = useState('default');
+    const [currentDayAxisThemeTaskLineColor, setCurrentDayAxisThemeTaskLineColor] = useState(getAxisThemeColorForDailyChart('default'));
 
-    // == Fetch Data ==
+        // == Fetch Data ==
     useEffect(() => {
         const fetchData = async () => {
-            setIsLoading(true);
-            setError(null);
-            const today = new Date();
-            const dayIndex = today.getDay();
-            const currentAxisTheme = dayToAxisThemeMapping[dayIndex];
-            const currentAxisSuffix = axisNameToCssVarSuffix(currentAxisTheme);
+            setIsLoading(true); setError(null);
+            const todayForLogic = new Date();
+            const dayIndex = todayForLogic.getDay();
+            const currentAxisThemeOfDay = dayToAxisThemeMapping[dayIndex]; // This IS the "Axis Theme of the Day"
+            const currentAxisSuffixVal = axisNameToCssVarSuffix(currentAxisThemeOfDay);
+            const themeTaskLineColor = getAxisThemeColorForDailyChart(currentAxisThemeOfDay);
 
-            setTodayDate(today);
-            setAxisName(currentAxisTheme);
-            setAxisCssSuffix(currentAxisSuffix);
+            setTodayDate(todayForLogic);
+            setAxisName(currentAxisThemeOfDay);
+            setAxisCssSuffix(currentAxisSuffixVal);
+            setCurrentDayAxisThemeTaskLineColor(themeTaskLineColor); // Ensure this state is defined
 
-            console.log(`Fetching data for DailyView: Axis=${currentAxisTheme}, Suffix=${currentAxisSuffix}`);
+            console.log(`DailyView: Fetching for Axis=${currentAxisThemeOfDay}, Color=${themeTaskLineColor}`);
 
             try {
-                const axisQuery = query(collection(db, "axes"), where("axisName", "==", currentAxisTheme), limit(1));
+                const axisQuery = query(collection(db, "axes"), where("axisName", "==", currentAxisThemeOfDay), limit(1));
                 const axisDataPromise = getDocs(axisQuery);
-                const metricsQuery = query(
-                    collection(db, "dailyMetrics"),
-                    orderBy(documentId(), "desc"),
-                    limit(30)
-                );
+                const metricsQuery = query(collection(db, "dailyMetrics"), orderBy(documentId(), "desc"), limit(30));
                 const metricsHistoryPromise = getDocs(metricsQuery);
+                const [axisSnapshot, metricsHistorySnapshot] = await Promise.all([axisDataPromise, metricsHistoryPromise]);
 
-                const [axisSnapshot, metricsHistorySnapshot] = await Promise.all([
-                    axisDataPromise, metricsHistoryPromise
-                ]);
-
-                if (!axisSnapshot.empty) {
-                    const fetchedAxisData = axisSnapshot.docs[0].data();
-                    setAxisData(fetchedAxisData);
-                    console.log("Axis Data for Roadmap:", fetchedAxisData);
-                } else {
-                    console.warn(`Axis data not found for: ${currentAxisTheme}`);
-                    setError(`Axis data setup needed for ${currentAxisTheme}`);
-                    setAxisData(null);
-                }
+                if (!axisSnapshot.empty) setAxisData(axisSnapshot.docs[0].data());
+                else { console.warn(`Axis data not found for: ${currentAxisThemeOfDay}`); setAxisData(null); }
 
                 const processedChartData = [];
                 metricsHistorySnapshot.forEach(doc => {
                     const data = doc.data();
+                    const tasksForThisDayAxisTheme = (data.axisTaskCounts && data.axisTaskCounts[currentAxisThemeOfDay] !== undefined)
+                        ? Number(data.axisTaskCounts[currentAxisThemeOfDay])
+                        : 0;
+
                     processedChartData.push({
                         name: formatChartDateLabel(doc.id),
                         score: Number(data.productivityScore !== undefined ? data.productivityScore : 0),
                         epiphany: Number(data.epiphanyCount !== undefined ? data.epiphanyCount : 0),
                         despair: Number(data.despairCount !== undefined ? data.despairCount : 0),
+                        axisTasks: tasksForThisDayAxisTheme, // Correctly add axisTasks
                         fullDate: doc.id
                     });
                 });
                 setChartData(processedChartData.reverse());
-                console.log("Processed Chart Data:", processedChartData);
-
-            } catch (err) {
-                console.error("Error fetching data for DailyView: ", err);
-                setError("Failed to load daily data.");
-                setAxisData(null);
-                setChartData([]);
-            } finally {
-                setIsLoading(false);
-            }
+                console.log("Processed Chart Data for DailyView (last 5):", processedChartData.slice(-5));
+                
+            } catch (err) { console.error("Error fetching data for DailyView: ", err); setError("Failed to load daily data."); setAxisData(null); setChartData([]); }
+            finally { setIsLoading(false); }
         };
-
         fetchData();
-    }, []);
+    }, []); // Fetch once on mount
 
     // == Modal Handlers ==
-    const handleAmRoutineSubmit = (formData) => { console.log("AM Routine Submitted:", formData); closeAmModal(); };
-    const handlePmRoutineSubmit = (formData) => { console.log("PM Routine Submitted:", formData); closePmModal(); };
-    const handleFamilyCleanSubmit = (formData) => { console.log("Family Clean Routine Submitted:", formData); closeFamilyCleanModal(); };
-    const handleStudySubmit = (formData) => { console.log("Study Session Submitted:", formData); closeStudyModal(); };
-    const handleBudgetSubmit = (formData) => { console.log("Budget Routine Submitted (in DailyView):", formData); closeBudgetModal(); };
-    const handleReadySubmit = (formData) => { console.log("Ready For Work Submitted:", formData); closeReadyModal(); };
-
+    const handleAmRoutineSubmit = (formData) => { console.log("AM Sub:", formData); closeAmModal(); };
+    const handlePmRoutineSubmit = (formData) => { console.log("PM Sub:", formData); closePmModal(); };
+    const handleFamilyCleanSubmit = (formData) => { console.log("FamClean Sub:", formData); closeFamilyCleanModal(); };
+    const handleStudySubmit = (formData) => { console.log("Study Sub:", formData); closeStudyModal(); };
+    const handleBudgetSubmit = (formData) => { console.log("Budget Sub (DailyView):", formData); closeBudgetModal(); };
+    const handleReadySubmit = (formData) => { console.log("Ready Sub:", formData); closeReadyModal(); };
     const closeAmModal = () => setIsAmModalOpen(false);
     const closePmModal = () => setIsPmModalOpen(false);
     const closeFamilyCleanModal = () => setIsFamilyCleanModalOpen(false);
@@ -176,25 +160,14 @@ function DailyView({ onNavigate }) {
     const closeBudgetModal = () => setIsBudgetModalOpen(false);
     const closeReadyModal = () => setIsReadyModalOpen(false);
 
-
-    // Helper to render milestone status visually
-    const getMilestoneStatusClass = (milestone, currentMilestone) => {
+    const getMilestoneStatusClass = (milestone, currentMilestone) => { /* ... same as your original ... */ 
         if (!milestone) return '';
-        if (milestone.completionDate && typeof milestone.completionDate.toDate === 'function') {
-            return styles.completed;
-        }
-        if (currentMilestone && milestone.text === currentMilestone.text) {
-            return styles.current;
-        }
+        if (milestone.completionDate && typeof milestone.completionDate.toDate === 'function') return styles.completed;
+        if (currentMilestone && milestone.text === currentMilestone.text) return styles.current;
         return styles.upcoming;
     };
-
-
-    // Find the current milestone
     const currentMilestone = axisData ? findUpcomingMilestone(axisData.milestones) : null;
-
-    // --- Define Inline Styles for Roadmap Section ---
-    const roadmapStyle = {
+    const roadmapStyle = { /* ... same as your original ... */
         '--roadmap-border-color': `var(--axis-color-${axisCssSuffix}-4, var(--axis-color-${axisCssSuffix}-3, var(--axis-color-default-3)))`,
         '--roadmap-text-color': `var(--axis-color-${axisCssSuffix}-4, var(--axis-color-${axisCssSuffix}-3, var(--axis-color-default-3)))`,
         '--roadmap-color-light': `var(--axis-color-${axisCssSuffix}-1, var(--axis-color-default-1))`,
@@ -202,23 +175,17 @@ function DailyView({ onNavigate }) {
         '--roadmap-color-dark': `var(--axis-color-${axisCssSuffix}-3, var(--axis-color-default-3))`,
         '--roadmap-color-darkest': `var(--axis-color-${axisCssSuffix}-4, var(--axis-color-${axisCssSuffix}-3, var(--axis-color-default-3)))`,
     };
-    // --- End Roadmap Styles ---
+    
+    // Define chart line colors using CSS variables, matching your original intent
+    const scoreChartLineColor = getCssVariableValue('--axis-color-on-track-n-plus-1-2', 'rgba(54, 162, 235, 1)');
+    const epiphanyChartLineColor = getCssVariableValue('--axis-color-environment-3', 'rgba(255, 205, 86, 1)');
+    const despairChartLineColor = getCssVariableValue('--axis-color-financial-3', 'rgba(104, 67, 188, 1)');
+    // currentDayAxisThemeTaskLineColor is already in state, dynamically set for the new axis tasks line
 
-    // Define chart line colors using global CSS variables
-    const scoreColor = 'var(--axis-color-on-track-n-plus-1-2)';
-    const epiphanyColor = 'var(--axis-color-environment-3)';
-    const despairColor = 'var(--axis-color-financial-3)';
-
-
-    // --- The main return statement for the component ---
     return (
         <div className={styles.dailyViewContainer}>
-            {isLoading ? (
-                <p>Loading daily focus...</p>
-            ) : error ? (
-                <p className={styles.errorText}>{error}</p>
-            ) : (
-                // Use React Fragment <> to return multiple top-level elements if needed
+            {isLoading ? ( <p>Loading daily focus...</p> ) : 
+             error ? ( <p className={styles.errorText}>{error}</p> ) : (
                 <>
                     {/* --- Header Section --- */}
                     <div className={styles.headerSection}>
@@ -233,151 +200,82 @@ function DailyView({ onNavigate }) {
                                         <LineChart data={chartData} margin={{ top: 5, right: 5, left: -25, bottom: 5 }}>
                                             <CartesianGrid strokeDasharray="3 3" stroke="var(--border-light)" />
                                             <XAxis dataKey="name" stroke="var(--text-secondary)" fontSize="0.8em" />
-                                            <YAxis allowDecimals={false} stroke="var(--text-secondary)" fontSize="0.8em" domain={[0, 'auto']} />
+                                            <YAxis yAxisId="left" allowDecimals={false} stroke="var(--text-secondary)" fontSize="0.8em" domain={[0, 'auto']} />
                                             <Tooltip contentStyle={{ fontSize: '0.8em', padding: '5px' }} />
                                             <Legend wrapperStyle={{ fontSize: '0.8em', paddingTop: '10px' }}/>
-                                            <Line type="monotone" dataKey="score" stroke={scoreColor} strokeWidth={2} dot={false} activeDot={{ r: 6, fill: scoreColor }} name="Score" />
-                                            <Line type="monotone" dataKey="epiphany" stroke={epiphanyColor} strokeWidth={1} dot={false} activeDot={{ r: 4, fill: epiphanyColor }} name="E" />
-                                            <Line type="monotone" dataKey="despair" stroke={despairColor} strokeWidth={1} dot={false} activeDot={{ r: 4, fill: despairColor }} name="D" />
+                                            
+                                            <Line yAxisId="left" type="monotone" dataKey="score" stroke={scoreChartLineColor} strokeWidth={2} dot={false} activeDot={{ r: 6 }} name="Score (All Tasks)" />
+                                            <Line yAxisId="left" type="monotone" dataKey="epiphany" stroke={epiphanyChartLineColor} strokeWidth={1.5} dot={false} activeDot={{ r: 4 }} name="E" />
+                                            <Line yAxisId="left" type="monotone" dataKey="despair" stroke={despairChartLineColor} strokeWidth={1.5} dot={false} activeDot={{ r: 4 }} name="D" />
+                                            
+                                            {/* NEW Line for the day's axis theme tasks */}
+                                            <Line 
+                                                yAxisId="left" 
+                                                type="monotone"
+                                                dataKey="axisTasks" 
+                                                stroke={currentDayAxisThemeTaskLineColor} // Dynamic color
+                                                strokeWidth={2} 
+                                                dot={false} // No dots
+                                                activeDot={{ r: 5, fill: currentDayAxisThemeTaskLineColor }} 
+                                                name={`${axisName} Tasks`} 
+                                            />
                                         </LineChart>
                                     </ResponsiveContainer>
-                                ) : (
-                                    <p className={styles.chartMessageSmall}>Not enough data for chart.</p>
-                                )}
+                                ) : ( <p className={styles.chartMessageSmall}>Not enough data for chart.</p> )}
                             </div>
                         </div>
-                        <div className={styles.headerRight}>
-                            <ContextMap axisName={axisName} />
-                        </div>
+                        <div className={styles.headerRight}> <ContextMap axisName={axisName} /> </div>
                     </div>
                     {/* --- End Header Section --- */}
 
-                    {/* --- Roadmap Section --- */}
+                    {/* --- Roadmap Section (Copied from your original) --- */}
                     {axisData && (axisData.question || axisData.milestones?.length > 0 || axisData.yearlyGoal) && (
                         <div className={styles.roadmapSection} style={roadmapStyle}>
-                            <h3 className={styles.sectionTitle} >
-                                {axisName} Roadmap
-                            </h3>
+                            <h3 className={styles.sectionTitle} >{axisName} Roadmap</h3>
                             <div className={styles.roadmapHorizontalContainer}>
-                                <div className={`${styles.roadmapColumn} ${styles.roadmapQuestion}`}>
-                                    <h4 className={styles.roadmapColumnTitle}>To Ponder</h4>
-                                    <p>{axisData?.question || <i className={styles.notSet}>N/A</i>}</p>
-                                </div>
-                                <div className={`${styles.roadmapColumn} ${styles.roadmapMilestones}`}>
-                                    <h4 className={styles.roadmapColumnTitle}>Milestones</h4>
-                                    {axisData?.milestones && axisData.milestones.length > 0 ? (
-                                        <div className={styles.milestonesHorizontalList}>
-                                            {axisData.milestones.map((milestone, index) => (
-                                                <div
-                                                    key={milestone.text || index}
-                                                    className={`${styles.milestoneItemHoriz} ${getMilestoneStatusClass(milestone, currentMilestone)}`}
-                                                >
-                                                    <span className={styles.milestoneTextHoriz}>{milestone.text}</span>
-                                                    {milestone.dueDate && typeof milestone.dueDate.toDate === 'function' && (
-                                                        <span className={styles.milestoneDateHoriz}>
-                                                            Due: {milestone.dueDate.toDate().toLocaleDateString()}
-                                                        </span>
-                                                    )}
-                                                    {milestone.completionDate &&
-                                                        typeof milestone.completionDate.toDate === 'function' && (
-                                                            <span className={styles.milestoneDateHoriz}>
-                                                                Done: {milestone.completionDate
-                                                                    .toDate()
-                                                                    .toLocaleDateString()}
-                                                            </span>
-                                                        )}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    ) : (
-                                        <p className={styles.noMilestones}>
-                                            <i>No milestones defined.</i>
-                                        </p>
-                                    )}
-                                </div>
-                                <div className={`${styles.roadmapColumn} ${styles.roadmapYearlyGoal}`}>
-                                    <h4 className={styles.roadmapColumnTitle}>Yearly Goal</h4>
-                                    <p>{axisData?.yearlyGoal || <i className={styles.notSet}>N/A</i>}</p>
-                                </div>
+                                <div className={`${styles.roadmapColumn} ${styles.roadmapQuestion}`}> <h4 className={styles.roadmapColumnTitle}>To Ponder</h4> <p>{axisData?.question || <i className={styles.notSet}>N/A</i>}</p> </div>
+                                <div className={`${styles.roadmapColumn} ${styles.roadmapMilestones}`}> <h4 className={styles.roadmapColumnTitle}>Milestones</h4> {axisData?.milestones && axisData.milestones.length > 0 ? ( <div className={styles.milestonesHorizontalList}> {axisData.milestones.map((milestone, index) => ( <div key={milestone.text || index} className={`${styles.milestoneItemHoriz} ${getMilestoneStatusClass(milestone, currentMilestone)}`}> <span className={styles.milestoneTextHoriz}>{milestone.text}</span> {milestone.dueDate?.toDate && (<span className={styles.milestoneDateHoriz}>Due: {milestone.dueDate.toDate().toLocaleDateString()}</span>)} {milestone.completionDate?.toDate && (<span className={styles.milestoneDateHoriz}>Done: {milestone.completionDate.toDate().toLocaleDateString()}</span>)} </div> ))} </div> ) : (<p className={styles.noMilestones}><i>No milestones defined.</i></p>)} </div>
+                                <div className={`${styles.roadmapColumn} ${styles.roadmapYearlyGoal}`}> <h4 className={styles.roadmapColumnTitle}>Yearly Goal</h4> <p>{axisData?.yearlyGoal || <i className={styles.notSet}>N/A</i>}</p> </div>
                             </div>
                         </div>
                     )}
                     {/* --- End Roadmap Section --- */}
-
-                    {/* --- Routine Buttons --- */}
+                    
+                    {/* --- Routine Buttons (Copied from your original) --- */}
                     <div className={styles.routineButtonsWrapper}>
-                        <button className={styles.routineButton} onClick={() => setIsAmModalOpen(true)}>
-                            Start AM Routine
-                        </button>
-                         <button className={`${styles.routineButton} ${styles.readyButton}`} onClick={() => setIsReadyModalOpen(true)}>
-                            Ready For Work
-                        </button>
-                        <button className={`${styles.routineButton} ${styles.studyButton}`} onClick={() => setIsStudyModalOpen(true)}>
-                            Start Study Session
-                        </button>
-                        <button className={`${styles.routineButton} ${styles.familyCleanButton}`} onClick={() => setIsFamilyCleanModalOpen(true)}>
-                            Start Family Clean
-                        </button>
-                        <button className={`${styles.routineButton} ${styles.pmButton}`} onClick={() => setIsPmModalOpen(true)}>
-                            Start PM Routine
-                        </button>
+                        <button className={styles.routineButton} onClick={() => setIsAmModalOpen(true)}>Start AM Routine</button>
+                        <button className={`${styles.routineButton} ${styles.readyButton}`} onClick={() => setIsReadyModalOpen(true)}>Ready For Work</button>
+                        <button className={`${styles.routineButton} ${styles.studyButton}`} onClick={() => setIsStudyModalOpen(true)}>Start Study Session</button>
+                        <button className={`${styles.routineButton} ${styles.familyCleanButton}`} onClick={() => setIsFamilyCleanModalOpen(true)}>Start Family Clean</button>
+                        <button className={`${styles.routineButton} ${styles.pmButton}`} onClick={() => setIsPmModalOpen(true)}>Start PM Routine</button>
                     </div>
                     {/* --- End Routine Buttons --- */}
 
-                    {/* === ADDED BREAK ANALYSIS CHART SECTION === */}
-                    {/* Added a check to only render chart if not loading/erroring */}
+                    {/* --- Break Analysis Chart Section (Copied from your original) --- */}
                     {!isLoading && !error && (
-                        <section className={styles.analysisSection}> {/* Optional wrapper class */}
+                        <section className={styles.analysisSection}>
                             <BreakAnalysisChart />
                         </section>
                     )}
-                    {/* === END BREAK ANALYSIS CHART SECTION === */}
-
+                    {/* --- End Break Analysis Chart Section --- */}
                 </>
             )}
 
-            {/* --- Modals --- */}
-            {isAmModalOpen && (
-                <Modal isOpen={isAmModalOpen} onClose={closeAmModal}>
-                    <AmRoutineForm onSubmit={handleAmRoutineSubmit} onClose={closeAmModal} />
+            {/* --- Modals (Copied from your original) --- */}
+            {isAmModalOpen && (<Modal isOpen={isAmModalOpen} onClose={closeAmModal}><AmRoutineForm onSubmit={handleAmRoutineSubmit} onClose={closeAmModal} /></Modal>)}
+            {isPmModalOpen && (<Modal isOpen={isPmModalOpen} onClose={closePmModal}><PmRoutineForm onSubmit={handlePmRoutineSubmit} onClose={closePmModal} /></Modal>)}
+            {isFamilyCleanModalOpen && (<Modal isOpen={isFamilyCleanModalOpen} onClose={closeFamilyCleanModal}><FamilyCleanForm onSubmit={handleFamilyCleanSubmit} onClose={closeFamilyCleanModal} /></Modal>)}
+            {isStudyModalOpen && (<Modal isOpen={isStudyModalOpen} onClose={closeStudyModal}><StudyForm onSubmit={handleStudySubmit} onClose={closeStudyModal} axisQuestion={axisData?.question}/></Modal>)}
+            {isBudgetModalOpen && (
+                 <Modal isOpen={isBudgetModalOpen} onClose={closeBudgetModal}>
+                    {/* <BudgetForm onSubmit={handleBudgetSubmit} onClose={closeBudgetModal} onNavigate={onNavigate} /> */}
+                    <p>Budget Form Placeholder</p> {/* Placeholder if BudgetForm isn't ready */}
                 </Modal>
             )}
-            {isPmModalOpen && (
-                <Modal isOpen={isPmModalOpen} onClose={closePmModal}>
-                    <PmRoutineForm onSubmit={handlePmRoutineSubmit} onClose={closePmModal} />
-                </Modal>
-            )}
-            {isFamilyCleanModalOpen && (
-                <Modal isOpen={isFamilyCleanModalOpen} onClose={closeFamilyCleanModal}>
-                    <FamilyCleanForm onSubmit={handleFamilyCleanSubmit} onClose={closeFamilyCleanModal} />
-                </Modal>
-            )}
-             {isStudyModalOpen && (
-                <Modal isOpen={isStudyModalOpen} onClose={closeStudyModal}>
-                    <StudyForm
-                        onSubmit={handleStudySubmit}
-                        onClose={closeStudyModal}
-                        axisQuestion={axisData?.question}
-                    />
-                </Modal>
-            )}
-            {isBudgetModalOpen && ( // Keep Budget Modal logic if button exists
-                <Modal isOpen={isBudgetModalOpen} onClose={closeBudgetModal}>
-                    <BudgetForm
-                        onSubmit={handleBudgetSubmit}
-                        onClose={closeBudgetModal}
-                        onNavigate={onNavigate}
-                    />
-                </Modal>
-            )}
-            {isReadyModalOpen && (
-                <Modal isOpen={isReadyModalOpen} onClose={closeReadyModal}>
-                    <ReadyForWorkForm onSubmit={handleReadySubmit} onClose={closeReadyModal} />
-                </Modal>
-            )}
+            {isReadyModalOpen && (<Modal isOpen={isReadyModalOpen} onClose={closeReadyModal}><ReadyForWorkForm onSubmit={handleReadySubmit} onClose={closeReadyModal} /></Modal>)}
             {/* --- End Modals --- */}
-        </div> // End of the main container div
-    ); // End of the return statement
-} // End of the DailyView function component
+        </div>
+    );
+}
 
 export default DailyView;

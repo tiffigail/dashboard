@@ -1,0 +1,93 @@
+Question,Answer
+Which key do you hold down when you want to select cells in different areas of the worksheet,Control
+How do you write an absolute cell ,$A$B dollar signs first
+What do you always use with a formula,=
+What do you use to copy formatting,Format painting
+How do you minimize or expand the ribbon,Double click the tab
+How do you add to your quick access tool bar,Go to the desired button on your ribbon tab right click and add to quick access tool bar
+Where and what is your status bar,"Bottom right, shows the average, count and sum of the selected numeric values"
+What is the big white cross icon,The select tool
+What is the black arrow icon when you are on the edge of a cell?,Drag and drop or move
+How do you select a large group of cells,Control a or select first and hold shift then select last
+How do you use split screen,"Select the cell you want to divide along, then select split screen from the view ribbon"
+How to copy down,Double click bottom right aarow
+How do I autofill with a pattern? ,Select the cells that contain the pattern.  Such as counting by 8s 8 then 16 and use fill excel automatically finds and continues the pattern.
+How to use flash fill,"For more complex patterns, such as a list of names and the next column is first.last@email.com using flash fill will continue to concatenate the rest of the names"
+How do you start a new line inside a cell,Alt enter
+Ctrl y,Redo
+How do I remove a character?,Ctrl h find and replace.  Leave replace with blank
+Move to bottom or top,Control down or up
+Insert slicer,Gives you placeable box of filter buttons
+
+Question,Answer
+Text to column,"Under the data tab.  You select 1. delimited: characters such as commas or tabs separate each field
+Or
+Fixed width: fields are aligned in columns with spaces between each field
+
+2. Specify what the delimiter character is.
+3. Formatting and destination "
+Split a fixed width,"Serial numbers with fixed width
+Data: text to columns
+Fixed
+Specify the column break
+3 format or destination"
+Control e,Shortcut for flash fill
+How to clean up case and spaces quickly,"Flash fill 
+It runs on iterations "
+Goal seek,"What if analysis tool
+See how a hypothetical value change affects a formula."
+Rich data types,Locations with stored data and frickin stocks
+Pivot table,Table to easily compare and analyze.  Pivot bc you can easily change columns.
+Plus signs,Shows hidden
+Prep for pivot,"Ungroup (data)
+Remove filters (data. Clear filter)
+Consistent data types within each row or column
+Clear meaningful columns
+No blank rows or columns"
+When does excels date code start,"Jan 1st 1900 = 1
+The new before Christ bc, ad"
+How to find empty cells,Find and select. Special. Blanks
+What 2 tabs show up when you create a pivot table,Analyze and design
+How do you create relationships ,"After creating a table, select relationship under analyze"
+What is the benefit of using tables,You can select data on different sheets...look into this more
+How do you change the field values,"Right click cell in pivot table
+Select value field settings
+Show values as
+Percentages runn8ng totals rankings"
+Div error,Divide by 0 or an empty cell
+#error,This is a parsing error.  Formula can't be interpreted as written
+#na,Data can't be found in the spreadsheet or data doesn't exist. ( like in look up)
+#name,Formula is not recognized 
+#num,Data doesn't make sense for that calculation
+#value,"General error, like a name in the start date"
+#ref,Referenced cells have been deleted
+Countif(),"Countif(range,""criterion"")"
+Countif(),"Countif(range,""criterion"")"
+Convert syntax,"Convert(values, current metric, return metric)"
+Convert syntax,"Convert(values, current metric, return metric)"
+Reject invalid inputs,Highlights invalid entries so formulas still work.
+
+Question,Answer
+Importrange(),Imports data from another collection 
+Value,Changes text string format to number
+Xlookup,"=xlookup(lookup value, lookup array, return array, [if not found],[match mode],search mode)
+Match mode
+0 exact match
+-1 exact match, if not found next lower number
++1 exact match, if not found next greater number
+2 a wildcard match
+Search mode "
+V lookup,"=vlookup(lookup value, range, return column number from beginning selection, false is exact match)"
+"Product(value1,value2)",Value1*value2
+Sumproduct,"Sumproduct(array1, array2)  this multiplies each cell in array 1 by each cell in array 2 and adds it up"
+
+Question,Answer
+Adding a range name,"Select range, then enter the name in the name box
+Or select an array and under formula tab select create from selection.  
+Use name manager to edit"
+Add developer tab,"Access macros and form controls.
+Insert (button you can attach to a macro) check box, combo box returns numeric value of position, list box, radio button, labels) "
+Active x,Form controls with vba
+Look up feature in a dashboard,Use a combo box to create a drop down to select that field. Then reference that cell in your lookup function.
+Index(),"A look up function: index looks in a data range
+Index(array or reference, row number, column number)"

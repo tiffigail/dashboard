@@ -1,12 +1,27 @@
-# React + Vite
+# Gearshift Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Welcome to the Gearshift Dashboard project! This is a personal productivity dashboard designed to help track daily routines, tasks, and analyze work patterns like Pomodoro cycles.
 
-Currently, two official plugins are available:
+## Key Features
+*   Daily task management
+*   Pomodoro timer with break logging
+*   Routine tracking (AM/PM, Cleaning, Budget, etc.)
+*   Data visualization for daily metrics and break analysis
+*   [Add any other key features]
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Technologies Used
+*   React
+*   Vite
+*   Firebase (Firestore)
+*   Chart.js / Recharts 
+*   [Add any other significant libraries/technologies]
 
-## Expanding the ESLint configuration
+## Project Documentation & Portfolio
 
-If you are developing a production application, we recommend using TypeScript and enable type-aware lint rules. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+For a detailed overview of this project, its features, and my development process, please see the following documents:
+
+*   **[Main Portfolio & Project Overview](./docs/portfolio/portfolio.md)**
+*   **[Detailed Feature Iterations (Pomodoro Break Analysis)](./docs/feature_iterations/pomodoro_break_feature/)** 
+    *   [Iteration 1: Initial Ratio Analysis](./docs/feature_iterations/pomodoro_break_feature/iteration_01_initial_ratio_analysis.md)
+    *   [Iteration 2: Awareness & Detailed Metrics](./docs/feature_iterations/pomodoro_break_feature/iteration_02_awareness.md)
+    *   *(Link to new iterations as you add them)*

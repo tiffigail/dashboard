@@ -1,0 +1,559 @@
+Question,Answer
+"Data Data Data, I cannot make bricks without clay",Sir Arthur Conan doyle data is the clay you use to make building blocks
+What is data analysis ,"The collection, transformation, and organization of data in order to draw conclusions and inform decisions "
+What are the 6 steps of data analysis ,"The six steps of the data analysis process that you have been learning in this program are: ask, prepare, process, analyze, share, and act"
+What is 1. Ask,"Assessing and gathering information in order to design the structure of the project or analysis
+In the ask phase, you’ll work to understand the challenge to be solved or the question to be answered. It will likely be assigned to you by stakeholders. As this is the ask phase, you’ll ask many questions to help you along the way. "
+What is 2. Prepare?,"Plan: what metrics are you using and ahow will you gather data and get those systems in place. When or how frequently
+Next, in the prepare phase, you’ll find and collect the data you'll need to answer your questions. You’ll identify data sources, gather data, and verify that it is accurate and useful for answering your questions. "
+What is 3. Process?,"The data analysts also made sure employees understood how their data would be collected, stored, managed, and protected. As planned in step 2. Prepare
+
+The process phase is when you will clean and organize your data. Tasks you perform here include removing any inconsistencies; filling in missing values; and, in many cases, changing the data to a format that's easier to work with. Essentially, you’re ensuring the data is ready before you begin analysis."
+What is 4. Analyze,"Discover and document
+
+The analyze phase is when you do the necessary data analysis to uncover answers and solutions. Depending on the situation and the data, this could involve tasks such as calculating averages or counting items in categories so you can examine trends and patterns."
+What is 5. Share,"This is the thing you don't do in rec therapy if you don't write papers.  Present information in easy to understand formats and explain conclusions simply
+Next comes the share phase, when you present your findings to decision-makers through a report, presentation, or data visualizations. As part of the share phase, you decide which medium you want to use to share your findings and select the data to include. Tools for presenting data visually include charts made in Google Sheets, Tableau, and R. "
+What is 6. Act?,"The last stage of the process for the team of analysts was to work with leaders within their company and decide how best to implement changes and take actions based on the findings
+Last is the act phase, in which you and others in the company put the data insights into action. This could mean implementing a new business strategy, making changes to a website, or any other action that solves the initial problem. "
+What is the origin of statistics ,"Data analysis is rooted in statistics, which has a pretty long history itself. Archaeologists mark the start of statistics in ancient Egypt with the building of the pyramids. The ancient Egyptians were masters of organizing data. They documented their calculations and theories on papyri (paper-like materials), which are now viewed as the earliest examples of spreadsheets and checklists. Today’s data analysts owe a lot to those brilliant scribes, who helped create a more technical and efficient process."
+What are the variations and iterations of the data analysis process?,"Emc
+SAS
+Project based
+Big data"
+What is EMC's data analysis process,"EMC Corporation's data analytics process is cyclical with six steps:
+
+Discovery
+
+Pre-processing data
+
+Model planning
+
+Model building
+
+Communicate results
+
+Operationalize
+
+EMC Corporation is now Dell EMC. This model, created by David Dietrich, reflects the cyclical nature of typical business projects. The phases aren’t static milestones; each step connects and leads to the next, and eventually repeats. Key questions help analysts test whether they have accomplished enough to move forward and ensure that teams have spent enough time on each of the phases and don’t start modeling before the data is ready. It is a little different from the data analysis process on which this program is based on, but it has some core ideas in common: the first phase is interested in discovering and asking questions; data has to be prepared before it can be analyzed and used; and then findings should be shared and acted on."
+"What is SAS's iterative process
+
+","An iterative data analysis process was created by a company called SAS, a leading data analytics solutions provider. It can be used to produce repeatable, reliable, and predictive results: 
+
+Ask
+
+Prepare
+
+Explore
+
+Model
+
+Implement
+
+Act
+
+Evaluate
+
+The SAS model emphasizes the cyclical nature of their model by visualizing it as an infinity symbol. Its process has seven steps, many of which mirror the other models, like ask, prepare, model, and act. But this process is also a little different; it includes a step after the act phase designed to help analysts evaluate their solutions and potentially return to the ask phase again. 
+
+"
+"What is Project-based data analytics process 
+
+","A project-based data analytics process has five simple steps:
+
+Identifying the problem
+
+Designing data requirements
+
+Pre-processing data
+
+Performing data analysis
+
+Visualizing data
+
+This data analytics project process was developed by Vignesh Prajapati. It doesn’t include the sixth phase, or the act phase. However, it still covers a lot of the same steps described. It begins with identifying the problem, preparing and processing data before analysis, and ends with data visualization.
+
+"
+"What is Big data analytics process
+
+","Authors Thomas Erl, Wajid Khattak, and Paul Buhler proposed a big data analytics process in their book, Big Data Fundamentals: Concepts, Drivers & Techniques. Their process suggests phases divided into nine steps:
+
+Business case evaluation
+
+Data identification
+
+Data acquisition and filtering
+
+Data extraction
+
+Data validation and cleaning 
+
+Data aggregation and representation
+
+Data analysis
+
+Data visualization
+
+Utilization of analysis results
+
+This process appears to have three or four more steps than the previous models. But in reality, they have just broken down what has been referred to as prepare and process into smaller steps. It emphasizes the individual tasks required for gathering, preparing, and cleaning data before the analysis phase.
+
+"
+What are the 5 essential skills of a data analyst,"1. Curiosity
+2. Context
+3. Technical mindset
+4. Data design and
+5. Data strategy"
+5 whys,Ask why 5 times. You're going 5 why's deep to uncover the root cause
+Gap analysis,What are the gaps in process.  Where am I now. Where do I want to be.
+Predict the future,Just far enough in advance to be right on time
+Predict the end,You can't when there are so many starting points
+Issue,Topic or subject to investigate
+Question,Designed.  DESIGNEDto discover information
+Problem ,Obstacle or complication that needs a solution
+Oversampling,Increasing the sample size of non dominant groups
+
+Question,Answer
+Best chart type to show changes over time,Line
+Best chart type to show changes over time,Line
+Nightingale coxcomb,Like an exploded pie chart. 1850d.  Shows sizes of pie slices better.  Shows multiple axis per section
+Data driven ,Classic grapgs abd charts
+Conceptual,"Explain a process, abstract concept or idea. Like an org chart."
+Column charts,"use size to contrast and compare two or more values, using height or lengths to represent the specific values.  "
+Heat maps,"Similar to bar charts, heatmaps also use color to compare categories in a data set. They are mainly used to show relationships between two variables and use a system of color-coding to represent different values. The following heatmap plots temperature changes for each city during the hottest and coldest months of the year."
+Pie charts," circular graph that is divided into segments representing proportions corresponding to the quantity it represents, especially when dealing with parts of a whole."
+Pie charts," circular graph that is divided into segments representing proportions corresponding to the quantity it represents, especially when dealing with parts of a whole."
+Scatterplots,"show relationships between different variables. Scatterplots are typically used for two variables for a set of data, although additional variables can be displayed."
+Does your data have only one numeric variable? ,"If you have data that has one, continuous, numerical variable, then a histogram or density plot are the best methods of plotting your categorical data. Depending on your type of data, a bar chart can even be appropriate in this case. For example, if you have data pertaining to the height of a group of students, you will want to use a histogram to visualize how many students there are in each height range:"
+Are there multiple datasets? ,"For cases dealing with more than one set of data, consider a line or pie chart for accurate representation of your data. A line chart will connect multiple data sets over a single, continuous line, showing how numbers have changed over time. A pie chart is good for dividing a whole into multiple categories or parts. An example of this is when you are measuring quarterly sales figures of your company. Below are examples of this data plotted on both a line and pie chart."
+Are there multiple datasets? ,"For cases dealing with more than one set of data, consider a line or pie chart for accurate representation of your data. A line chart will connect multiple data sets over a single, continuous line, showing how numbers have changed over time. A pie chart is good for dividing a whole into multiple categories or parts. An example of this is when you are measuring quarterly sales figures of your company. Below are examples of this data plotted on both a line and pie chart."
+Are you measuring changes over time? ,"A line chart is usually adequate for plotting trends over time. However, when the changes are larger, a bar chart is the better option. If, for example, you are measuring the number of visitors to NYC over the past 6 months, the data would look like this:"
+Do relationships between the data need to be shown? ,"When you have two variables for one set of data, it is important to point out how one affects the other. Variables that pair well together are best plotted on a scatterplot. However, if there are too many data points, the relationship between variables can be obscured so a heat map can be a better representation in that case. If you are measuring the population of people across all 50 states in the United States, your data points would consist of millions so you would use a heat map. If you are simply trying to show the relationship between the number of hours spent studying and its effects on grades, your data would look like this:"
+What are the 4 elements of successful  visualization?,"Information: reflects the conclusion you’ve drawn from the data, which you will communicate with visualization
+
+Story: adds meaning to the data and makes it interesting
+
+Goals: makes the data usable and useful
+
+Visual form: creates both beauty and structure"
+5 seconds best practice,"Your audience should know what they are observing within five seconds of being shown a data visualization. Visuals should be clear and easy to follow. 
+
+In the five seconds after that, your audience should understand the conclusion your visualization is making—even if they aren’t familiar with your research. 
+
+"
+Simplicity best practice,"As long as it’s not misleading, you should visually represent only the data that your audience needs to understand your findings. Including irrelevant data may confuse, distract, or overwhelm your audience."
+What are the 9 principles of design?,"Balance
+Emphasis 
+Movement 
+Pattern
+Repetition
+Proportion 
+Rhythm 
+Variety
+Unity"
+Balance,"The design of a data visualization is balanced when the key visual elements, like color and shape, are distributed evenly. This doesn’t mean that you need complete symmetry, but your visualization shouldn’t have one side distracting from the other. If your data visualization is balanced, this could mean that the lines used to create the graphics are similar in length on both sides, or that the space between objects is equal. For example, this column chart (also shown below) is balanced; even though the columns are different heights and the chart isn’t symmetrical, the colors, width, and spacing of the columns keep this data visualization balanced. The colors provide sufficient contrast to each other so that you can pay attention to both the motivation level and the energy level displayed.
+
+"
+Emphasis," Your data visualization should have a focal point, so that your audience knows where to concentrate. In other words, your visualizations should emphasize the most important data so that users recognize it first. Using color and value is one effective way to make this happen. By using contrasting colors, you can make certain that graphic elements—and the data shown in those elements—stand out. 
+
+For example, you will notice a heat map data visualization below from The Pudding’s “Where Slang Comes From"" article. This heat map uses colors and value intensity to emphasize the states where search interest is highest. You can visually identify the increase in the search over time from low interest to high interest. This way, you are able to quickly grasp the key idea being presented without knowing the specific data values."
+Movement,"Movement can refer to the path the viewer’s eye travels as they look at a data visualization, or literal movement created by animations. Movement in data visualization should mimic the way people usually read. You can use lines and colors to pull the viewer’s attention across the page. 
+
+For example, notice how the average line in this combo chart (also shown below) draws your attention from left to right. Even though this example isn’t moving, it still uses the movement principle to guide viewers’ understanding of the data. "
+Pattern,"You can use similar shapes and colors to create patterns in your data visualization. This can be useful in a lot of different ways. For example, you can use patterns to highlight similarities between different data sets, or break up a pattern with a unique shape, color, or line to create more emphasis.
+
+In the example below, the different colored categories of this stacked column chart (also shown below) are a consistent pattern that makes it easier to compare book sales by genre in each column. Notice in the chart that the Fantasy & Sci Fi category (royal blue) is increasing over time even as the general category (green) is staying about the same. 
+
+"
+Repetition ,"Repeating chart types, shapes, or colors adds to the effectiveness of your visualization. Think about the book sales chart from the previous example: the repetition of the colors helps the audience understand that there are distinct sets of data. You may notice this repetition in all of the examples we have reviewed so far. Take some time to review each of the previous examples and notice the elements that are repeated to create a meaningful visual story."
+Proportion,"Proportion is another way that you can demonstrate the importance of certain data. Using various colors and sizes helps demonstrate that you are calling attention to a specific visual over others. If you make one chart in a dashboard larger than the others, then you are calling attention to it. It is important to make sure that each chart accurately reflects and visualizes the relationship among the values in it. In this dashboard (also shown below), the slice sizes and colors of the pie chart compared to the data in the table help make the number of donuts eaten by each person the focal point. "
+Rhythm ,"This refers to creating a sense of movement or flow in your visualization. Rhythm is closely tied to the movement principle. If your finished design doesn’t successfully create a flow, you might want to rearrange some of the elements to improve the rhythm."
+Variety,"Your visualizations should have some variety in the chart types, lines, shapes, colors, and values you use. Variety keeps the audience engaged. But it is good to find balance since too much variety can confuse people. The variety you include should make your dashboards and other visualizations feel interesting and unified."
+Unity,"The last principle is unity. This means that your final data visualization should be cohesive. If the visual is disjointed or not well organized, it will be confusing and overwhelming. "
+5 phases of design thinking,"Empathize: Thinking about the emotions and needs of the target audience for the data visualization 
+
+Define: Figuring out exactly what your audience needs from the data
+
+Ideate: Generating ideas for data visualization
+
+Prototype: Putting visualizations together for testing and feedback
+
+Test: Showing prototype visualizations to people before stakeholders see them"
+Empathize,"Thinking about the emotions and needs of the target audience for the data visualization 
+
+"
+Define,"Figuring out exactly what your audience needs from the data
+
+"
+Ideate," Generating ideas for data visualization
+
+"
+Prototype,"Putting visualizations together for testing and feedback
+
+"
+Test,Showing prototype visualizations to people before stakeholders see them
+Headline,"A headline is a line of words printed in large letters at the top of a visualization to communicate what data is being presented. It is the attention grabber that makes your audience want to read more. Here are some examples:
+
+Which Generation Controls the Senate?: This headline immediately generates curiosity. Refer to the subreddit post in the dataisbeautiful community, r/dataisbeautiful, on January 21, 2021.
+
+Top 10 coffee producers: This headline immediately informs how many coffee producers are ranked. Read the full article: bbc.com/news/business-43742686."
+Subtitle,"supports the headline by adding more context and description. Adding a subtitle will help the audience better understand the details associated with your chart. Typically, the text for subtitles has a smaller font size than the headline. "
+Label,"label in a visualization identifies data in relation to other data. Most commonly, labels in a chart identify what the x-axis and y-axis show. Always make sure you label your axes. We can add “Months (January - June 2020)” for the x-axis and “Average Monthly Rents ($)” for the y-axis in the average rents chart. 
+
+This is an unfinished stacked line chart, headline, subtitle, and newly added labels for the x and y axes.
+Data can also be labeled directly in a chart instead of through a chart legend. This makes it easier for the audience to understand data points without having to look up symbols or interpret the color coding in a legend. 
+
+We can add direct labels in the average rents chart. The audience can then identify the data for Oceanside in yellow, the data for Carlsbad in green, and the data for Vista in blue. 
+
+"
+Annotations,"briefly explains data or helps focus the audience on a particular aspect of the data in a visualization. 
+
+Suppose in the average rents chart that we want the audience to pay attention to the rents at their highs. Annotating the data points representing the highest average rents will help people focus on those values for each city."
+Gnatt charts,Gantt charts demonstrate the duration of events or activities on a timeline.
+Tableau: highlight charts,Charts with conditional formatting
+Box plots,"Box plots, also known as box and whisker charts, illustrate the distribution of values along a chart axis. Refer to the steps to build a box plot."
+Bullet graphs,Bullet graphs compare a primary measure with another and can be used instead of dial gauge charts. Review the steps to build a bullet graph.
+Data ink ratio,The data-ink entails focusing on the part of the visual that is essential to understanding the point of the chart. Try to minimize non-data ink like boxes around legends or shadows to optimize the data-ink ratio.
+Data ink ratio,The data-ink entails focusing on the part of the visual that is essential to understanding the point of the chart. Try to minimize non-data ink like boxes around legends or shadows to optimize the data-ink ratio.
+Avoid cutting off the y axis,"Changing the scale on the y-axis can make the differences between different groups in your data seem more dramatic, even if the difference is actually quite small. "
+Avoid the misleading use of a dual x axis,Using a dual y-axis without clearly labeling it in your data visualization can create extremely misleading chart
+Avoid artificially limiting the scope of the x axis,"If you only consider the part of the data that confirms your analysis, your visualizations will be misleading because they don’t take all of the data into account. "
+Avoid misleading grouping,It is important to make sure that the way you are grouping data isn’t misleading or misrepresenting your data and disguising important trends and insights. 
+Avoid totals not adding up,"If you are using a part-to-whole visual like a pie chart to explain your data, the individual parts should add up to equal 100%. If they don’t, your data visualization will be misleading. "
+Avoid hiding trends in cumulative charts,Creating a cumulative chart can disguise more insightful trends by making the scale of the visualization too large to track any changes over time. 
+Story telling steps,"1. Engage the audience.
+2. Create Compelling visuals
+3. Tell the story in an interesting way "
+Sorry telling with visuals,"Provide context, show your work(allows them to do some analysis)
+And present the conclusion"
+Know thy audience,"What role do they play
+What are their expectations 
+What do they hope to get from the presentation 
+What is their stake in the product
+"
+Mccandless,General to specific. Start with high level information and work your way into the deepest specifics
+Mccandless,General to specific
+
+Question,Answer
+Structured thinking,"The process of recognizing the current problem or situation, organizing available information, revealing gaps and opportunities "
+What is the purpose of Structured thinking,"break the data analysis process into smaller, manageable parts"
+Problem type: Making predictions,"A company that wants to know the best advertising method to bring in new customers is an example of a problem requiring analysts to make predictions. Analysts with data on location, type of media, and number of new customers acquired as a result of past ads can't guarantee future results, but they can help predict the best placement of advertising to reach the target audience."
+Problem type: categorize,An example of a problem requiring analysts to categorize things is a company's goal to improve customer satisfaction. Analysts might classify customer service calls based on certain keywords or scores. This could help identify top-performing customer service representatives or help correlate certain actions taken with higher customer satisfaction scores.
+Problem type: spotting something unusual,A company that sells smart watches that help people monitor their health would be interested in designing their software to spot something unusual. Analysts who have analyzed aggregated health data can help product developers determine the right algorithms to spot and set off alarms when certain data doesn't trend normally.
+Problem type: identifying connections,"User experience (UX) designers might rely on analysts to analyze user interaction data. Similar to problems that require analysts to categorize things, usability improvement projects might require analysts to identify themes to help prioritize the right product features for improvement. Themes are most often used to help researchers explore certain aspects of data. In a user study, user beliefs, practices, and needs are examples of themes. 
+
+By now you might be wondering if there is a difference between categorizing things and identifying themes. The best way to think about it is: categorizing things involves assigning items to categories; identifying themes takes those categories a step further by grouping them into broader themes.
+
+"
+Problem type: discovering themes,"A third-party logistics company working with another company to get shipments delivered to customers on time is a problem requiring analysts to discover connections. By analyzing the wait times at shipping hubs, analysts can determine the appropriate schedule changes to increase the number of on-time deliveries. "
+Problem type: finding patterns,"Minimizing downtime caused by machine failure is an example of a problem requiring analysts to find patterns in data. For example, by analyzing maintenance data, they might discover that most failures happen if regular maintenance is delayed by more than a 15-day window. "
+Problem type: finding patterns,"Minimizing downtime caused by machine failure is an example of a problem requiring analysts to find patterns in data. For example, by analyzing maintenance data, they might discover that most failures happen if regular maintenance is delayed by more than a 15-day window. "
+Problem types: diff types of problems require different solutions,"Making predictions
+Categorizing things
+Spotting something unusual
+Identifying themes 
+Discovering connections
+Finding patterns
+As you move through this program, you will develop a sharper eye for problems and you will practice thinking through the problem types when you begin your analysis. This method of problem solving will help you figure out solutions that meet the needs of all stakeholders.
+
+"
+Problem types: diff types of problems require different solutions,"Making predictions
+Categorizing things
+Spotting something unusual
+Identifying themes 
+Discovering connections
+Finding patterns
+As you move through this program, you will develop a sharper eye for problems and you will practice thinking through the problem types when you begin your analysis. This method of problem solving will help you figure out solutions that meet the needs of all stakeholders.
+
+"
+Smart questions,"Effective questions meaning the answers get you to an end goal.  Same as smart goals: 
+
+Specific: 
+
+Is the question specific? Does it address the problem? Does it have context? Will it uncover a lot of the information you need?
+
+Specific: 
+
+Is the question specific? Does it address the problem? Does it have context? Will it uncover a lot of the information you need?
+
+Measurable: Will the question give you answers that you can measure?
+
+Action-oriented: Will the answers provide information that helps you devise some type of plan?
+
+Relevant: Is the question about the particular problem you are trying to solve?
+
+Time-bound: Are the answers relevant to the specific time being studied?"
+Report,Static collection of data at the time.  A snapshot of a period of time
+Dash board,Living updating summary of now.
+Volume,Amount of data
+Variety,Different kinds of data
+Veracity ,Quality and reliability of data
+Velocity,How fast data CAN BE processed
+Velocity,How fast data CAN BE processed
+Sow,Scope of work: outlines simply for everyone
+Primary key," is a field within a table that is a primary key in another table. A table can have only one primary key, but it can have multiple foreign keys. These keys are what create the relationships between tables in a relational database, which helps organize and connect data across multiple tables in the database. "
+
+Question,Answer
+Continuous data ,Data that is measured and can have almost any numeric value
+Discrete data,Data that is counted and has a limited number of values
+Nominal data,"
+A type of qualitative data that is categorized without a set order
+
+"
+Nominal data,"
+A type of qualitative data that is categorized without a set order
+
+"
+Ordinal data,"
+A type of qualitative data with a set order or scale
+
+"
+Ordinal data,"
+A type of qualitative data with a set order or scale
+
+"
+Long data,"data where each row contains a single data point for a particular item. In the long data example below, individual stock prices (data points) have been collected for Apple (AAPL), Amazon (AMZN), and Google (GOOGL) (particular items) on the given dates.
+
+Preferred when Storing a lot of variables about each subject. For example, 60 years worth of interest rates for each bank
+Performing advanced statistical analysis or graphing "
+Wide data," is data where each row contains multiple data points for the particular items identified in the columns. 
+Preferred when Creating tables and charts with a few variables about each subject
+Comparing straightforward line graphs"
+Data transformation ,"Data transformation is the process of changing the data’s format, structure, or values. 
+Adding, copying, or replicating data 
+
+Deleting fields or records 
+
+Standardizing the names of variables
+
+Renaming, moving, or combining columns in a database
+
+Joining one set of data with another
+
+Saving a file in a different format. For example, saving a spreadsheet as a comma separated values (.csv) file."
+How do you know you have good data?,"R reliable 
+O original 
+C comprehensive
+C cited
+C current "
+Pii,Personally identifiable information
+Interoperability,Multiple parties can access and share info. Like psychiatrist sending prescription to 
+Currency,The aspect of data ethics that presumes individuals should be aware of financial transactions resulting from the use of their personal data and the scale of those transactions
+Ethics,"Well-founded standards of right and wrong that prescribe what humans ought to do, usually in terms of rights, obligations, benefits to society, fairness, or specific virtues"
+Ethics,"Well-founded standards of right and wrong that prescribe what humans ought to do, usually in terms of rights, obligations, benefits to society, fairness, or specific virtues"
+Observer bias,The tendency for different people to observe things differently (also called experimenter bias)
+Transaction transparency,The aspect of data ethics that presumes all data-processing activities and algorithms should be explainable and understood by the individual who provides the data
+Relational database," is a database that contains a series of tables that can be connected to form relationships. Basically, they allow data analysts to organize and link data based on what the data has in common.  
+
+In a non-relational table, you will find all of the possible variables you might be interested in analyzing all grouped together. This can make it really hard to sort through. This is one reason why relational databases are so common in data analysis: they simplify a lot of analysis processes and make data easier to find and use across an entire database. "
+Relational database," is a database that contains a series of tables that can be connected to form relationships. Basically, they allow data analysts to organize and link data based on what the data has in common.  
+
+In a non-relational table, you will find all of the possible variables you might be interested in analyzing all grouped together. This can make it really hard to sort through. This is one reason why relational databases are so common in data analysis: they simplify a lot of analysis processes and make data easier to find and use across an entire database. "
+Normalization ,"is a process of organizing data in a relational database. For example, creating tables and establishing relationships between those tables. It is applied to eliminate data redundancy, increase data integrity, and reduce complexity in a database."
+Primary key," is an identifier that references a column in which each value is unique. In other words, it's a column of a table that is used to uniquely identify each record within that table. The value assigned to the primary key in a particular row must be unique within the entire table. For example, if customer_id is the primary key for the customer table, no two customers will ever have the same customer_id. "
+Primary key," is an identifier that references a column in which each value is unique. In other words, it's a column of a table that is used to uniquely identify each record within that table. The value assigned to the primary key in a particular row must be unique within the entire table. For example, if customer_id is the primary key for the customer table, no two customers will ever have the same customer_id. "
+Csv,Comma separated values
+Cleaning data,"Sort by
+Find and replace blanks or errors
+Remove blank rows.
+Formats: value types"
+Camel case,"CamelCase capitalization means that you capitalize the start of each word, like a two-humped (Bactrian) camel. So the table TicketsByOccasion uses CamelCase capitalization"
+Snake case,snake_case
+Sql comments,"-- is used in all platforms, # can be used in some
+if you have more than two lines of comments, it might be cleaner and easier is to use /* to start the comment and */ to close the comment. "
+Schema,"Schema: A way of describing how something, such as data, is organized"
+Schema,"Schema: A way of describing how something, such as data, is organized"
+Types of metadata,"Administrative
+Metadata that indicates the technical source of a digital asset
+
+Descriptive
+Metadata that describes a piece of data and can be used to identify it at a later point in time
+
+Structural
+Metadata that indicates how a piece of data is organized and whether it is part of one or more than one data collection"
+
+Question,Answer
+Access control,"Features such as password protection, user permissions, and encryption that are used to protect a spreadsheet "
+Access control,"Features such as password protection, user permissions, and encryption that are used to protect a spreadsheet "
+Regular expression (regex) patterns,Values must match a prescribed patternA phone number must match ###-###-#### (no other 
+Cross-field validation,"Certain conditions for multiple fields must be satisfied
+
+Values are percentages and values from multiple fields must add up to 100%"
+Cross-field validation,"Certain conditions for multiple fields must be satisfied
+
+Values are percentages and values from multiple fields must add up to 100%"
+Dated if,Calculates the time between 2 dates
+Confidence interval,"How confident you are in the survey results. For example, a 95% confidence level means that if you were to run the same survey 100 times, you would get similar results 95 of those 100 times. Confidence level is targeted before you start your study because it will affect how big your margin of error is at the end of your study. "
+Margin of error,"
+
+Since a sample is used to represent a population, the sample’s results are expected to differ from what the result would have been if you had surveyed the entire population. This difference is called the margin of error. The smaller the margin of error, the closer the results of the sample are to what the result would have been if you had surveyed the entire population. "
+Confidence interval,"Confidence interval
+
+The range of possible values that the population’s result would be at the confidence level of the study. This range is the sample result +/- the margin of error."
+Statistical significance,"
+
+The determination of whether your result could be due to random chance or not. The greater the significance, the less due to chance."
+Choosing sample size ,"For a higher confidence level, use a larger sample size
+
+To decrease the margin of error, use a larger sample size
+
+For greater statistical significance, use a larger sample size"
+Choosing sample size ,"For a higher confidence level, use a larger sample size
+
+To decrease the margin of error, use a larger sample size
+
+For greater statistical significance, use a larger sample size"
+Sample minimum of 30,"Central Limit Theorem (CLT) in the field of probability and statistics. As sample size increases, the results more closely resemble the normal (bell-shaped) distribution from a large number of samples. A sample of 30 is the smallest sample size for which the CLT is still valid. Researchers who rely on regression analysis – statistical methods to determine the relationships between controlled and dependent variables – also prefer a minimum sample of 30."
+Sample size calculator,"Confidence level: The probability that your sample size accurately reflects the greater population.
+
+Margin of error: The maximum amount that the sample results are expected to differ from those of the actual population.
+
+Population: This is the total number you hope to pull your sample from.
+
+Sample: A part of a population that is representative of the population.
+
+Estimated response rate: If you are running a survey of individuals, this is the percentage of people you expect will complete your survey out of those who received the survey."
+Margin of error," is the maximum amount that the sample results are expected to differ from those of the actual population. More technically, the margin of error defines a range of values below and above the average result for the sample. The average result for the entire population is expected to be within that range. We can better understand margin of error by using some examples below."
+Right and left," =LEFT(A2, 5) to extract the first five characters from cell A2. This function will show the substring 51993."
+Trim,"TRIM is a function that removes leading, trailing, and repeated spaces in data.
+
+Select cell L1, and enter Trim.
+
+In cell L2, enter =TRIM(C2) to remove any leading, trailing, or repeated spaces.
+
+Double-click the fill handle and to automatically populate the rest of this column."
+
+Question,Answer
+Changelog,Includes why
+Sql dialects,"Standard sql
+Postgre sgl
+My sql
+Sql server
+"
+Data validation types,"Type
+Range 
+Constraints 
+Consistency
+Structure
+Code validation "
+Validating type,"Ensuring all data types are uniformPurpose: Check that the data matches the data type defined for a field.
+
+Example: Data values for school grades 1-12 must be a numeric data type.
+
+Limitations: The data value 13 would pass the data type validation but would be an unacceptable value. For this case, data range validation is also needed."
+Validating range,"Purpose: Check that the data falls within an acceptable range of values defined for the field.
+
+Example: Data values for school grades should be values between 1 and 12.
+
+Limitations: The data value 11.5 would be in the data range and would also pass as a numeric data type. But, it would be unacceptable because there aren't half grades. For this case, data constraint validation is also needed."
+Validating data constraints ,"Purpose: Check that the data meets certain conditions or criteria for a field. This includes the type of data entered as well as other attributes of the field, such as number of characters. 
+
+Example: Content constraint: Data values for school grades 1-12 must be whole numbers. 
+
+Limitations: The data value 13 is a whole number and would pass the content constraint validation. But, it would be unacceptable since 13 isn’t a recognized school grade. For this case, data range validation is also needed."
+Validate data consistency,"Purpose: Check that the data makes sense in the context of other related data.
+
+Example: Data values for product shipping dates can’t be earlier than product production dates.
+
+Limitations: Data might be consistent but still incorrect or inaccurate. A shipping date could be later than a production date and still be wrong.
+
+"
+Validate data structure ,"Purpose: Check that the data follows or conforms to a set structure.
+
+Example: Web pages must follow a prescribed structure to be displayed properly.
+
+Limitations: A data structure might be correct with the data still incorrect or inaccurate. Content on a web page could be displayed properly and still contain the wrong information."
+Code validation,"Purpose: Check that the application code systematically performs any of the previously mentioned validations during user data input. 
+
+Example: Common problems discovered during code validation include: more than one data type allowed, data range checking not done, or ending of text strings not well defined.
+
+Limitations: Code validation might not validate all possible variations with data input."
+
+Question,Answer
+How do you eliminate duplicates in sql,Select distinct
+How do you name the column you are returning from database,As
+How do you select what table you are querying in the database,"Select* if searching the entire database
+ Select from to specify a table
+"
+String length,"Len(column)
+Length(column)"
+How do you add conditions,Where
+How do you use the substring function ,"Substring(column,position of first character you want to return, total length of the substring)"
+Dml,Data manipulation language
+Cast(),Can be used to convert anything from one data type to another.
+Coalesce ,"Coalesce(columna,columnb) if no value in a it returns value in b"
+How do you change data types?,"Cast
+Cast as [data type]
+From table"
+How do you avoid failed returns when casting (error),Safe_cast: returns null value where the errors are.  This allows the action to be completed without failing the entire command.
+What data types are ther,"Int
+String
+Datetime
+Many more"
+What is unix_date,"UNIX_DATE returns the number of days that have passed since January 1, 1970 and is used to compare and work with dates across multiple time zones. You will likely use CAST most often. "
+Concat_ws,With separator adds character between 
+Sql stores info In a 64 bit memory system,Int64
+Join,"Part of a from clause.  From table1, join table 2
+On table 1. Column name
+Signifies how tables are to be matched for the correct information to be combined from both."
+Types of joins,"Right join, left join, inner, full outer"
+Types of joins,"Right join, left join, inner, full outer"
+Inner join,Combines only info in both the tables
+Outer join ,Combines only distinct info from both tables
+Left join,"From
+Table1.name
+Table2.salesrep
+Left join table 1
+On customer.customerid = sales.customerid"
+Left join,"From
+Table1.name
+Table2.salesrep
+Left join table 1
+On customer.customerid = sales.customerid"
+Full outer join ,Returns all data from both tables paired up.  Even if there are no pairs it will return the value with null 
+Full outer join ,Returns all data from both tables paired up.  Even if there are no pairs it will return the value with null 
+Foreign key,Links data in one table to data in another table. Same data type as the primary key it references
+IN operator,The IN operator allows you to specify multiple values in a where clause
+
+Question,Answer
+Organize and sort and adjust,"The first two phases of data analysis, Organize data and Format and adjust data, are important for data analysts because they can use these phases to manipulate their data in ways that make important patterns and trends more obvious. "
+How do you sort in sql,Where and order by.  Defaults to ascending order.  To arrange in descending order use DESC 
+Aggregate ,Collecting many parts into a whole
+Data analytics puzzle analogy,Shelf of puzzles that falls to the floor. Aggregate or sort into parts.  And the putting of the puzzles together is the analysis.
+Value function,Changes from text to numeric values
+Temporary table,"Create in sql to refer to and access info better. Use with, select into, create table"
+"Start with ""With""",Parenthesis select statement creates temporary table
+Select into ,"Copies data from one table into a new table, but doesn't add the new table into the database.  Copy a table with a specific condition."
+Create table,Good option when several people need to access the same temp table. This statement adds the table into the database.
+Modulo,An operator (%) that returns the remainder when one number is divided by another
+Long data,"Each instance has its own entry.  Like a dated log showing each time people complete a task. (Vs wide would show each person's name and the number of tasks per type, etc)"
+Wide data,Each subject has its own row.  
+Reshape data,Change from wide to long.  Pivot.
+
+Question,Answer
+Common functions you can use to preview data,"Colname()
+Str()
+Glimpse()
+Head()"
+Rename(),"Rename(dataset, col_name = new col_name, col_name2 = new col_name2"
+Ggplot,"Loaded with tidyverse
+Ggplot(data = diamonds, aes(x = carat, y = price)) + geom_point()
+Returns graph with carat and price as x and y axes"
+Facet_wrap(),Separates out components for a less busy visual
+Variable,<-
+Vector,A group of data elements of the same type stored in a one dimensional sequence  in R
+Pipe,"%>%
+Tool for expressing a sequence of multiple operations"
+Vector,"group of data elements of the same type, stored in a sequence in R. You cannot have a vector that contains both logicals and numerics."
+Tibble,"Tibbles are data. frames that are lazy and surly: they do less (i.e. they don't change variable names or types, and don't do partial matching) and complain more (e.g. when a variable does not exist). This forces you to confront problems earlier, typically leading to cleaner, more expressive code."
+Skim_without_charts(bookings_df),"Gives summary info (min, max, empty, average, etc) of each variable type"
+Geom_pount(),Creates scatterplots
+Aes,"Aesthetics, sets x and y axis, color, how it looks"
+Aes alpha,Transparent
+Changes to all points(not variable dependent),Do it outside the aes() function
+Reshape,"Df= reshape(data = dataframe
+Idvar=new observations
+Varying= which columns will be reshaped
+Sep=[separator]
+Timevar= ""year""
+Direction = long or wide"
