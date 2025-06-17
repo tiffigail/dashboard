@@ -1,0 +1,143 @@
+/* src/components/LeaveWorkAtWork/LeaveWorkAtWork.module.css */
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    background-color: var(--background-color-main);
+    color: var(--text-color-primary);
+    min-width: 500px;
+}
+
+.formTitle {
+    font-size: 1.75rem;
+    color: var(--header-color);
+    text-align: center;
+    margin: 0 0 0.5rem 0;
+}
+
+.section {
+    padding: 1.25rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-large);
+    background-color: var(--background-color-light);
+}
+
+.sectionTitle {
+    font-size: 1.2rem;
+    color: var(--text-color-primary);
+    margin: 0 0 1rem 0;
+    border-bottom: 2px solid var(--accent-color-1);
+    padding-bottom: 0.5rem;
+}
+
+.metricsGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.inputField {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.inputField label {
+    font-weight: 500;
+}
+
+.numberInput, .textareaInput {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-medium);
+    background-color: var(--background-color-input);
+    color: var(--text-color-primary);
+    font-family: inherit;
+    font-size: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.textareaInput {
+    resize: vertical;
+}
+
+.numberInput:focus, .textareaInput:focus {
+    outline: none;
+    border-color: var(--accent-color-2);
+    box-shadow: 0 0 0 2px var(--accent-color-trans-2);
+}
+
+.checkGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.checkItem {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.checkItem label {
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.checkbox {
+    cursor: pointer;
+    width: 1.25rem;
+    height: 1.25rem;
+    accent-color: var(--accent-color-1);
+}
+
+.driveInstructions {
+    text-align: center;
+    font-style: italic;
+    color: var(--text-color-secondary);
+    margin-top: -1rem;
+    margin-bottom: 1rem;
+}
+
+.instructionsList {
+    list-style-type: '✅  ';
+    padding-left: 1.5rem;
+    margin: 0;
+}
+
+.instructionsList li {
+    margin-bottom: 0.75rem;
+}
+
+.errorText {
+    color: var(--error-color-text);
+    text-align: center;
+    margin-bottom: 0;
+}
+
+.submitButton {
+    padding: 0.8rem 1.5rem;
+    border: none;
+    background: linear-gradient(to right, var(--accent-color-1), var(--accent-color-2));
+    color: var(--button-text-color);
+    border-radius: var(--border-radius-medium);
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    margin-top: 1rem;
+}
+
+.submitButton:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.submitButton:disabled {
+    background: var(--disabled-color-bg);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}

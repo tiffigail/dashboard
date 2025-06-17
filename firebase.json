@@ -1,33 +1,39 @@
 {
-  // Firestore configuration: Specifies the rules file and optionally an indexes file.
   "firestore": {
-    "rules": "firestore.rules", // Points to your security rules file
-    "indexes": "firestore.indexes.json" // Default name for Firestore indexes (optional if you don't have custom indexes)
+    "database": "(default)",
+    "location": "nam7",
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
   },
-
-  // Hosting configuration: Defines how your web app is served.
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "ignore": [
+        "venv",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "*.local"
+      ],
+      "runtime": "python312"
+    }
+  ],
   "hosting": {
-    // Specifies the directory containing your production build files (HTML, CSS, JS).
-    // Changed from "build" to "dist" assuming a Vite build process.
-    "public": "dist", // <--- UPDATED
-
-    // Specifies files and directories to ignore when deploying.
+    "public": "build",
     "ignore": [
-      "firebase.json", // Ignore the config file itself
-      "**/.*",         // Ignore hidden files (like .git)
-      "**/node_modules/**" // Ignore node_modules directory
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
     ],
-
-    // Configures rewrites, essential for single-page applications (like React).
-    // This ensures that all navigation requests are directed to your index.html file,
-    // allowing client-side routing (e.g., React Router) to handle the path.
     "rewrites": [
       {
-        "source": "**", // Matches all paths
-        "destination": "/index.html" // Serves index.html for any path not matching a static file
+        "source": "**",
+        "destination": "/index.html"
       }
     ]
+  },
+  "storage": {
+    "rules": "storage.rules"
   }
-
-  // Add other Firebase service configurations here if needed (e.g., "functions")
 }

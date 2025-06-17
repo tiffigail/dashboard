@@ -7,8 +7,7 @@ import PmRoutineForm from '../PmRoutineForm/PmRoutineForm';
 import FamilyCleanForm from '../FamilyCleanForm/FamilyCleanForm';
 import StudyForm from '../StudyForm/StudyForm';
 import ReadyForWorkForm from '../ReadyForWorkForm/ReadyForWorkForm';
-// Assuming BudgetForm is correctly imported if isBudgetModalOpen is used
-// import BudgetForm from '../BudgetForm/BudgetForm'; // If you have this, uncomment
+import {LeaveWorkAtWork} from '../LeaveWorkAtWork/LeaveWorkAtWork';
 import ContextMap from '../ContextMap/ContextMap';
 import BreakAnalysisChart from '../BreakAnalysisChart/BreakAnalysisChart';
 import { db } from '../../firebaseConfig';
@@ -91,6 +90,7 @@ function DailyView({ onNavigate }) {
     const [isStudyModalOpen, setIsStudyModalOpen] = useState(false);
     const [isBudgetModalOpen, setIsBudgetModalOpen] = useState(false);
     const [isReadyModalOpen, setIsReadyModalOpen] = useState(false);
+    const [isLeaveWorkModalOpen, setIsLeaveWorkModalOpen] = useState(false);
     const [axisCssSuffix, setAxisCssSuffix] = useState('default');
     const [currentDayAxisThemeTaskLineColor, setCurrentDayAxisThemeTaskLineColor] = useState(getAxisThemeColorForDailyChart('default'));
 
@@ -153,6 +153,8 @@ function DailyView({ onNavigate }) {
     const handleStudySubmit = (formData) => { console.log("Study Sub:", formData); closeStudyModal(); };
     const handleBudgetSubmit = (formData) => { console.log("Budget Sub (DailyView):", formData); closeBudgetModal(); };
     const handleReadySubmit = (formData) => { console.log("Ready Sub:", formData); closeReadyModal(); };
+     const handleLeaveWorkSubmit = (formData) => { console.log("Leave Work at Work Submitted:", formData); closeLeaveWorkModal(); };
+    const closeLeaveWorkModal = () => setIsLeaveWorkModalOpen(false);
     const closeAmModal = () => setIsAmModalOpen(false);
     const closePmModal = () => setIsPmModalOpen(false);
     const closeFamilyCleanModal = () => setIsFamilyCleanModalOpen(false);
@@ -246,6 +248,7 @@ function DailyView({ onNavigate }) {
                         <button className={styles.routineButton} onClick={() => setIsAmModalOpen(true)}>Start AM Routine</button>
                         <button className={`${styles.routineButton} ${styles.readyButton}`} onClick={() => setIsReadyModalOpen(true)}>Ready For Work</button>
                         <button className={`${styles.routineButton} ${styles.studyButton}`} onClick={() => setIsStudyModalOpen(true)}>Start Study Session</button>
+                        <button className={`${styles.routineButton} ${styles.leaveWorkButton}`} onClick={() => setIsLeaveWorkModalOpen(true)}>Leave Work at Work</button>
                         <button className={`${styles.routineButton} ${styles.familyCleanButton}`} onClick={() => setIsFamilyCleanModalOpen(true)}>Start Family Clean</button>
                         <button className={`${styles.routineButton} ${styles.pmButton}`} onClick={() => setIsPmModalOpen(true)}>Start PM Routine</button>
                     </div>
@@ -273,6 +276,11 @@ function DailyView({ onNavigate }) {
                 </Modal>
             )}
             {isReadyModalOpen && (<Modal isOpen={isReadyModalOpen} onClose={closeReadyModal}><ReadyForWorkForm onSubmit={handleReadySubmit} onClose={closeReadyModal} /></Modal>)}
+             {isLeaveWorkModalOpen && (
+                <Modal isOpen={isLeaveWorkModalOpen} onClose={closeLeaveWorkModal}>
+                    <LeaveWorkAtWork onSubmit={handleLeaveWorkSubmit} onClose={closeLeaveWorkModal} />
+                </Modal>
+            )}
             {/* --- End Modals --- */}
         </div>
     );

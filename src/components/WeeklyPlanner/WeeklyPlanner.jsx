@@ -241,26 +241,16 @@ function WeeklyPlanner({ onClose }) {
         const finalGoals = {};
         const stepsToAdd = [];
 
-        // *** MODIFICATION START: Determine the target ISO Week ID for the plan ***
-        // nextWeekSundayAtMidnight is the Sunday the user is planning FOR (e.g., May 25th)
-        // We need the ISO Week ID of the week that *contains the Monday of this planning period*.
-        const mondayOfTargetUserWeek = new Date(nextWeekSundayAtMidnight); // Start with the Sunday
-        if (mondayOfTargetUserWeek.getUTCDay() !== 1) { // If it's not already Monday (1 in UTC)
-             // Adjust to find the Monday of the week this Sunday (nextWeekSundayAtMidnight) belongs to,
-             // or rather, the Monday of the user's perceived week starting this Sunday.
-             // If nextWeekSundayAtMidnight is Sunday, its corresponding Monday is the next day.
-            if (mondayOfTargetUserWeek.getUTCDay() === 0) { // If it's Sunday
-                mondayOfTargetUserWeek.setUTCDate(mondayOfTargetUserWeek.getUTCDate() + 1);
-            } else { // For any other day, find the Monday of that week (this path is less likely if nextWeekSundayAtMidnight is always Sunday)
-                let day = mondayOfTargetUserWeek.getUTCDay();
-                let diffToMonday = 1 - day; // e.g. if Tuesday (2), diff is -1.
-                if (day === 0) diffToMonday = 1; // if Sunday (0), diff is 1.
-                mondayOfTargetUserWeek.setUTCDate(mondayOfTargetUserWeek.getUTCDate() + diffToMonday);
-            }
-        }
-        const targetPlanFirestoreWeekId = getWeekId(mondayOfTargetUserWeek);
-        console.log(`Targeting Firestore Week ID: ${targetPlanFirestoreWeekId} (based on Monday: ${mondayOfTargetUserWeek.toISOString()}) for plans starting on Sunday: ${nextWeekSundayAtMidnight.toISOString()}`);
-        // *** MODIFICATION END ***
+        // --- CORRECTED LOGIC START ---
+        // To get the ID for next week, simply take today's date and add 7 days.
+        // The getWeekId function will correctly handle any edge cases.
+        const today = new Date();
+        const nextWeekDate = new Date();
+        nextWeekDate.setDate(today.getDate() + 7);
+        const targetPlanFirestoreWeekId = getWeekId(nextWeekDate);
+
+        console.log(`Correctly targeting Firestore Week ID for next week: ${targetPlanFirestoreWeekId}`);
+        // --- CORRECTED LOGIC END ---
 
 
         for (const axisName in inProgressPlan) {
@@ -285,7 +275,7 @@ function WeeklyPlanner({ onClose }) {
                             taskType: 'planned',
                             plannedSteps: step.text.trim(),
                             axisTheme: axisName,
-                            weekId: targetPlanFirestoreWeekId, // *** USE MODIFIED Week ID ***
+                            weekId: targetPlanFirestoreWeekId,
                             assignedDays: step.assignedDays,
                             createdAt: serverTimestamp(),
                             status: 'pending',
@@ -299,7 +289,7 @@ function WeeklyPlanner({ onClose }) {
         }
 
         const weeklyPlanData = {
-            weekId: targetPlanFirestoreWeekId, // *** USE MODIFIED Week ID ***
+            weekId: targetPlanFirestoreWeekId,
             axisGoals: finalGoals,
             axisGoalStatus: {}, // Initialize as empty or with default statuses
             createdAt: serverTimestamp(),
@@ -307,8 +297,8 @@ function WeeklyPlanner({ onClose }) {
         };
 
         const batch = writeBatch(db);
-        const weeklyPlanDocRef = doc(db, "weeklyPlan", targetPlanFirestoreWeekId); // *** USE MODIFIED Week ID ***
-        batch.set(weeklyPlanDocRef, weeklyPlanData, { merge: true });
+        const weeklyPlanDocRef = doc(db, "weeklyPlan", targetPlanFirestoreWeekId);
+        batch.set(weeklyPlanDocRef, weeklyPlanData); // Removed { merge: true } for a clean overwrite
 
         const stepsCollectionRef = collection(db, "weeklySteps");
         stepsToAdd.forEach(stepData => {
@@ -343,10 +333,10 @@ function WeeklyPlanner({ onClose }) {
         displayStepsArray = [{ text: '', assignedDays: [] }];
     } else {
         displayStepsArray = displayStepsArray.map(step =>
-             (typeof step === 'object' && step !== null && Array.isArray(step.assignedDays))
-                 ? step
-                 : { text: typeof step === 'string' ? step : '', assignedDays: [] }
-         );
+                (typeof step === 'object' && step !== null && Array.isArray(step.assignedDays))
+                    ? step
+                    : { text: typeof step === 'string' ? step : '', assignedDays: [] }
+            );
         if (displayStepsArray.length === 0) {
             displayStepsArray.push({ text: '', assignedDays: [] });
         }

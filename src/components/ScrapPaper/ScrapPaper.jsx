@@ -1,12 +1,13 @@
 // src/components/ScrapPaper/ScrapPaper.jsx
-import React, { useState, useCallback, useEffect } from 'react'; // Added useEffect
+import React, { useState, useCallback, useEffect } from 'react';
 import { db } from '../../firebaseConfig';
 import {
     collection, query, where, orderBy, limit, getDocs, doc, getDoc,
-    writeBatch, Timestamp, serverTimestamp, documentId // Added documentId
+    writeBatch, Timestamp, serverTimestamp, documentId
 } from "firebase/firestore";
 
 import ThemedChartView from '../ThemedChartView/ThemedChartView';
+import WordCloudDisplay from '../WordCloudDisplay/WordCloudDisplay';
 
 // Re-define or import recurringRoutineDefinitions if needed for axisTheme lookup
 const recurringRoutineDefinitionsForScrapPaper = {
@@ -36,6 +37,7 @@ const getTodayDateString = () => {
 };
 
 function ScrapPaper({ onNavigate }) {
+    // --- All your existing state variables are preserved ---
     const [recentBreakLogs, setRecentBreakLogs] = useState([]);
     const [breakLogsLoading, setBreakLogsLoading] = useState(false);
     const [breakLogsError, setBreakLogsError] = useState(null);
@@ -63,6 +65,8 @@ function ScrapPaper({ onNavigate }) {
     const [isRetroProcessing, setIsRetroProcessing] = useState(false);
     const [allAxisThemesForRetro, setAllAxisThemesForRetro] = useState([]);
 
+
+
     useEffect(() => {
         const fetchAllKnownThemes = async () => {
             try {
@@ -79,13 +83,13 @@ function ScrapPaper({ onNavigate }) {
         fetchAllKnownThemes();
     }, []);
 
-    const fetchRecentBreakLogs = useCallback(async () => { /* ... same logic ... */ 
+    const fetchRecentBreakLogs = useCallback(async () => { 
         setBreakLogsLoading(true); setBreakLogsError(null); try { const q = query(collection(db, "pomodoroCycleLogs"), orderBy("logSubmittedAt", "desc"), limit(3)); const querySnapshot = await getDocs(q); setRecentBreakLogs(querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))); } catch (err) { console.error("Err fetch breaks:", err); setBreakLogsError(err.message); } setBreakLogsLoading(false);
     }, []);
-    const fetchDailyMetricByDate = useCallback(async (dateString) => { /* ... same logic ... */
+    const fetchDailyMetricByDate = useCallback(async (dateString) => { 
         if (!dateString) { setDailyMetricError("Valid date needed."); setSpecificDailyMetric(null); setSearchedMetricDate(''); return; } setDailyMetricLoading(true); setDailyMetricError(null); setSpecificDailyMetric(null); setSearchedMetricDate(dateString); try { const docRef = doc(db, "dailyMetrics", dateString); const docSnap = await getDoc(docRef); if (docSnap.exists()) { setSpecificDailyMetric({ id: docSnap.id, ...docSnap.data() }); } else { setSpecificDailyMetric(null); setDailyMetricError(`No metric for ${dateString}.`); } } catch (err) { console.error("Err fetch metric:", err); setDailyMetricError(err.message); setSpecificDailyMetric(null); } setDailyMetricLoading(false);
     }, []);
-    const fetchAllEpiphaniesAndDespairs = useCallback(async () => { /* ... same logic ... */
+    const fetchAllEpiphaniesAndDespairs = useCallback(async () => { 
         setReflectionsLoading(true); setReflectionsError(null); setReflectionsFetched(false); try { const epiphaniesQuery = query(collection(db, "epiphanies"), orderBy("timestamp", "desc")); const despairsQuery = query(collection(db, "despairs"), orderBy("timestamp", "desc")); const [epiphaniesSnapshot, despairsSnapshot] = await Promise.all([getDocs(epiphaniesQuery), getDocs(despairsQuery)]); setEpiphaniesList(epiphaniesSnapshot.docs.map(d => ({ id: d.id, ...d.data() }))); setDespairsList(despairsSnapshot.docs.map(d => ({ id: d.id, ...d.data() }))); setReflectionsFetched(true); } catch (err) { console.error("Err fetch reflections:", err); setReflectionsError(err.message); } setReflectionsLoading(false);
     }, []);
 
@@ -114,7 +118,6 @@ function ScrapPaper({ onNavigate }) {
                 const axisTaskCountsForDay = {};
                 allAxisThemesForRetro.forEach(theme => { if (theme) axisTaskCountsForDay[theme] = 0; });
 
-                // 1. Get completed weeklySteps for the day
                 const stepsQuery = query(weeklyStepsRef,
                     where("currentAssignedDate", "==", dateStr),
                     where("status", "==", "completed")
@@ -127,9 +130,6 @@ function ScrapPaper({ onNavigate }) {
                     }
                 });
 
-                // 2. Get completed recurring routines for the day by checking dailyMetrics.tasksStatus
-                // This assumes that recurring routines are *not* also duplicated as completed weeklySteps for the same day.
-                // If they are, this might double-count. Adjust if necessary.
                 const dailyMetricDocSnap = await getDoc(doc(dailyMetricsRef, dateStr));
                 if (dailyMetricDocSnap.exists()) {
                     const dailyData = dailyMetricDocSnap.data();
@@ -138,9 +138,6 @@ function ScrapPaper({ onNavigate }) {
                             if (dailyData.tasksStatus[taskId].completed && recurringRoutineDefinitionsForScrapPaper[taskId]) {
                                 const routineTheme = recurringRoutineDefinitionsForScrapPaper[taskId].axisTheme;
                                 if (routineTheme && typeof axisTaskCountsForDay[routineTheme] === 'number') {
-                                     // Avoid double counting if weeklySteps already captured it via a generic "Routine Complete" task
-                                     // This part depends on how your data is structured.
-                                     // For now, let's assume distinct or add a check.
                                     axisTaskCountsForDay[routineTheme]++;
                                 }
                             }
@@ -151,7 +148,7 @@ function ScrapPaper({ onNavigate }) {
                 const metricDocRef = doc(dailyMetricsRef, dateStr);
                 currentFirestoreBatch.set(metricDocRef, { 
                     axisTaskCounts: axisTaskCountsForDay, 
-                    lastAxisCountsUpdate: serverTimestamp() // New field to track this update
+                    lastAxisCountsUpdate: serverTimestamp()
                 }, { merge: true });
                 operationsInCurrentBatch++;
                 updatedCount++;
@@ -161,7 +158,7 @@ function ScrapPaper({ onNavigate }) {
                     console.log(`Committed batch for ${dateStr}. Processed ${updatedCount} days so far.`);
                     currentFirestoreBatch = writeBatch(db);
                     operationsInCurrentBatch = 0;
-                    await new Promise(resolve => setTimeout(resolve, 500)); // Small delay
+                    await new Promise(resolve => setTimeout(resolve, 500));
                 }
             } catch (e) {
                 console.error(`Error processing date ${dateStr} for retroactive update:`, e);
@@ -182,6 +179,7 @@ function ScrapPaper({ onNavigate }) {
         setIsRetroProcessing(false);
         setRetroStatus(`Retroactive update finished. ${updatedCount} days processed. ${errorCount > 0 ? `${errorCount} errors.` : 'No errors.'}`);
     }, [retroStartDate, retroEndDate, allAxisThemesForRetro]);
+
 
     const sectionStyle = { marginBottom: '40px', padding: '20px', border: '1px solid #ddd', borderRadius: '8px', backgroundColor: '#f9f9f9' };
     const h2Style = { marginTop: '0', borderBottom: '1px solid #eee', paddingBottom: '10px', color: '#333' };
@@ -204,7 +202,7 @@ function ScrapPaper({ onNavigate }) {
             <p style={{ textAlign: 'center', color: '#555', marginBottom: '20px' }}>
                 This component demonstrates fetching data and can be used to launch experimental views or tools.
             </p>
-
+            
             <div style={sectionStyle}>
                 <h2 style={h2Style}>Experimental Tools</h2>
                 <button onClick={handleNavigateToMapGenerator} style={buttonStyle}
@@ -215,6 +213,18 @@ function ScrapPaper({ onNavigate }) {
                 <p style={{fontSize: '0.9em', color: '#666', marginTop: '10px'}}>
                     Navigate to the AI-powered Project Map Generator tool.
                 </p>
+            </div>
+            
+            {/* --- THIS IS THE NEW SECTION FOR THE WORD CLOUD --- */}
+            <div style={sectionStyle}>
+                <h2 style={h2Style}>Example: Word Cloud Visualization</h2>
+                <p>This chart analyzes text from Firestore to find common themes in your "Epiphanies".</p>
+                <WordCloudDisplay 
+                    collectionName="momentsLog"
+                    textField="text"
+                    filter={{ field: "type", value: "epiphany" }}
+                    customStopWords={['feel', 'safe', 'peace', 'near', 'here']}
+                />
             </div>
 
             <div style={sectionStyle}>

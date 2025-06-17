@@ -401,6 +401,17 @@
     color: var(--color-white, #fff); /* White text on hover */
 }
 
+/* Leave work at work button*/
+.leaveWorkButton {
+    background-color: var(--axis-color-financial-3, #57127a);
+    border-color: var(--axis-color-financial-3, #927aaa); 
+    color: white;
+}
+.leaveWorkButton:hover:not(:disabled) {
+    background-color: var(--axis-color-financial-2, #19053a); /* Medium Financial Purple on hover */
+    border-color: var(--axis-color-financial-3, #05000a);
+    color: var(--text-primary, #053229); /* Peacock text on hover */
+}
 /* Family Clean Button uses Secondary styles */
 .familyCleanButton {
     background-color: var(--button-secondary-bg, #ead6a0); /* Sage */
