@@ -1,10 +1,11 @@
 // src/App.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import styles from './App.module.css'; // Your existing App.module.css
-import { Howl, Howler } from 'howler';
+import { Howl } from 'howler';
 
-// Import Firestore db instance
+// Import Firestore db instance and functions
 import { db } from './firebaseConfig';
+import { collection, getDocs } from 'firebase/firestore';
 
 // Import view components
 import NowView from './components/NowView/NowView';
@@ -15,9 +16,10 @@ import YearlyView from './components/YearlyView/YearlyView';
 import ParetoView from './components/ParetoView/ParetoView';
 import LifeMapView from './components/LifeMapView/LifeMapView';
 import ScrapPaper from './components/ScrapPaper/ScrapPaper';
-import ProjectMapGenerator from './components/ProjectMapGenerator/ProjectMapGenerator'; // <-- ADDED IMPORT
+import ProjectMapGenerator from './components/ProjectMapGenerator/ProjectMapGenerator';
+import YearlyTimelinePlanner from './components/YearlyTimelinePlanner/YearlyTimelinePlanner';
 
-// Import the new ThePointSection component
+// Import the ThePointSection component
 import ThePointSection from './components/ThePointSection/ThePointSection';
 
 // Constants for view names
@@ -30,7 +32,8 @@ const VIEWS = {
     PARETO: 'pareto',
     LIFE: 'life',
     SCRAPPAPER: 'scrappaper',
-    PROJECTMAPGENERATOR: 'projectmapgenerator', // <-- ADDED VIEW KEY (matches toUpperCase() of 'ProjectMapGenerator')
+    PROJECTMAPGENERATOR: 'projectmapgenerator',
+    YEARLYTIMELINEPLANNER: 'yearlytimelineplanner'
 };
 
 // Default Pomodoro timer duration
@@ -48,7 +51,6 @@ const LS_KEYS = {
 const timerSounds = [
     '/sounds/082569_robot-voice-let39s-get-it-on-82780.mp3',
     '/sounds/applause-2-31567.mp3',
-    // ... (other sounds remain the same) ...
     '/sounds/Yeahoh.mp3'
 ];
 
@@ -72,17 +74,20 @@ const loadState = (key, defaultValue) => {
 // Main App component
 function App() {
     const [currentView, setCurrentView] = useState(VIEWS.NOW);
+    const [activeAxisId, setActiveAxisId] = useState(null);
     const [currentTaskId, setCurrentTaskId] = useState(() => loadState(LS_KEYS.CURRENT_TASK_ID, null));
     const [pomodoroDurationMinutes, setPomodoroDurationMinutes] = useState(() => loadState(LS_KEYS.POMODORO_DURATION, DEFAULT_POMODORO_MINUTES));
     const [timerSeconds, setTimerSeconds] = useState(() => loadState(LS_KEYS.TIMER_SECONDS, loadState(LS_KEYS.POMODORO_DURATION, DEFAULT_POMODORO_MINUTES) * 60));
     const [isTimerRunning, setIsTimerRunning] = useState(() => loadState(LS_KEYS.IS_TIMER_RUNNING, false));
     const [isTimerFinished, setIsTimerFinished] = useState(false);
+    const [allAxesData, setAllAxesData] = useState([]); // To store all axis data
+    const [currentActiveMilestone, setCurrentActiveMilestone] = useState(null);
 
     const intervalRef = useRef(null);
     const soundRef = useRef(null);
     const nextSoundIndexRef = useRef(0);
 
-    // Effect to save currentTaskId to localStorage
+    // Effects to save state to localStorage
     useEffect(() => {
         if (currentTaskId !== null) {
             localStorage.setItem(LS_KEYS.CURRENT_TASK_ID, currentTaskId);
@@ -91,17 +96,14 @@ function App() {
         }
     }, [currentTaskId]);
 
-    // Effect to save pomodoroDurationMinutes to localStorage
     useEffect(() => {
         localStorage.setItem(LS_KEYS.POMODORO_DURATION, String(pomodoroDurationMinutes));
     }, [pomodoroDurationMinutes]);
 
-    // Effect to save timerSeconds to localStorage
     useEffect(() => {
         localStorage.setItem(LS_KEYS.TIMER_SECONDS, String(timerSeconds));
     }, [timerSeconds]);
 
-    // Effect to save isTimerRunning to localStorage
     useEffect(() => {
         localStorage.setItem(LS_KEYS.IS_TIMER_RUNNING, String(isTimerRunning));
     }, [isTimerRunning]);
@@ -165,6 +167,44 @@ function App() {
         };
     }, []);
 
+    // This effect fetches all axes data and determines the active milestone
+    useEffect(() => {
+        const fetchAxesAndSetMilestone = async () => {
+            try {
+                const axesCollectionRef = collection(db, "axes");
+                const querySnapshot = await getDocs(axesCollectionRef);
+                const axesData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                setAllAxesData(axesData);
+
+                let nextMilestone = null;
+                const axisDisplayOrder = [
+                    "Rest and preparation", "Physical", "Financial", "Gear",
+                    "ON TRACK N+1", "Misdirect", "Environment"
+                ];
+
+                const sortedAxes = axisDisplayOrder
+                    .map(name => axesData.find(axis => axis.axisName === name))
+                    .filter(axis => axis !== undefined);
+
+                for (const axis of sortedAxes) {
+                    if (axis.milestones) {
+                        const foundMilestone = axis.milestones.find(m => m.completionDate === null || m.completionDate === undefined);
+                        if (foundMilestone) {
+                            nextMilestone = { ...foundMilestone, id: foundMilestone.id || `ms_${Date.now()}`};
+                            break;
+                        }
+                    }
+                }
+                console.log("App.jsx: Found and set the active milestone:", nextMilestone);
+                setCurrentActiveMilestone(nextMilestone);
+            } catch (error) {
+                console.error("App.jsx: Error fetching axes data:", error);
+            }
+        };
+
+        fetchAxesAndSetMilestone();
+    }, []); // Runs once when the app loads
+
     // Handler functions for Pomodoro timer state
     const handleSetCurrentTask = (taskId) => { setCurrentTaskId(taskId); };
     const handleSetTimerSeconds = (seconds) => { setTimerSeconds(seconds); };
@@ -186,22 +226,21 @@ function App() {
     };
 
     // Handler for view navigation
-    const handleNavigation = (viewKey) => { // viewKey is like 'ProjectMapGenerator' from ScrapPaper
-        console.log(`App.jsx: handleNavigate called with viewKey: "${viewKey}"`);
-        const targetViewKeyConstant = viewKey.toUpperCase(); // Converts 'ProjectMapGenerator' to 'PROJECTMAPGENERATOR'
-        const targetViewValue = VIEWS[targetViewKeyConstant]; // Looks up VIEWS.PROJECTMAPGENERATOR
-        console.log(`App.jsx: targetViewKeyConstant is "${targetViewKeyConstant}", targetViewValue is "${targetViewValue}"`);
+    const handleNavigation = (viewKey, payload = {}) => {
+        console.log(`App.jsx: handleNavigate called for view "${viewKey}" with payload:`, payload);
+        const targetViewKeyConstant = viewKey.toUpperCase();
+        const targetViewValue = VIEWS[targetViewKeyConstant];
+
         if (targetViewValue) {
-            setCurrentView(targetViewValue); // Sets currentView to 'projectmapgenerator'
-            console.log(`App.jsx: Attempting to set currentView to "${targetViewValue}"`);
+            setCurrentView(targetViewValue);
+            if (payload.axisId) {
+                setActiveAxisId(payload.axisId);
+                console.log(`App.jsx: Active axis ID set to "${payload.axisId}"`);
+            }
         } else {
-            console.warn(`App.jsx: Invalid view key: "${viewKey}" (Processed as "${targetViewKeyConstant}"). No navigation will occur.`);
+            console.warn(`App.jsx: Invalid view key: "${viewKey}". Navigation aborted.`);
         }
     };
-
-    useEffect(() => {
-        console.log(`App.jsx: currentView changed to: "${currentView}"`);
-    }, [currentView]);
 
     const renderCurrentView = () => {
         const commonProps = {
@@ -217,24 +256,30 @@ function App() {
             onSetIsTimerFinished: handleSetIsTimerFinished,
         };
         switch (currentView) {
-            case VIEWS.NOW: return <NowView {...commonProps} />;
+            case VIEWS.NOW: return <NowView {...commonProps} activeMilestone={currentActiveMilestone} />;
             case VIEWS.DAILY: return <DailyView />;
             case VIEWS.WEEKLY: return <WeeklyView onNavigate={handleNavigation} />;
             case VIEWS.MONTHLY: return <MonthlyView />;
-            case VIEWS.YEARLY: return <YearlyView />;
+            case VIEWS.YEARLY: return <YearlyView onNavigate={handleNavigation} />;
             case VIEWS.PARETO: return <ParetoView />;
             case VIEWS.LIFE: return <LifeMapView />;
-            case VIEWS.SCRAPPAPER:
-                console.log("App.jsx: Rendering ScrapPaper, passing onNavigate prop.");
-                return <ScrapPaper onNavigate={handleNavigation} />;
-            case VIEWS.PROJECTMAPGENERATOR: // <-- ADDED CASE
-                console.log("App.jsx: Rendering ProjectMapGenerator.");
-                return <ProjectMapGenerator />;
+            case VIEWS.SCRAPPAPER: return <ScrapPaper onNavigate={handleNavigation} />;
+            case VIEWS.PROJECTMAPGENERATOR: return <ProjectMapGenerator />;
+            case VIEWS.YEARLYTIMELINEPLANNER:
+                return <YearlyTimelinePlanner
+                onNavigate={handleNavigation}
+                allAxesData={allAxesData}
+                activeAxisId={activeAxisId}
+                />;
             default:
                 console.warn("App.jsx: Invalid view selected, defaulting to NOW view.");
                 return <NowView {...commonProps} />;
         }
     };
+
+    // --- NEW --- Define which views should show ThePointSection
+    // You can add or remove views from this array (e.g., VIEWS.WEEKLY)
+    const showThePointOnViews = [VIEWS.NOW, VIEWS.DAILY, VIEWS.Weekly, VIEWS.MONTHLY];
 
     const buttonStyle = { margin: '0.5rem', padding: '0.5rem 1rem', cursor: 'pointer', border: '1px solid #ccc', borderRadius: '4px', backgroundColor: '#e7e7e7', transition: 'background-color 0.2s ease', fontSize: '0.9em' };
     const activeButtonStyle = { ...buttonStyle, backgroundColor: '#a0a0a0', fontWeight: 'bold', borderColor: '#888' };
@@ -254,11 +299,10 @@ function App() {
                 <button style={currentView === VIEWS.SCRAPPAPER ? activeScrapPaperButtonStyle : scrapPaperButtonStyle} onClick={() => handleNavigation('SCRAPPAPER')}>
                     📝 Scrap Paper
                 </button>
-                {/* You could add a direct navigation button here for ProjectMapGenerator if desired */}
-                {/* <button style={currentView === VIEWS.PROJECTMAPGENERATOR ? activeButtonStyle : buttonStyle} onClick={() => handleNavigation('PROJECTMAPGENERATOR')}>Project Map Gen</button> */}
             </div>
 
-            <ThePointSection db={db} />
+            {/* --- UPDATED --- Conditionally render ThePointSection */}
+            {showThePointOnViews.includes(currentView) && <ThePointSection db={db} />}
 
             <div className={styles.contentArea}>
                 {renderCurrentView()}

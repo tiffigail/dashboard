@@ -1,0 +1,94 @@
+/* src/components/Timeline/AxisMilestoneTimeline/AxisMilestoneTimeline.module.css */
+
+.modalOverlay {
+    position: fixed;
+    inset: 0;
+    /* This z-index must be higher than the parent modal's z-index */
+    z-index: 1200; 
+    background-color: rgba(255, 255, 255, 0.7); /* Lighter overlay */
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    /* Initial state for zoom animation */
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease-out;
+}
+
+.modalOverlay.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.modalContent {
+    background-color: #ffffff;
+    border-radius: 1rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+    width: 95%;
+    max-width: 1400px;
+    height: 90vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    border: 1px solid #e5e7eb;
+    
+    /* Initial state for zoom animation */
+    transform: scale(0.9);
+    transition: transform 0.3s ease-out;
+}
+
+.modalOverlay.open .modalContent {
+    transform: scale(1);
+}
+
+.closeButton {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: #e5e7eb;
+    border: none;
+    border-radius: 9999px;
+    width: 2.5rem;
+    height: 2.5rem;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #4b5563;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    z-index: 20;
+}
+
+.closeButton:hover {
+    background: #d1d5db;
+    transform: rotate(90deg);
+}
+
+.header {
+    padding: 2rem 2.5rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.title {
+    font-size: 2.25rem;
+    font-weight: 800;
+    color: var(--accent-color);
+    margin: 0;
+    line-height: 1.2;
+}
+
+.subtitle {
+    font-size: 1rem;
+    color: #6b7280;
+    margin-top: 0.5rem;
+}
+
+.body {
+    padding: 2.5rem;
+    flex-grow: 1;
+    overflow-y: auto;
+}

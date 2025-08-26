@@ -1,36 +1,59 @@
-// src/components/WeeklyPlanner/WeeklyPlanner.jsx
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import styles from './WeeklyPlanner.module.css';
 import { db } from '../../firebaseConfig';
 import {
     collection,
     doc,
-    setDoc,
+    getDoc,
+    getDocs,
+    query,
+    where,
     writeBatch,
     serverTimestamp,
 } from "firebase/firestore";
 import ContextMap from '../ContextMap/ContextMap';
 
-// --- localStorage Key ---
-const LOCAL_STORAGE_KEY = 'weeklyPlanInProgress_v4'; // Updated key for new structure
-
 // --- Date Helper Functions ---
-function getWeekId(date = new Date()) { // ISO Week ID (Week starts Monday)
-    const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-    const dayNum = d.getUTCDay() || 7;
-    d.setUTCDate(d.getUTCDate() + 4 - dayNum);
-    const yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
-    const weekNo = Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1)/7);
-    return `${d.getUTCFullYear()}-W${String(weekNo).padStart(2, '0')}`;
+function getWeekStartDate(date = new Date()) {
+    const startDate = new Date(date);
+    startDate.setDate(startDate.getDate() - startDate.getDay()); // Adjust to Sunday (day 0)
+    startDate.setHours(0, 0, 0, 0); // Set to start of the day
+    return startDate;
 }
+
+function getWeekId(date = new Date()) {
+    const targetDate = new Date(date);
+    targetDate.setHours(12, 0, 0, 0); // Normalize to midday for robustness before getting week start
+
+    const weekStartDate = getWeekStartDate(targetDate);
+    weekStartDate.setHours(0, 0, 0, 0); // Ensure week start is precisely at midnight
+
+    const year = weekStartDate.getFullYear();
+    
+    const janFirst = new Date(year, 0, 1);
+    janFirst.setHours(0, 0, 0, 0); // Ensure Jan 1st is precisely at midnight
+
+    const firstSundayOfYear = new Date(janFirst);
+    firstSundayOfYear.setDate(janFirst.getDate() - janFirst.getDay());
+    firstSundayOfYear.setHours(0, 0, 0, 0); // Ensure first Sunday of year is precisely at midnight
+
+    const diffInMilliseconds = weekStartDate.getTime() - firstSundayOfYear.getTime();
+    
+    // Use Math.round to handle potential floating point inaccuracies from timezone/DST
+    // This is the key change to fix subtle off-by-one errors for week calculation
+    const diffInDays = Math.round(diffInMilliseconds / (1000 * 60 * 60 * 24)); 
+    
+    const weekNumber = Math.floor(diffInDays / 7) + 1; // Weeks are 1-indexed
+
+    return `${year}-W${String(weekNumber).padStart(2, '0')}`;
+}
+
 
 function getDateStringForDayInWeek(weekStartDate, targetDayIndex) {
     if (!(weekStartDate instanceof Date) || isNaN(weekStartDate)) {
-        console.error("Invalid weekStartDate provided to getDateStringForDayInWeek");
         return null;
     }
     const targetDate = new Date(weekStartDate);
-    // weekStartDate is expected to be Sunday. targetDayIndex is 0 for Sun, 1 for Mon, etc.
     targetDate.setDate(weekStartDate.getDate() + targetDayIndex);
     const year = targetDate.getFullYear();
     const month = String(targetDate.getMonth() + 1).padStart(2, '0');
@@ -38,319 +61,408 @@ function getDateStringForDayInWeek(weekStartDate, targetDayIndex) {
     return `${year}-${month}-${day}`;
 }
 
-
-function getCurrentWeekStartDate(date = new Date()) { // Returns Sunday of the current week
-    const current = new Date(date);
-    const dayOfWeek = current.getDay(); // 0 = Sunday
-    const diff = current.getDate() - dayOfWeek;
-    const sundayDate = new Date(current.setDate(diff));
-    sundayDate.setHours(0, 0, 0, 0); // Normalize to start of day
-    return sundayDate;
-}
-
-
-function getUpcomingMondaySundayRange(date = new Date()) { // For display string
-    const today = new Date(date);
-    const currentDay = today.getDay(); // 0 = Sunday, 1 = Monday...
-    // Days until the *next* Monday (could be tomorrow if today is Sun, or next week's Mon if today is Mon)
-    let daysUntilMonday;
-    if (currentDay === 0) { // Sunday
-        daysUntilMonday = 1;
-    } else {
-        daysUntilMonday = 8 - currentDay;
-    }
-    const upcomingMonday = new Date(today);
-    upcomingMonday.setDate(today.getDate() + daysUntilMonday);
-    upcomingMonday.setHours(0,0,0,0);
-
-    const followingSunday = new Date(upcomingMonday);
-    followingSunday.setDate(upcomingMonday.getDate() + 6);
-    followingSunday.setHours(0,0,0,0);
-
-    const options = { month: 'long', day: 'numeric' };
-    return {
-        monday: upcomingMonday.toLocaleDateString(undefined, options),
-        sunday: followingSunday.toLocaleDateString(undefined, options),
-        mondayDateObj: upcomingMonday // Return the Monday Date object
-    };
-}
-// --- End Date Helper Functions ---
-
-// Mapping from Day of Week (0=Sun) to Axis Theme Name
+// --- Constants ---
 const dayToAxisThemeMapping = [
     "Rest and preparation", "Physical", "Financial", "Gear",
-    "ON TRACK N+1", "Misdirect", "Environment"
+    "On Track N+1", "Misdirect", "Environment"
 ];
 
-// Days of the week for checkboxes
 const daysOfWeek = [
     { label: 'Sun', value: 0 }, { label: 'Mon', value: 1 }, { label: 'Tue', value: 2 },
     { label: 'Wed', value: 3 }, { label: 'Thu', value: 4 }, { label: 'Fri', value: 5 },
     { label: 'Sat', value: 6 },
 ];
 
-const loadFromLocalStorage = (key, defaultValue) => {
-    try {
-        const saved = localStorage.getItem(key);
-        if (saved === null) return defaultValue;
-        const parsed = JSON.parse(saved);
-        for (const axis in parsed) {
-            if (parsed[axis] && !Array.isArray(parsed[axis].steps)) {
-                parsed[axis].steps = [{ text: '', assignedDays: [] }];
-            } else if (parsed[axis] && parsed[axis].steps.length === 0) {
-                parsed[axis].steps = [{ text: '', assignedDays: [] }];
-            } else if (parsed[axis]) {
-                parsed[axis].steps = parsed[axis].steps.map(step =>
-                    (typeof step === 'object' && step !== null && Array.isArray(step.assignedDays))
-                        ? step
-                        : { text: typeof step === 'string' ? step : '', assignedDays: [] }
-                );
-            }
-        }
-        return parsed;
-    } catch (error) {
-        console.error(`Error reading localStorage key “${key}”:`, error);
-        return defaultValue;
-    }
-};
-
-function WeeklyPlanner({ onClose }) {
-    const [currentAxisIndex, setCurrentAxisIndex] = useState(() => loadFromLocalStorage('weeklyPlanner_currentAxisIndex', 0));
-    const [inProgressPlan, setInProgressPlan] = useState(() => loadFromLocalStorage(LOCAL_STORAGE_KEY, {}));
+// --- Component ---
+function WeeklyPlanner({ onClose, allAxes = [], allMilestones = [], targetDate }) {
+    const [currentAxisIndex, setCurrentAxisIndex] = useState(0);
+    const [inProgressPlan, setInProgressPlan] = useState({});
     const [isFinishing, setIsFinishing] = useState(false);
     const [error, setError] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [weekStartDate, setWeekStartDate] = useState(null); // Will be set in useEffect
 
-    const currentAxisTheme = dayToAxisThemeMapping[currentAxisIndex];
-    
-    // Determine the target planning week (next week)
-    // currentWeekSundayAtMidnight is the Sunday of the week the planner is opened.
-    const currentWeekSundayAtMidnight = getCurrentWeekStartDate(new Date());
+    // This function fetches data for a given week but does NOT set component state.
+    // It returns the fetched plan data and the calculated week start date.
+    const getPlanDataForWeek = useCallback(async (dateToFetch) => {
+        const calculatedWeekStartDate = getWeekStartDate(dateToFetch);
+        const weekId = getWeekId(calculatedWeekStartDate);
 
-    // nextWeekSundayAtMidnight is the Sunday the user will be planning FOR.
-    const nextWeekSundayAtMidnight = new Date(currentWeekSundayAtMidnight);
-    nextWeekSundayAtMidnight.setDate(currentWeekSundayAtMidnight.getDate() + 7);
+        console.log("Fetching data for Week ID:", weekId); // LOG 1: What week ID are we querying?
 
-    // For display, use the Mon-Sun range of the ISO week we are planning FOR.
-    // The targetISOWeekId will be based on the Monday of the week that nextWeekSundayAtMidnight is part of.
-    const mondayOfTargetPlanningISOWeek = new Date(nextWeekSundayAtMidnight);
-    if (mondayOfTargetPlanningISOWeek.getUTCDay() === 0) { // If Sunday
-        mondayOfTargetPlanningISOWeek.setUTCDate(mondayOfTargetPlanningISOWeek.getUTCDate() + 1);
-    } else { // If not Sunday, find that week's Monday
-        const day = mondayOfTargetPlanningISOWeek.getUTCDay();
-        const diff = mondayOfTargetPlanningISOWeek.getUTCDate() - day + (day === 0 ? -6 : 1);
-        mondayOfTargetPlanningISOWeek.setUTCDate(diff);
-    }
-    const endOfTargetPlanningISOWeek = new Date(mondayOfTargetPlanningISOWeek);
-    endOfTargetPlanningISOWeek.setUTCDate(mondayOfTargetPlanningISOWeek.getUTCDate() + 6);
-    
-    const options = { month: 'long', day: 'numeric' };
-    const weekRangeString = `Planning for: ${nextWeekSundayAtMidnight.toLocaleDateString(undefined, options)} (Sun) to ${new Date(new Date(nextWeekSundayAtMidnight).setDate(nextWeekSundayAtMidnight.getDate() + 6)).toLocaleDateString(undefined, options)} (Sat)`;
+        const planDocRef = doc(db, "new_weeklyPlans", weekId);
+        const tasksQuery = query(
+            collection(db, "new_tasks"),
+            where("parentId", "==", weekId),
+            where("taskType", "==", "planned")
+        );
 
-
-    useEffect(() => {
         try {
-            const planToSave = {};
-            for (const axis in inProgressPlan) {
-                const stepsToSave = (inProgressPlan[axis].steps || [])
-                                        .filter(step => step && typeof step.text === 'string' && step.text.trim() !== '');
-                if (stepsToSave.length === 0) {
-                    stepsToSave.push({ text: '', assignedDays: [] });
-                }
-                planToSave[axis] = {
-                    ...inProgressPlan[axis],
-                    steps: stepsToSave
-                };
-            }
-            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(planToSave));
-            localStorage.setItem('weeklyPlanner_currentAxisIndex', currentAxisIndex);
-        } catch (error) {
-            console.error("Error saving plan to localStorage:", error);
-        }
-    }, [inProgressPlan, currentAxisIndex]);
+            const [planDocSnap, tasksSnap] = await Promise.all([getDoc(planDocRef), getDocs(tasksQuery)]);
+            let existingPlan = {};
 
-    const handlePrevious = () => {
-        setCurrentAxisIndex(prev => (prev > 0 ? prev - 1 : dayToAxisThemeMapping.length - 1));
+            if (planDocSnap.exists()) {
+                const planData = planDocSnap.data();
+                console.log("Raw Weekly Plan Doc Data for", weekId, ":", planData); // LOG 2: Raw plan doc data
+                if (planData.weeklyGoals) {
+                    for (const axisName in planData.weeklyGoals) {
+                        const themeName = dayToAxisThemeMapping.find(theme => 
+                            theme.toLowerCase() === axisName.toLowerCase() || 
+                            theme.toLowerCase().replace(/\s/g, '-') === axisName.toLowerCase()
+                        );
+                        if (themeName) {
+                            existingPlan[themeName] = {
+                                goal: planData.weeklyGoals[axisName].goal,
+                                milestoneId: planData.weeklyGoals[axisName].milestoneId,
+                                steps: [] // Steps will be populated from tasksSnap
+                            };
+                        }
+                    }
+                }
+            } else {
+                console.log("No Weekly Plan document found for Week ID:", weekId); // LOG 3: No plan doc
+            }
+
+            if (!tasksSnap.empty) {
+                const rawTasks = tasksSnap.docs.map(d => ({ id: d.id, ...d.data() })); // Capture doc.id here!
+                console.log("Raw Planned Tasks Data for", weekId, ":", rawTasks); // LOG 4: Raw tasks data
+
+                // Group tasks by title and axisTheme, collecting assignedDays and their doc IDs
+                const tasksByTitle = {};
+                rawTasks.forEach(task => { // Iterate rawTasks that now include ID
+                    if (!tasksByTitle[task.title]) {
+                        tasksByTitle[task.title] = { text: task.title, assignedDays: [], axisTheme: task.axisTheme, docIds: [] };
+                    }
+                    const assignedDate = new Date(task.assignedDate + 'T00:00:00');
+                    const dayOfWeek = assignedDate.getUTCDay();
+                    tasksByTitle[task.title].assignedDays.push(dayOfWeek);
+                    tasksByTitle[task.title].docIds.push(task.id); // Store the doc ID for the task document
+                });
+
+                for (const title in tasksByTitle) {
+                    const taskGroup = tasksByTitle[title];
+                    if (existingPlan[taskGroup.axisTheme]) {
+                        existingPlan[taskGroup.axisTheme].steps.push({
+                            text: taskGroup.text,
+                            assignedDays: taskGroup.assignedDays.sort((a, b) => a - b),
+                            // IMPORTANT: For simplification, we'll collect all IDs associated with this title/theme/assignedDays combo.
+                            // When saving, we'll manage individual (title, assignedDate) pairs.
+                            // This `allAssociatedDocIds` is for debugging/understanding, not directly used in the reconciliation below.
+                            allAssociatedDocIds: taskGroup.docIds 
+                        });
+                    } else {
+                        existingPlan[taskGroup.axisTheme] = {
+                            goal: '',
+                            steps: [{
+                                text: taskGroup.text,
+                                assignedDays: taskGroup.assignedDays.sort((a, b) => a - b),
+                                allAssociatedDocIds: taskGroup.docIds
+                            }]
+                        };
+                    }
+                }
+            } else {
+                console.log("No Planned Tasks found for Week ID:", weekId); // LOG 5: No tasks
+            }
+            
+            console.log("Final processed existingPlan for", weekId, ":", existingPlan); // LOG 6: Final processed plan
+
+            return { plan: existingPlan, weekStart: calculatedWeekStartDate };
+
+        } catch (err) {
+            console.error("Error fetching weekly plan data from Firebase:", err);
+            setError("Could not load the weekly plan.");
+            return { plan: {}, weekStart: calculatedWeekStartDate }; // Return empty plan on error
+        }
+    }, []);
+
+    // Effect to handle initial load and updates when `targetDate` prop changes
+    useEffect(() => {
+        const loadPlan = async (date) => {
+            setIsLoading(true); // Show loading when fetch starts
+            const { plan, weekStart } = await getPlanDataForWeek(date);
+            setWeekStartDate(weekStart); // Update week start date state
+            setInProgressPlan(plan); // Update the plan data
+            setIsLoading(false); // Hide loading when fetch finishes
+        };
+
+        const initialDate = targetDate ? new Date(targetDate) : new Date();
+        console.log("Initial date for loading:", initialDate.toLocaleDateString()); // LOG 7: Initial date passed to loadPlan
+        loadPlan(initialDate);
+
+    }, [targetDate, getPlanDataForWeek]);
+
+    const handlePreviousAxis = () => setCurrentAxisIndex(prev => (prev > 0 ? prev - 1 : dayToAxisThemeMapping.length - 1));
+    const handleNextAxis = () => setCurrentAxisIndex(prev => (prev < dayToAxisThemeMapping.length - 1 ? prev + 1 : 0));
+
+    const handlePreviousWeek = async () => {
+        setIsLoading(true);
+        const newDate = new Date(weekStartDate);
+        newDate.setDate(newDate.getDate() - 7);
+        console.log("Navigating to previous week:", newDate.toLocaleDateString());
+        const { plan, weekStart } = await getPlanDataForWeek(newDate);
+        setWeekStartDate(weekStart);
+        setInProgressPlan(plan);
+        setIsLoading(false);
     };
-    const handleNext = () => {
-        setCurrentAxisIndex(prev => (prev < dayToAxisThemeMapping.length - 1 ? prev + 1 : 0));
+
+    const handleNextWeek = async () => {
+        setIsLoading(true);
+        const newDate = new Date(weekStartDate);
+        newDate.setDate(newDate.getDate() + 7);
+        console.log("Navigating to next week:", newDate.toLocaleDateString());
+        const { plan, weekStart } = await getPlanDataForWeek(newDate);
+        setWeekStartDate(weekStart);
+        setInProgressPlan(plan);
+        setIsLoading(false);
     };
 
     const handleAxisGoalChange = (e) => {
         const goal = e.target.value;
-        setInProgressPlan(prevPlan => ({
-            ...prevPlan,
-            [currentAxisTheme]: { ...(prevPlan[currentAxisTheme] || { steps: [{ text: '', assignedDays: [] }], goal: '' }), goal: goal }
-        }));
+        setInProgressPlan(prev => ({ ...prev, [currentAxisTheme]: { ...(prev[currentAxisTheme] || { steps: [] }), goal } }));
     };
 
     const handleStepInputChange = (index, value) => {
-        setInProgressPlan(prevPlan => {
-            const currentAxisPlan = prevPlan[currentAxisTheme] || { steps: [{ text: '', assignedDays: [] }], goal: '' };
-            const updatedSteps = [...currentAxisPlan.steps];
-            if (!updatedSteps[index]) {
-                updatedSteps[index] = { text: '', assignedDays: [] };
-            }
-            updatedSteps[index].text = value;
-            return { ...prevPlan, [currentAxisTheme]: { ...currentAxisPlan, steps: updatedSteps } };
+        setInProgressPlan(prev => {
+            const steps = [...(currentPlanData.steps || [])];
+            const existingStep = steps[index] || { text: '', assignedDays: [] };
+            steps[index] = { ...existingStep, text: value };
+            return { ...prev, [currentAxisTheme]: { ...currentPlanData, steps } };
         });
     };
 
     const handleAddStepInput = () => {
-        setInProgressPlan(prevPlan => {
-            const currentAxisPlan = prevPlan[currentAxisTheme] || { steps: [], goal: '' };
-            const updatedSteps = [...currentAxisPlan.steps, { text: '', assignedDays: [] }];
-            return { ...prevPlan, [currentAxisTheme]: { ...currentAxisPlan, steps: updatedSteps } };
+        setInProgressPlan(prev => {
+            const steps = [...(currentPlanData.steps || []), { text: '', assignedDays: [] }];
+            return { ...prev, [currentAxisTheme]: { ...currentPlanData, steps } };
         });
     };
 
     const handleRemoveStepInput = (indexToRemove) => {
-        setInProgressPlan(prevPlan => {
-            const currentAxisPlan = prevPlan[currentAxisTheme] || { steps: [], goal: '' };
-            let updatedSteps = currentAxisPlan.steps.filter((_, index) => index !== indexToRemove);
-            if (updatedSteps.length === 0) {
-                updatedSteps = [{ text: '', assignedDays: [] }];
-            }
-            return { ...prevPlan, [currentAxisTheme]: { ...currentAxisPlan, steps: updatedSteps } };
+        setInProgressPlan(prev => {
+            let steps = (currentPlanData.steps || []).filter((_, i) => i !== indexToRemove);
+            if (steps.length === 0) steps = [{ text: '', assignedDays: [] }];
+            return { ...prev, [currentAxisTheme]: { ...currentPlanData, steps } };
         });
     };
 
     const handleStepDayChange = (stepIndex, dayValue, isChecked) => {
-        setInProgressPlan(prevPlan => {
-            const currentAxisPlan = prevPlan[currentAxisTheme] || { steps: [], goal: '' };
-            const updatedSteps = [...currentAxisPlan.steps];
-            if (!updatedSteps[stepIndex]) {
-                updatedSteps[stepIndex] = { text: '', assignedDays: [] };
-            }
-            const currentDays = updatedSteps[stepIndex].assignedDays || [];
-            let newDays;
-            if (isChecked) {
-                newDays = [...currentDays, dayValue].filter((v, i, a) => a.indexOf(v) === i).sort((a, b) => a - b);
-            } else {
-                newDays = currentDays.filter(day => day !== dayValue);
-            }
-            updatedSteps[stepIndex].assignedDays = newDays;
-            return { ...prevPlan, [currentAxisTheme]: { ...currentAxisPlan, steps: updatedSteps } };
+        setInProgressPlan(prev => {
+            const steps = [...(currentPlanData.steps || [])];
+            const existingStep = steps[stepIndex] || { text: '', assignedDays: [] };
+            const currentDays = existingStep.assignedDays || [];
+            const newDays = isChecked ? [...currentDays, dayValue] : currentDays.filter(d => d !== dayValue);
+            steps[stepIndex] = { ...existingStep, assignedDays: newDays.sort((a, b) => a - b) };
+            return { ...prev, [currentAxisTheme]: { ...currentPlanData, steps } };
+        });
+    };
+
+    const handleSelectAllDays = (stepIndex) => {
+        setInProgressPlan(prev => {
+            const steps = [...(currentPlanData.steps || [])];
+            const step = { ...(steps[stepIndex] || { text: '', assignedDays: [] }) };
+            step.assignedDays = (step.assignedDays.length === 7) ? [] : daysOfWeek.map(d => d.value);
+            steps[stepIndex] = step;
+            return { ...prev, [currentAxisTheme]: { ...currentPlanData, steps } };
         });
     };
 
     const handleFinish = async () => {
-        console.log("Weekly planning finished. Saving overall weekly plan and steps...");
         setIsFinishing(true);
         setError(null);
 
-        const finalGoals = {};
-        const stepsToAdd = [];
-
-        // --- CORRECTED LOGIC START ---
-        // To get the ID for next week, simply take today's date and add 7 days.
-        // The getWeekId function will correctly handle any edge cases.
-        const today = new Date();
-        const nextWeekDate = new Date();
-        nextWeekDate.setDate(today.getDate() + 7);
-        const targetPlanFirestoreWeekId = getWeekId(nextWeekDate);
-
-        console.log(`Correctly targeting Firestore Week ID for next week: ${targetPlanFirestoreWeekId}`);
-        // --- CORRECTED LOGIC END ---
-
-
-        for (const axisName in inProgressPlan) {
-            const plan = inProgressPlan[axisName];
-            if (plan.goal && plan.goal.trim()) {
-                finalGoals[axisName] = plan.goal.trim();
-            }
-
-            if (plan.steps && Array.isArray(plan.steps)) {
-                plan.steps.forEach(step => {
-                    if (step.text && step.text.trim() && Array.isArray(step.assignedDays) && step.assignedDays.length > 0) {
-                        const earliestDayIndex = Math.min(...step.assignedDays);
-                        // Use nextWeekSundayAtMidnight (actual start of user's week) to calculate the date string
-                        const initialAssignedDateString = getDateStringForDayInWeek(nextWeekSundayAtMidnight, earliestDayIndex);
-                        
-                        if (!initialAssignedDateString) {
-                            console.error(`Could not calculate initial assigned date for step "${step.text}" in axis ${axisName}`);
-                            return;
-                        }
-
-                        stepsToAdd.push({
-                            taskType: 'planned',
-                            plannedSteps: step.text.trim(),
-                            axisTheme: axisName,
-                            weekId: targetPlanFirestoreWeekId,
-                            assignedDays: step.assignedDays,
-                            createdAt: serverTimestamp(),
-                            status: 'pending',
-                            completedAt: null,
-                            rolloverCount: 0,
-                            currentAssignedDate: initialAssignedDateString, // Date of first assignment in the planned week
-                        });
-                    }
-                });
-            }
-        }
-
-        const weeklyPlanData = {
-            weekId: targetPlanFirestoreWeekId,
-            axisGoals: finalGoals,
-            axisGoalStatus: {}, // Initialize as empty or with default statuses
-            createdAt: serverTimestamp(),
-            lastUpdatedAt: serverTimestamp()
-        };
-
-        const batch = writeBatch(db);
-        const weeklyPlanDocRef = doc(db, "weeklyPlan", targetPlanFirestoreWeekId);
-        batch.set(weeklyPlanDocRef, weeklyPlanData); // Removed { merge: true } for a clean overwrite
-
-        const stepsCollectionRef = collection(db, "weeklySteps");
-        stepsToAdd.forEach(stepData => {
-            const newStepDocRef = doc(stepsCollectionRef); // Auto-generate ID for each step
-            batch.set(newStepDocRef, stepData);
-        });
-
-        console.log(`Prepared batch: Setting weeklyPlan/${targetPlanFirestoreWeekId} and adding ${stepsToAdd.length} individual steps.`);
-
         try {
+            const targetPlanWeekId = getWeekId(weekStartDate);
+            const batch = writeBatch(db);
+            let dataError = null;
+
+            // --- 1. Process Weekly Goals ---
+            const finalWeeklyGoals = {};
+            for (const axisName of dayToAxisThemeMapping) {
+                const plan = inProgressPlan[axisName];
+                // Only save goals if they have text or associated steps
+                if (plan && (plan.goal?.trim() || (plan.steps && plan.steps.some(s => s.text?.trim())))) {
+                    const axisData = allAxes.find(a => a.axisName === axisName);
+                    if (!axisData) {
+                        dataError = `Configuration Error: Data for axis "${axisName}" is missing.`;
+                        break;
+                    }
+                    const axisId = axisData.id;
+
+                    const activeMilestonesForAxis = allMilestones.filter(
+                        m => m.axisId === axisId && m.completionDate === null
+                    );
+                    activeMilestonesForAxis.sort((a, b) => {
+                        const dateA = a.dueDate?.toDate ? a.dueDate.toDate() : new Date('9999-12-31');
+                        const dateB = b.dueDate?.toDate ? b.dueDate.toDate() : new Date('9999-12-31');
+                        return dateA - dateB;
+                    });
+                    const activeMilestone = activeMilestonesForAxis.length > 0 ? activeMilestonesForAxis[0] : null;
+                    
+                    const goalDueDate = new Date(weekStartDate);
+                    goalDueDate.setDate(weekStartDate.getDate() + 6);
+                    
+                    finalWeeklyGoals[axisName] = {
+                        goal: plan.goal?.trim() || '', // Ensure goal is empty string if null/undefined
+                        status: 'todo',
+                        dueDate: goalDueDate,
+                        completionDate: null,
+                        milestoneId: activeMilestone ? activeMilestone.id : null
+                    };
+                }
+            }
+
+            if (dataError) { setError(dataError); setIsFinishing(false); return; }
+
+            const weeklyPlanDocRef = doc(db, "new_weeklyPlans", targetPlanWeekId);
+            if (Object.keys(finalWeeklyGoals).length > 0) {
+                batch.set(weeklyPlanDocRef, {
+                    weekId: targetPlanWeekId,
+                    weeklyGoals: finalWeeklyGoals,
+                    createdAt: serverTimestamp(),
+                    lastUpdatedAt: serverTimestamp()
+                }, { merge: true });
+                console.log("Batching weekly plan update for:", targetPlanWeekId, finalWeeklyGoals);
+            } else {
+                // If no goals or steps are entered for any axis, potentially delete the whole weekly plan doc
+                // For now, we'll just not update it, meaning existing empty goals stay empty.
+                // To delete the doc: batch.delete(weeklyPlanDocRef);
+                console.log("No weekly goals to save for:", targetPlanWeekId, " - not updating document.");
+            }
+
+
+            // --- 2. Reconcile Planned Tasks (Steps) ---
+            const currentTasksToSave = []; // Tasks derived from current UI state
+            for (const axisName of dayToAxisThemeMapping) {
+                const plan = inProgressPlan[axisName];
+                const axisData = allAxes.find(a => a.axisName === axisName);
+                if (!axisData) continue; // Skip if axis data is missing
+
+                if (plan && Array.isArray(plan.steps)) {
+                    plan.steps.forEach(step => {
+                        if (step.text?.trim() && step.assignedDays?.length > 0) {
+                            step.assignedDays.forEach(dayIndex => {
+                                const assignedDateString = getDateStringForDayInWeek(weekStartDate, dayIndex);
+                                if (assignedDateString) {
+                                    currentTasksToSave.push({
+                                        title: step.text.trim(),
+                                        axisId: axisData.id,
+                                        axisTheme: axisName,
+                                        parentId: targetPlanWeekId,
+                                        parentType: 'weeklyPlan',
+                                        taskType: 'planned',
+                                        status: 'todo',
+                                        assignedDate: assignedDateString,
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
+            }
+
+            // Fetch ALL existing planned tasks for this specific week from Firestore
+            const existingFirestoreTasksSnap = await getDocs(query(
+                collection(db, "new_tasks"),
+                where("parentId", "==", targetPlanWeekId),
+                where("taskType", "==", "planned")
+            ));
+            
+            const existingFirestoreTasksMap = new Map(); // Key: `${title}-${assignedDate}`, Value: Firestore Doc ID
+            existingFirestoreTasksSnap.docs.forEach(doc => {
+                const data = doc.data();
+                const key = `${data.title}-${data.assignedDate}`;
+                existingFirestoreTasksMap.set(key, doc.id);
+            });
+
+            console.log("Current UI tasks to save:", currentTasksToSave);
+            console.log("Existing Firestore tasks map:", existingFirestoreTasksMap);
+
+            // Determine tasks to delete and tasks to add
+            const tasksToDeleteIds = [];
+            const tasksToCreate = [];
+
+            // Identify tasks to delete (exist in Firestore but not in current UI state)
+            existingFirestoreTasksMap.forEach((docId, key) => {
+                const isStillInUI = currentTasksToSave.some(task => `${task.title}-${task.assignedDate}` === key);
+                if (!isStillInUI) {
+                    tasksToDeleteIds.push(docId);
+                }
+            });
+
+            // Identify tasks to create (exist in current UI state but not in Firestore)
+            currentTasksToSave.forEach(taskData => {
+                const key = `${taskData.title}-${taskData.assignedDate}`;
+                if (!existingFirestoreTasksMap.has(key)) {
+                    tasksToCreate.push(taskData);
+                }
+            });
+
+            // Add delete operations to batch
+            tasksToDeleteIds.forEach(docId => {
+                batch.delete(doc(db, "new_tasks", docId));
+                console.log("Marked for deletion (ID):", docId);
+            });
+
+            // Add create operations to batch
+            tasksToCreate.forEach(taskData => {
+                const newTaskDocRef = doc(collection(db, "new_tasks"));
+                batch.set(newTaskDocRef, { ...taskData, createdAt: serverTimestamp(), completedAt: null });
+                console.log("Marked for creation:", taskData.title, taskData.assignedDate);
+            });
+
+            if (Object.keys(finalWeeklyGoals).length === 0 && currentTasksToSave.length === 0 && tasksToDeleteIds.length === 0) {
+                 setError("Nothing to save. Please enter at least one weekly goal or step.");
+                 setIsFinishing(false);
+                 return;
+            }
+
+            // Commit the batch
             await batch.commit();
-            console.log(`Batch write successful for week ${targetPlanFirestoreWeekId}`);
-            alert("Weekly plan and all steps saved successfully!");
-            localStorage.removeItem(LOCAL_STORAGE_KEY);
-            localStorage.removeItem('weeklyPlanner_currentAxisIndex');
-            setInProgressPlan({});
-            setCurrentAxisIndex(0);
-            onClose();
+            console.log("Firestore batch committed successfully.");
+
+            if (onClose) onClose();
+
         } catch (err) {
-            console.error("Error committing batch write:", err);
-            setError(`Failed to save the weekly plan/steps for ${targetPlanFirestoreWeekId}. Please try again.`);
-            alert(`Error: Failed to save the weekly plan/steps.`);
+            console.error("--- FIRESTORE WRITE FAILED ---", err);
+            setError(`Failed to save plan. Check console for details: ${err.message}`);
         } finally {
             setIsFinishing(false);
         }
     };
-
-    const currentPlanData = inProgressPlan[currentAxisTheme] || { steps: [{ text: '', assignedDays: [] }], goal: '' };
-    const displayGoal = currentPlanData.goal || '';
-    let displayStepsArray = Array.isArray(currentPlanData.steps) ? currentPlanData.steps : [];
-    if (displayStepsArray.length === 0 || displayStepsArray.every(step => typeof step !== 'object')) {
-        displayStepsArray = [{ text: '', assignedDays: [] }];
-    } else {
-        displayStepsArray = displayStepsArray.map(step =>
-                (typeof step === 'object' && step !== null && Array.isArray(step.assignedDays))
-                    ? step
-                    : { text: typeof step === 'string' ? step : '', assignedDays: [] }
-            );
-        if (displayStepsArray.length === 0) {
-            displayStepsArray.push({ text: '', assignedDays: [] });
-        }
+    
+    if (isLoading || !weekStartDate) {
+        return <div className={styles.loading}>Loading Plan...</div>;
     }
+
+    const currentAxisTheme = dayToAxisThemeMapping[currentAxisIndex];
+    const options = { month: 'long', day: 'numeric' };
+    const weekEndDate = new Date(weekStartDate);
+    weekEndDate.setDate(weekStartDate.getDate() + 6);
+    const weekRangeString = `Planning for: ${weekStartDate.toLocaleDateString(undefined, options)} (Sun) to ${weekEndDate.toLocaleDateString(undefined, options)} (Sat)`;
+
+    const currentPlanData = inProgressPlan[currentAxisTheme] || {};
+    const displayGoal = currentPlanData.goal || '';
+    const displayStepsArray = Array.isArray(currentPlanData.steps) && currentPlanData.steps.length > 0
+        ? currentPlanData.steps
+        : [{ text: '', assignedDays: [] }];
 
     return (
         <div className={styles.weeklyPlannerModalContent}>
             <h3 className={styles.plannerTitle}>{currentAxisTheme} - Weekly Plan</h3>
             <p className={styles.weekRange}>{weekRangeString}</p>
 
+            <div className={styles.weekNavigation}>
+                <button type="button" onClick={handlePreviousWeek} className={styles.navButton} disabled={isFinishing}>
+                    &larr; Previous Week
+                </button>
+                <button type="button" onClick={handleNextWeek} className={styles.navButton} disabled={isFinishing}>
+                    Next Week &rarr;
+                </button>
+            </div>
+
             <div className={styles.plannerLayout}>
-                <div className={styles.contextMapArea}>
-                    <ContextMap axisName={currentAxisTheme} />
-                </div>
+                <ContextMap axisName={currentAxisTheme} />
 
                 <div className={styles.inputsArea}>
                     {error && <p className={styles.errorText}>{error}</p>}
@@ -377,7 +489,7 @@ function WeeklyPlanner({ onClose }) {
                                     <div className={styles.stepInputRow}>
                                         <input
                                             type="text"
-                                            value={step.text}
+                                            value={step.text || ''}
                                             onChange={(e) => handleStepInputChange(index, e.target.value)}
                                             placeholder={`Step ${index + 1}...`}
                                             className={styles.stepInput}
@@ -410,6 +522,14 @@ function WeeklyPlanner({ onClose }) {
                                                 <label htmlFor={`day-${day.value}-step-${index}-${currentAxisIndex}`}>{day.label}</label>
                                             </div>
                                         ))}
+                                        <button 
+                                            type="button" 
+                                            onClick={() => handleSelectAllDays(index)}
+                                            className={styles.allDaysButton}
+                                            title="Select/Deselect All Days"
+                                        >
+                                            All
+                                        </button>
                                     </div>
                                 </div>
                             ))}
@@ -428,13 +548,13 @@ function WeeklyPlanner({ onClose }) {
             </div>
 
             <div className={styles.navigation}>
-                <button type="button" onClick={handlePrevious} className={styles.navButton} disabled={isFinishing}>
+                <button type="button" onClick={handlePreviousAxis} className={styles.navButton} disabled={isFinishing}>
                     &larr; Previous Axis
                 </button>
                 <button type="button" onClick={handleFinish} className={`${styles.navButton} ${styles.finishButton}`} disabled={isFinishing}>
                     {isFinishing ? 'Saving Plan...' : 'Finish Planning & Save All'}
                 </button>
-                <button type="button" onClick={handleNext} className={styles.navButton} disabled={isFinishing}>
+                <button type="button" onClick={handleNextAxis} className={styles.navButton} disabled={isFinishing}>
                     Next Axis &rarr;
                 </button>
             </div>

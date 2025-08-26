@@ -13,174 +13,181 @@ import {
     onSnapshot
 } from "firebase/firestore";
 
-// --- Helper Functions ---
-function getWeekId(date = new Date()) { // ISO Week ID (Week starts Monday)
-    const d = new Date(date.valueOf()); // Use valueOf to clone
-    const dayNum = d.getUTCDay() || 7; // getUTCDay() is 0 for Sunday
-    d.setUTCDate(d.getUTCDate() + 4 - dayNum); // Adjust to Thursday of that week
+// --- Helper Function ---
+function getWeekId(date = new Date()) {
+    const d = new Date(date.valueOf());
+    const dayNum = d.getUTCDay() || 7;
+    d.setUTCDate(d.getUTCDate() + 4 - dayNum);
     const yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
     const weekNo = Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1)/7);
     return `${d.getUTCFullYear()}-W${String(weekNo).padStart(2, '0')}`;
 }
-
-function findUpcomingMilestone(milestones) {
-    if (!Array.isArray(milestones)) {
-        console.warn("findUpcomingMilestone: Input is not an array.", milestones);
-        return null;
-    }
-    return milestones.find(m => m.completionDate === null || m.completionDate === undefined) || null;
-}
-// --- End Helper Functions ---
+// --- End Helper Function ---
 
 function ContextMapInternal({ axisName }) {
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     const [contextData, setContextData] = useState({
         stretchGoal: null,
         yearlyGoal: null,
         monthlyTheme: null,
         nextMilestone: null,
-        weeklyGoal: null,
+        weeklyAxisGoal: null,
         steps: []
     });
 
     useEffect(() => {
-        setContextData({ stretchGoal: null, yearlyGoal: null, monthlyTheme: null, nextMilestone: null, weeklyGoal: null, steps: [] });
+        // Reset state when axisName changes
+        setContextData({ stretchGoal: null, yearlyGoal: null, monthlyTheme: null, nextMilestone: null, weeklyAxisGoal: null, steps: [] });
         setError(null);
         setIsLoading(true);
-        console.log("ContextMap: useEffect triggered for axis:", axisName);
 
         if (!axisName) {
             setIsLoading(false);
-            console.log("ContextMap: No axisName provided, clearing data.");
             return;
         }
 
-        const today = new Date();
-        // *** MODIFIED: Calculate currentWeekId for fetching current week's data ***
-        const currentWeekId = getWeekId(today);
-        // *** END MODIFICATION ***
-        const currentYear = today.getFullYear();
-        const currentMonth = String(today.getMonth() + 1).padStart(2, '0');
-        const currentMonthId = `${currentYear}-${currentMonth}`;
-
-        let unsubscribeMonthly = () => {};
-
-        try {
-            const monthlyPlanRef = doc(db, "monthlyPlans", currentMonthId);
-            unsubscribeMonthly = onSnapshot(monthlyPlanRef, (docSnap) => {
-                let fetchedMonthlyTheme = "Month Focus Not Set";
-                if (docSnap.exists()) {
-                    fetchedMonthlyTheme = docSnap.data().monthFocus || "Month Focus Not Set";
-                    // console.log("ContextMap (onSnapshot): Updated monthly theme:", fetchedMonthlyTheme);
-                } else {
-                    // console.log(`ContextMap (onSnapshot): No monthlyPlan document found for ${currentMonthId}`);
-                }
-                setContextData(prevData => ({
-                    ...prevData,
-                    monthlyTheme: fetchedMonthlyTheme
-                }));
-            }, (err) => {
-                console.error("Error listening to monthlyPlan:", err);
-                setError(prevError => prevError || "Failed to listen to monthly plan updates.");
-                setContextData(prevData => ({ ...prevData, monthlyTheme: "Error" }));
-            });
-        } catch (err) {
-            console.error("Error setting up monthlyPlan listener:", err);
-            setError(prevError => prevError || "Failed to set up listener.");
-            setContextData(prevData => ({ ...prevData, monthlyTheme: "Error" }));
-        }
-
-        const fetchOtherData = async () => {
+        const fetchAllContextData = async () => {
             try {
-                const axisQueryRef = query(collection(db, "axes"), where("axisName", "==", axisName), limit(1));
-                // *** MODIFIED: Use currentWeekId for weeklyPlan and weeklySteps ***
-                const weeklyPlanRef = doc(db, "weeklyPlan", currentWeekId);
-                const weeklyStepsQueryRef = query(collection(db, "weeklySteps"),
-                    where("weekId", "==", currentWeekId),
+                // --- 1. Get Axis ID ---
+                const axisQuery = query(collection(db, "new_axes"), where("axisName", "==", axisName), limit(1));
+                const axisSnap = await getDocs(axisQuery);
+                if (axisSnap.empty) {
+                    throw new Error(`Axis '${axisName}' not found.`);
+                }
+                const axisId = axisSnap.docs[0].id;
+
+                // --- 2. Get all Goals for this Axis ---
+                const goalsQuery = query(collection(db, "new_goals"), where("axisId", "==", axisId));
+                const goalsSnap = await getDocs(goalsQuery);
+                let stretchGoal = null;
+                let yearlyGoal = null;
+                let yearlyGoalId = null;
+                goalsSnap.forEach(doc => {
+                    const goal = doc.data();
+                    if (goal.type === 'stretch' || goal.type === 'pareto') {
+                        stretchGoal = goal.title;
+                    }
+                    if (goal.type === 'yearly' && goal.year === new Date().getFullYear()) {
+                        yearlyGoal = goal.title;
+                        yearlyGoalId = goal.goalId;
+                    }
+                });
+
+                // --- 3. Get all Milestones for this Axis and find the next one ---
+                let nextMilestone = null;
+                if (yearlyGoalId) {
+                    const milestonesQuery = query(collection(db, "new_milestones"), where("goalId", "==", yearlyGoalId));
+                    const milestonesSnap = await getDocs(milestonesQuery);
+                    const incompleteMilestones = milestonesSnap.docs
+                        .map(doc => doc.data())
+                        .filter(m => m.status !== 'completed')
+                        .sort((a, b) => a.dueDate.toDate() - b.dueDate.toDate());
+                    if (incompleteMilestones.length > 0) {
+                        nextMilestone = incompleteMilestones[0].title;
+                    }
+                }
+
+                // --- 4. Get the current Weekly Plan and the goal for this axis ---
+                const currentWeekId = getWeekId(new Date());
+                const weeklyPlanRef = doc(db, "new_weeklyPlans", currentWeekId);
+                const weeklyPlanSnap = await getDoc(weeklyPlanRef);
+                let weeklyAxisGoal = null;
+                if (weeklyPlanSnap.exists()) {
+                    const planData = weeklyPlanSnap.data();
+                    if (planData.weeklyGoals && planData.weeklyGoals[axisName]) {
+                        weeklyAxisGoal = planData.weeklyGoals[axisName];
+                    }
+                }
+
+                // --- 5. Get the planned steps for this week and axis ---
+                const stepsQuery = query(collection(db, "new_tasks"),
+                    where("parentId", "==", currentWeekId),
                     where("axisTheme", "==", axisName),
                     where("taskType", "==", "planned")
                 );
-                // *** END MODIFICATION ***
+                const stepsSnap = await getDocs(stepsQuery);
+                
+                // **MODIFIED**: Use a Map to get unique steps by their title
+                const uniqueStepsMap = new Map();
+                stepsSnap.docs.forEach(doc => {
+                    const taskData = doc.data();
+                    uniqueStepsMap.set(taskData.title, { id: doc.id, text: taskData.title });
+                });
+                const uniqueSteps = Array.from(uniqueStepsMap.values());
 
-                const [axisSnap, weeklyPlanSnap, weeklyStepsSnap] = await Promise.all([
-                    getDocs(axisQueryRef),
-                    getDoc(weeklyPlanRef),
-                    getDocs(weeklyStepsQueryRef)
-                ]);
 
-                let fetchedAxisData = null;
-                let fetchedNextMilestoneText = null;
-                let fetchedWeeklyGoal = "";
-                let fetchedSteps = [];
-
-                if (!axisSnap.empty) {
-                    fetchedAxisData = axisSnap.docs[0].data();
-                    const upcomingMilestoneObject = findUpcomingMilestone(fetchedAxisData?.milestones);
-                    fetchedNextMilestoneText = upcomingMilestoneObject ? upcomingMilestoneObject.text : null;
-                    // console.log("ContextMap (fetchOther): Found axis data & milestone:", fetchedNextMilestoneText || "None");
-                } else { console.warn(`ContextMap (fetchOther): Axis data not found for: ${axisName}`); }
-
-                if (weeklyPlanSnap.exists()) {
-                    fetchedWeeklyGoal = weeklyPlanSnap.data().axisGoals?.[axisName] || "";
-                    console.log(`ContextMap (fetchOther): Found weeklyPlan goal for ${currentWeekId}:`, fetchedWeeklyGoal || '(Not set)');
-                } else { console.log(`ContextMap (fetchOther): No weeklyPlan document found for ${currentWeekId}`); }
-
-                weeklyStepsSnap.forEach(doc => { fetchedSteps.push({ id: doc.id, ...doc.data() }); });
-                console.log(`ContextMap (fetchOther): Found ${fetchedSteps.length} planned steps for ${axisName} in ${currentWeekId}.`);
-
+                // --- 6. Set all state ---
                 setContextData(prevData => ({
-                    ...prevData,
-                    stretchGoal: fetchedAxisData?.paretoGoal || fetchedAxisData?.stretchGoal || null,
-                    yearlyGoal: fetchedAxisData?.yearlyGoal || null,
-                    nextMilestone: fetchedNextMilestoneText,
-                    weeklyGoal: fetchedWeeklyGoal,
-                    steps: fetchedSteps
+                    ...prevData, // Keep monthly theme from other listener
+                    stretchGoal: stretchGoal,
+                    yearlyGoal: yearlyGoal,
+                    nextMilestone: nextMilestone,
+                    weeklyAxisGoal: weeklyAxisGoal,
+                    steps: uniqueSteps // Use the de-duplicated array
                 }));
 
             } catch (err) {
-                console.error("Error fetching other context data: ", err);
-                setError(prevError => prevError || "Failed to load some context map data.");
-                setContextData(prevData => ({
-                    ...prevData,
-                    stretchGoal: "Error",
-                    yearlyGoal: "Error",
-                    nextMilestone: "Error",
-                    weeklyGoal: "Error",
-                    steps: []
-                }));
+                console.error("Error fetching context data:", err);
+                setError("Failed to load context.");
             } finally {
                 setIsLoading(false);
             }
         };
 
-        fetchOtherData();
+        fetchAllContextData();
+
+        // The monthly listener can remain as is, since it reads from a collection we didn't refactor
+        const today = new Date();
+        const currentMonthId = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
+        const monthlyPlanRef = doc(db, "monthlyPlans", currentMonthId);
+       console.log(`[Monthly Listener] Requesting document with ID: ${currentMonthId}`);
+
+
+        const unsubscribeMonthly = onSnapshot(monthlyPlanRef, (docSnap) => {
+        let fetchedMonthlyTheme = "Month Focus Not Set";
+    
+    // Add these logs to see what the listener finds
+    if (docSnap.exists()) {
+        console.log("[Monthly Listener] Document found!", docSnap.data());
+        fetchedMonthlyTheme = docSnap.data().monthFocus || "Month Focus Not Set";
+    } else {
+        console.error("[Monthly Listener] Document NOT found!");
+    }
+    
+    setContextData(prevData => ({
+        ...prevData,
+        monthlyTheme: fetchedMonthlyTheme
+    }));
+}, (err) => {
+    console.error("Error listening to monthlyPlan:", err);
+    setError(prevError => prevError || "Failed to listen to monthly plan updates.");
+});
 
         return () => {
-            console.log("ContextMap: Cleaning up listener for axis:", axisName);
             unsubscribeMonthly();
         };
 
     }, [axisName]);
 
-    if (isLoading && !contextData.monthlyTheme) { 
+    if (isLoading) {
         return <div className={styles.loading}>Loading Context...</div>;
     }
     
     return (
         <div className={styles.contextMapContainer}>
-            {error && <p className={styles.errorTextSmall}>Error loading some data. Displaying what's available.</p>}
+            {error && <p className={styles.errorTextSmall}>{error}</p>}
             <p className={styles.contextStretch}>Stretch: {contextData.stretchGoal || <i className={styles.notSet}>Not Set</i>}</p>
             <p className={styles.contextYear}>Year: {contextData.yearlyGoal || <i className={styles.notSet}>Not Set</i>}</p>
-            <p className={styles.contextMonth}>Month: {contextData.monthlyTheme || (isLoading ? <i className={styles.notSet}>Loading...</i> : <i className={styles.notSet}>Not Set</i>)}</p>
+            <p className={styles.contextMonth}>Month: {contextData.monthlyTheme || <i className={styles.notSet}>Not Set</i>}</p>
             <p className={styles.contextMilestone}>Milestone: {contextData.nextMilestone || <i className={styles.notSet}>Not Set</i>}</p>
-            <p className={styles.contextWeek}>Week: {contextData.weeklyGoal || <i className={styles.notSet}>Not Set</i>}</p>
+            <p className={styles.contextWeek}>Week Goal: {contextData.weeklyAxisGoal?.goal || <i className={styles.notSet}>Not Set</i>}</p>
             <div className={styles.stepsSection}>
                 <h4 className={styles.stepsTitle}>Next Steps Planned:</h4>
                 {contextData.steps.length > 0 ? (
                     <ul className={styles.stepsList}>
                         {contextData.steps.map(step => (
-                            <li key={step.id}>{step.plannedSteps}</li>
+                            <li key={step.id}>{step.text}</li>
                         ))}
                     </ul>
                 )

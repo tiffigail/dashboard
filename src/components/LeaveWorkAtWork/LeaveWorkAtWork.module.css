@@ -1,143 +1,146 @@
 /* src/components/LeaveWorkAtWork/LeaveWorkAtWork.module.css */
+/* This file has been updated to match the styles of ReadyForWorkForm.module.css */
+
 .form {
+    padding: var(--space-lg, 1.5rem);
+    background-color: var(--bg-card, #fff);
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
-    padding: 1.5rem;
-    background-color: var(--background-color-main);
-    color: var(--text-color-primary);
+    gap: var(--space-lg, 1.5rem);
+    color: var(--text-primary);
     min-width: 500px;
 }
 
 .formTitle {
-    font-size: 1.75rem;
-    color: var(--header-color);
     text-align: center;
-    margin: 0 0 0.5rem 0;
+    margin-top: 0;
+    margin-bottom: var(--space-md, 1rem);
+    color: var(--text-secondary, #355E58);
+    font-size: 1.5em;
 }
 
 .section {
-    padding: 1.25rem;
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius-large);
-    background-color: var(--background-color-light);
+    padding: var(--space-md, 1rem);
+    border: 1px solid var(--border-light, #BCDDDC);
+    border-radius: 6px;
+    background-color: var(--bg-panel-accent, #e0f2f7);
 }
 
 .sectionTitle {
-    font-size: 1.2rem;
-    color: var(--text-color-primary);
-    margin: 0 0 1rem 0;
-    border-bottom: 2px solid var(--accent-color-1);
-    padding-bottom: 0.5rem;
+    font-size: 1.1em;
+    font-weight: 600;
+    margin-top: 0;
+    margin-bottom: var(--space-md, 1rem);
+    padding-bottom: var(--space-sm, 0.5rem);
+    border-bottom: 1px solid var(--border-secondary, #72B0AB);
+    color: var(--text-secondary, #355E58);
+    text-align: center;
 }
 
 .metricsGrid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 1.5rem;
+    gap: var(--space-md, 1rem);
+    align-items: end;
 }
 
 .inputField {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: var(--space-xs, 0.25rem);
 }
 
 .inputField label {
     font-weight: 500;
+    font-size: 0.9em;
+    color: var(--text-secondary);
 }
 
+/* Unified style for number and text area inputs */
 .numberInput, .textareaInput {
+    padding: var(--space-sm, 0.5rem);
+    border: 1px solid var(--border-muted, #ced4da);
+    border-radius: 4px;
     width: 100%;
-    padding: 0.75rem;
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius-medium);
-    background-color: var(--background-color-input);
-    color: var(--text-color-primary);
+    font-size: 1em;
+    box-sizing: border-box;
+    background-color: var(--bg-input, #fff);
+    color: var(--text-primary);
     font-family: inherit;
-    font-size: 1rem;
-    transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .textareaInput {
     resize: vertical;
+    min-height: 80px;
 }
 
-.numberInput:focus, .textareaInput:focus {
-    outline: none;
-    border-color: var(--accent-color-2);
-    box-shadow: 0 0 0 2px var(--accent-color-trans-2);
+.numberInput:disabled, .textareaInput:disabled {
+    background-color: var(--bg-input-disabled, #f8f9fa);
+    opacity: 0.7;
 }
 
 .checkGrid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
+    gap: var(--space-sm, 0.5rem) var(--space-md, 1rem);
 }
 
 .checkItem {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: var(--space-sm, 0.5rem);
 }
 
 .checkItem label {
-    font-size: 1rem;
     cursor: pointer;
+    line-height: 1.3;
 }
 
 .checkbox {
+    width: 1.1rem;
+    height: 1.1rem;
     cursor: pointer;
-    width: 1.25rem;
-    height: 1.25rem;
-    accent-color: var(--accent-color-1);
+    accent-color: var(--text-secondary);
+    flex-shrink: 0;
 }
 
 .driveInstructions {
     text-align: center;
     font-style: italic;
-    color: var(--text-color-secondary);
+    color: var(--text-secondary);
     margin-top: -1rem;
     margin-bottom: 1rem;
 }
 
-.instructionsList {
-    list-style-type: '✅  ';
-    padding-left: 1.5rem;
-    margin: 0;
-}
-
-.instructionsList li {
-    margin-bottom: 0.75rem;
-}
-
 .errorText {
-    color: var(--error-color-text);
+    color: var(--text-error, #dc3545);
+    font-size: 0.9em;
+    margin-top: var(--space-sm, 0.5rem);
     text-align: center;
     margin-bottom: 0;
 }
 
+/* Button style from ReadyForWorkForm */
 .submitButton {
-    padding: 0.8rem 1.5rem;
-    border: none;
-    background: linear-gradient(to right, var(--accent-color-1), var(--accent-color-2));
-    color: var(--button-text-color);
-    border-radius: var(--border-radius-medium);
-    font-size: 1.1rem;
-    font-weight: bold;
+    align-self: center;
+    padding: var(--space-md, 1rem) var(--space-lg, 1.5rem);
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 6px;
     cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
-    margin-top: 1rem;
+    transition: background-color 0.2s, box-shadow 0.2s;
+    border: 1px solid var(--axis-color-financial-3, #927aaa);
+    background-color: var(--axis-color-financial-2, #b8a7cd);
+    color: var(--text-primary, #053229);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-top: var(--space-md, 1rem);
 }
-
 .submitButton:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    background-color: var(--axis-color-financial-3, #927aaa);
+    color: var(--color-white, #fff);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
 }
-
 .submitButton:disabled {
-    background: var(--disabled-color-bg);
+    opacity: 0.6;
     cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
 }

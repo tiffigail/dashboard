@@ -1,0 +1,112 @@
+/* src/components/YearlyTimelinePlanner/YearlyTimelinePlanner.module.css */
+
+.container {
+    width: 100%;
+    padding: 2rem;
+    background-color: #f9fafb;
+    border-radius: 1rem;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #1f2937;
+    margin: 0;
+}
+
+.axisSelector {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid #d1d5db;
+    background-color: white;
+}
+
+.timelineWrapper {
+    overflow-x: auto;
+    padding: 2rem 0;
+}
+
+.timeline {
+    display: flex;
+    align-items: flex-start;
+    padding-bottom: 1rem;
+    min-width: max-content;
+}
+
+.milestoneNode {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 200px;
+    flex-shrink: 0;
+}
+
+.milestoneIcon {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    /* The color is now set by a CSS variable from the component */
+    border: 3px solid var(--accent-color, #6b7280);
+    color: var(--accent-color, #6b7280);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1rem;
+    background-color: white;
+    margin-bottom: 0.75rem;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.milestoneIconCompleted {
+    background-color: #e5e7eb;
+}
+
+.milestoneDetails {
+    font-size: 0.875rem;
+    color: #4b5563;
+    padding: 0 0.5rem;
+}
+
+.milestoneText {
+    margin: 0 0 0.5rem 0;
+    font-weight: 600;
+}
+
+.milestoneDate {
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+.completedText {
+    text-decoration: line-through;
+    color: #9ca3af;
+}
+
+.line {
+    height: 3px;
+    /* The color is also set by the CSS variable */
+    background-color: var(--accent-color, #d1d5db);
+    flex-grow: 1;
+    margin: 1.25rem -1rem 0 -1rem;
+    position: relative;
+}
+
+.emptyState {
+    text-align: center;
+    padding: 4rem;
+    color: #6b7280;
+}

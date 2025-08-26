@@ -34,7 +34,7 @@ const getTodayDateString = () => { /* ... same as your original ... */
     return `${year}-${month}-${day}`;
 };
 const dayToAxisThemeMapping = [ /* ... same as your original ... */
-    "Rest and preparation", "Physical", "Financial", "Gear", "ON TRACK N+1", "Misdirect", "Environment"
+    "Rest and preparation", "Physical", "Financial", "Gear", "On Track N+1", "Misdirect", "Environment"
 ];
 function findUpcomingMilestone(milestones) { /* ... same as your original ... */
     if (!Array.isArray(milestones)) return null;
@@ -94,57 +94,117 @@ function DailyView({ onNavigate }) {
     const [axisCssSuffix, setAxisCssSuffix] = useState('default');
     const [currentDayAxisThemeTaskLineColor, setCurrentDayAxisThemeTaskLineColor] = useState(getAxisThemeColorForDailyChart('default'));
 
-        // == Fetch Data ==
-    useEffect(() => {
-        const fetchData = async () => {
-            setIsLoading(true); setError(null);
-            const todayForLogic = new Date();
-            const dayIndex = todayForLogic.getDay();
-            const currentAxisThemeOfDay = dayToAxisThemeMapping[dayIndex]; // This IS the "Axis Theme of the Day"
-            const currentAxisSuffixVal = axisNameToCssVarSuffix(currentAxisThemeOfDay);
-            const themeTaskLineColor = getAxisThemeColorForDailyChart(currentAxisThemeOfDay);
+ useEffect(() => {
+    const fetchData = async () => {
+        setIsLoading(true);
+        setError(null);
 
-            setTodayDate(todayForLogic);
-            setAxisName(currentAxisThemeOfDay);
-            setAxisCssSuffix(currentAxisSuffixVal);
-            setCurrentDayAxisThemeTaskLineColor(themeTaskLineColor); // Ensure this state is defined
+        // --- 1. Initial Setup ---
+        const todayForLogic = new Date();
+        const currentYear = todayForLogic.getFullYear();
+        const dayIndex = todayForLogic.getDay();
+        const currentAxisThemeOfDay = dayToAxisThemeMapping[dayIndex]; // e.g., "Environment"
+        
+        // Set state for display right away
+        setTodayDate(todayForLogic);
+        setAxisName(currentAxisThemeOfDay);
+        // ... (other state setters for CSS, etc.)
+        const currentAxisSuffixVal = axisNameToCssVarSuffix(currentAxisThemeOfDay);
+        const themeTaskLineColor = getAxisThemeColorForDailyChart(currentAxisThemeOfDay);
+        setAxisCssSuffix(currentAxisSuffixVal);
+        setCurrentDayAxisThemeTaskLineColor(themeTaskLineColor);
+        
+        console.log(`DailyView: Fetching all data to find axis=${currentAxisThemeOfDay}`);
 
-            console.log(`DailyView: Fetching for Axis=${currentAxisThemeOfDay}, Color=${themeTaskLineColor}`);
+        try {
+            // --- 2. Use the "Robust Fetch" strategy from YearlyView ---
+            const goalsQuery = query(
+                collection(db, "new_goals"),
+                where("type", "==", "yearly"),
+                where("year", "==", 2025)
+            );
 
-            try {
-                const axisQuery = query(collection(db, "axes"), where("axisName", "==", currentAxisThemeOfDay), limit(1));
-                const axisDataPromise = getDocs(axisQuery);
-                const metricsQuery = query(collection(db, "dailyMetrics"), orderBy(documentId(), "desc"), limit(30));
-                const metricsHistoryPromise = getDocs(metricsQuery);
-                const [axisSnapshot, metricsHistorySnapshot] = await Promise.all([axisDataPromise, metricsHistoryPromise]);
+            const [axesSnapshot, goalsSnapshot, milestonesSnapshot] = await Promise.all([
+                getDocs(collection(db, "new_axes")),
+                getDocs(goalsQuery),
+                getDocs(collection(db, "new_milestones"))
+            ]);
 
-                if (!axisSnapshot.empty) setAxisData(axisSnapshot.docs[0].data());
-                else { console.warn(`Axis data not found for: ${currentAxisThemeOfDay}`); setAxisData(null); }
+            // --- 3. Process and link data in JavaScript, just like YearlyView ---
+            const axesMap = new Map(axesSnapshot.docs.map(doc => [doc.data().axisName, { id: doc.id, ...doc.data() }]));
+            const milestonesByGoal = new Map();
+            milestonesSnapshot.forEach(doc => {
+                const milestone = { id: doc.id, ...doc.data() };
+                if (!milestonesByGoal.has(milestone.goalId)) {
+                    milestonesByGoal.set(milestone.goalId, []);
+                }
+                milestonesByGoal.get(milestone.goalId).push(milestone);
+            });
 
-                const processedChartData = [];
-                metricsHistorySnapshot.forEach(doc => {
-                    const data = doc.data();
-                    const tasksForThisDayAxisTheme = (data.axisTaskCounts && data.axisTaskCounts[currentAxisThemeOfDay] !== undefined)
-                        ? Number(data.axisTaskCounts[currentAxisThemeOfDay])
-                        : 0;
+            // --- 4. Find the specific data for THIS day's axis ---
+            const finalAxisData = { question: '', new_goals: null, new_milestones: [] };
+            const currentAxisObject = axesMap.get(currentAxisThemeOfDay);
 
-                    processedChartData.push({
-                        name: formatChartDateLabel(doc.id),
-                        score: Number(data.productivityScore !== undefined ? data.productivityScore : 0),
-                        epiphany: Number(data.epiphanyCount !== undefined ? data.epiphanyCount : 0),
-                        despair: Number(data.despairCount !== undefined ? data.despairCount : 0),
-                        axisTasks: tasksForThisDayAxisTheme, // Correctly add axisTasks
-                        fullDate: doc.id
-                    });
-                });
-                setChartData(processedChartData.reverse());
-                console.log("Processed Chart Data for DailyView (last 5):", processedChartData.slice(-5));
+            if (currentAxisObject) {
+                finalAxisData.question = currentAxisObject.question || '';
                 
-            } catch (err) { console.error("Error fetching data for DailyView: ", err); setError("Failed to load daily data."); setAxisData(null); setChartData([]); }
-            finally { setIsLoading(false); }
-        };
-        fetchData();
-    }, []); // Fetch once on mount
+                // FIX 1: Find the goal by matching its 'axisId' to the current axis's DOCUMENT ID.
+                const goalForThisAxis = goalsSnapshot.docs
+                    .map(doc => ({ id: doc.id, ...doc.data() }))
+                    .find(goal => goal.axisId === currentAxisObject.id); // <-- CORRECTED LINE
+
+                if (goalForThisAxis) {
+                    finalAxisData.new_goals = goalForThisAxis.title;
+
+                    // FIX 2: Get milestones using the goal's logical 'goalId' field, not its document ID.
+                    const milestones = milestonesByGoal.get(goalForThisAxis.goalId) || []; // <-- CORRECTED LINE
+                    
+                    finalAxisData.new_milestones = milestones
+                        .map(m => ({...m, text: m.title}))
+                        .sort((a,b) => (a.dueDate?.toMillis() || 0) - (b.dueDate?.toMillis() || 0));
+                } else {
+                    console.warn(`Could not find a 2025 goal for axisID: ${currentAxisObject.id}`);
+                }
+            } else {
+                console.warn(`Could not find axis data for axisName: ${currentAxisThemeOfDay} in new_axes collection.`);
+            }
+
+            setAxisData(finalAxisData);
+
+            // --- 5. Fetch Chart Data (this logic remains the same) ---
+            const metricsQuery = query(collection(db, "dailyMetrics"), orderBy(documentId(), "desc"), limit(30));
+            const metricsHistorySnapshot = await getDocs(metricsQuery);
+            const processedChartData = [];
+            metricsHistorySnapshot.forEach(doc => {
+                const data = doc.data();
+                const tasksForThisDayAxisTheme = (data.axisTaskCounts && data.axisTaskCounts[currentAxisThemeOfDay] !== undefined)
+                    ? Number(data.axisTaskCounts[currentAxisThemeOfDay])
+                    : 0;
+
+                processedChartData.push({
+                    name: formatChartDateLabel(doc.id),
+                    score: Number(data.productivityScore !== undefined ? data.productivityScore : 0),
+                    epiphany: Number(data.epiphanyCount !== undefined ? data.epiphanyCount : 0),
+                    despair: Number(data.despairCount !== undefined ? data.despairCount : 0),
+                    axisTasks: tasksForThisDayAxisTheme,
+                    fullDate: doc.id
+                });
+            });
+            setChartData(processedChartData.reverse());
+            
+        } catch (err) {
+            console.error("Error fetching data for DailyView: ", err);
+            setError("Failed to load daily data.");
+            setAxisData(null);
+            setChartData([]);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    fetchData();
+}, []);
+        
 
     // == Modal Handlers ==
     const handleAmRoutineSubmit = (formData) => { console.log("AM Sub:", formData); closeAmModal(); };
@@ -168,7 +228,7 @@ function DailyView({ onNavigate }) {
         if (currentMilestone && milestone.text === currentMilestone.text) return styles.current;
         return styles.upcoming;
     };
-    const currentMilestone = axisData ? findUpcomingMilestone(axisData.milestones) : null;
+    const currentMilestone = axisData ? findUpcomingMilestone(axisData.new_milestones) : null;
     const roadmapStyle = { /* ... same as your original ... */
         '--roadmap-border-color': `var(--axis-color-${axisCssSuffix}-4, var(--axis-color-${axisCssSuffix}-3, var(--axis-color-default-3)))`,
         '--roadmap-text-color': `var(--axis-color-${axisCssSuffix}-4, var(--axis-color-${axisCssSuffix}-3, var(--axis-color-default-3)))`,
@@ -230,18 +290,39 @@ function DailyView({ onNavigate }) {
                     </div>
                     {/* --- End Header Section --- */}
 
-                    {/* --- Roadmap Section (Copied from your original) --- */}
-                    {axisData && (axisData.question || axisData.milestones?.length > 0 || axisData.yearlyGoal) && (
-                        <div className={styles.roadmapSection} style={roadmapStyle}>
-                            <h3 className={styles.sectionTitle} >{axisName} Roadmap</h3>
-                            <div className={styles.roadmapHorizontalContainer}>
-                                <div className={`${styles.roadmapColumn} ${styles.roadmapQuestion}`}> <h4 className={styles.roadmapColumnTitle}>To Ponder</h4> <p>{axisData?.question || <i className={styles.notSet}>N/A</i>}</p> </div>
-                                <div className={`${styles.roadmapColumn} ${styles.roadmapMilestones}`}> <h4 className={styles.roadmapColumnTitle}>Milestones</h4> {axisData?.milestones && axisData.milestones.length > 0 ? ( <div className={styles.milestonesHorizontalList}> {axisData.milestones.map((milestone, index) => ( <div key={milestone.text || index} className={`${styles.milestoneItemHoriz} ${getMilestoneStatusClass(milestone, currentMilestone)}`}> <span className={styles.milestoneTextHoriz}>{milestone.text}</span> {milestone.dueDate?.toDate && (<span className={styles.milestoneDateHoriz}>Due: {milestone.dueDate.toDate().toLocaleDateString()}</span>)} {milestone.completionDate?.toDate && (<span className={styles.milestoneDateHoriz}>Done: {milestone.completionDate.toDate().toLocaleDateString()}</span>)} </div> ))} </div> ) : (<p className={styles.noMilestones}><i>No milestones defined.</i></p>)} </div>
-                                <div className={`${styles.roadmapColumn} ${styles.roadmapYearlyGoal}`}> <h4 className={styles.roadmapColumnTitle}>Yearly Goal</h4> <p>{axisData?.yearlyGoal || <i className={styles.notSet}>N/A</i>}</p> </div>
+                    {/* --- REPIACE THE ENTIRE Roadmap Section --- */}
+{axisData && (axisData.question || axisData.new_milestones?.length > 0 || axisData.new_goals) && (
+    <div className={styles.roadmapSection} style={roadmapStyle}>
+        <h3 className={styles.sectionTitle} >{axisName} Roadmap</h3>
+        <div className={styles.roadmapHorizontalContainer}>
+            <div className={`${styles.roadmapColumn} ${styles.roadmapQuestion}`}>
+                <h4 className={styles.roadmapColumnTitle}>To Ponder</h4>
+                <p>{axisData?.question || <i className={styles.notSet}>N/A</i>}</p>
+            </div>
+            <div className={`${styles.roadmapColumn} ${styles.roadmapMilestones}`}>
+                <h4 className={styles.roadmapColumnTitle}>Milestones</h4>
+                {/* Use new_milestones here */}
+                {axisData?.new_milestones && axisData.new_milestones.length > 0 ? (
+                    <div className={styles.milestonesHorizontalList}>
+                        {axisData.new_milestones.map((milestone, index) => (
+                            <div key={milestone.text || index} className={`${styles.milestoneItemHoriz} ${getMilestoneStatusClass(milestone, currentMilestone)}`}>
+                                <span className={styles.milestoneTextHoriz}>{milestone.text}</span>
+                                {milestone.dueDate?.toDate && (<span className={styles.milestoneDateHoriz}>Due: {milestone.dueDate.toDate().toLocaleDateString()}</span>)}
+                                {milestone.completionDate?.toDate && (<span className={styles.milestoneDateHoriz}>Done: {milestone.completionDate.toDate().toLocaleDateString()}</span>)}
                             </div>
-                        </div>
-                    )}
-                    {/* --- End Roadmap Section --- */}
+                        ))}
+                    </div>
+                ) : (<p className={styles.noMilestones}><i>No milestones defined.</i></p>)}
+            </div>
+            <div className={`${styles.roadmapColumn} ${styles.roadmapYearlyGoal}`}>
+                <h4 className={styles.roadmapColumnTitle}>Yearly Goal</h4>
+                {/* Use new_goals here */}
+                <p>{axisData?.new_goals || <i className={styles.notSet}>N/A</i>}</p>
+            </div>
+        </div>
+    </div>
+)}
+{/* --- End Roadmap Section --- */}
                     
                     {/* --- Routine Buttons (Copied from your original) --- */}
                     <div className={styles.routineButtonsWrapper}>

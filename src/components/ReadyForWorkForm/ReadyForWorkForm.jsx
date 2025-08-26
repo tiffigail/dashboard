@@ -15,9 +15,9 @@ import {
 
 // Define checklist items
 const checklistItems = [
-    "Shower", "Dress", "AM Meds", "Brush Teeth", "Floss Teeth",
-    "Hair", "Makeup", "Scent", "Recitation", // Checklist item label
-    "PKW", "Water", "Lunch", "Supps", "Snacks"
+    "Shower", "Dress", "AM Meds", "Brush Teeth", "Floss Teeth", "Deoderant",
+    "Hair", "Makeup", "Scent", "Recitation", 
+    "PKW", "Water", "Lunch", "Supps", "Snacks", "Leave your worth", "remember your point"
 ];
 
 // Props: onSubmit, onClose
@@ -160,6 +160,7 @@ function ReadyForWorkForm({ onSubmit, onClose }) {
                 {(workRecitation && workRecitation !== "Loading recitation..." && workRecitation !== "No active 'work' recitation set." && workRecitation !== "Error loading recitation.") && (
                     <div className={styles.recitationDisplay}>
                          <p className={styles.recitationText}>{workRecitation}</p>
+                         <p>Zoom In</p>
                     </div>
                 )}
                 {/* End Recitation Display */}

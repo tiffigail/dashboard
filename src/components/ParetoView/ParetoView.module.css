@@ -1,205 +1,472 @@
 /* src/components/ParetoView/ParetoView.module.css */
-/* Using CSS Variables from global file */
+
+:root {
+    /* Define base variables if they aren't already */
+    --space-lg: 1rem; /* Adjust as needed for overall spacing */
+    --space-sm: 0.5rem; /* Adjust as needed */
+    --text-primary: #333;
+    --text-secondary: #6A4A3C;
+    --text-error: #CC333F;
+    --bg-panel: #f9f9f9;
+    --border-primary: #ddd;
+    --border-secondary: #aaa;
+    --border-light: #eee;
+    --text-muted: #888;
+    --text-accent: #00A0B0; /* Example, should be dynamic for axis cards */
+}
 
 .paretoViewContainer {
-  padding: var(--space-lg);
-  max-width: 1000px; /* Adjusted max-width */
-  margin: 0 auto;
-  color: var(--text-primary);
+    padding: 0 1in; /* Approximately 1 inch padding on sides, no top/bottom */
+    max-width: 1400px; /* Increased max-width for better column display */
+    margin: 0 auto; /* Center the container */
+    color: var(--text-primary);
 }
 
-.viewTitle {
-  color: var(--text-secondary);
-  text-align: center;
-  margin-bottom: var(--space-lg);
-  font-size: 1.8rem;
-  font-weight: bold;
+.loadingText, .errorText {
+    text-align: center;
+    margin: var(--space-sm) 0;
+    font-size: 1.2rem;
+    color: var(--text-secondary);
 }
-
 .errorText {
     color: var(--text-error);
-    text-align: center;
-    margin-top: var(--space-md);
     font-weight: bold;
 }
 
-/* --- Introduction Section Styles --- */
-.introSection {
-    background-color: var(--bg-panel-accent); /* Light background */
-    padding: var(--space-lg);
-    border-radius: 8px;
-    margin-bottom: var(--space-xl);
-    border: 1px solid var(--border-light);
-    color: var(--text-secondary);
-    font-size: 0.95em;
-    line-height: 1.6;
-    /* --- MODIFIED: Ensure overall section text is left aligned --- */
+/* --- Main Grid Layout --- */
+/* NEW: Wrapper for Section 2 (Methodology & Roadmap) to apply a single border */
+.section2Wrapper {
+    grid-column: 1 / -1; /* Make this div span all columns of its parent grid (contentGrid) */
+    display: grid; /* Make this wrapper *itself* a grid container */
+    grid-template-columns: subgrid; /* IMPORTANT: Inherit column definitions from parent `.contentGrid` */
+    background-color: #cde6e8 !important;
+
+    /* Apply your desired border and styling here */
+    border: 2px solid var(--border-primary); /* Example: A thin, primary border */
+    border-radius: 0.5rem; /* Optional: Rounded corners */
+    padding: 1.5rem; /* Optional: Padding inside the border */
+    background-color: var(--bg-panel); /* Optional: Background color for the entire section */
+    box-shadow: 0 5px 10px -2px rgba(0,0,0,0.1), 0 2px 3px -1px rgba(0,0,0,0.05); /* Optional: Soft shadow */
+
+    /* Ensure the gap between the inner columns (Methodology & Roadmap) matches your main grid gap */
+    column-gap: 2rem;
+}
+.contentGrid {
+    display: grid;
+    /* Default for mobile: single column, rows stack automatically */
+    grid-template-columns: 1fr;
+    grid-auto-rows: minmax(min-content, max-content); /* Rows adjust to content */
+    gap: 1.5rem; /* Gap between sections when stacked */
+    align-items: start; /* Align content at the top of each grid cell */
+}
+
+@media (min-width: 768px) {
+    .contentGrid {
+        grid-template-columns: 1fr 1.8fr; /* Left column thinner than right */
+        grid-template-rows: auto auto auto; /* Defines 3 rows */
+        gap: 2rem; /* Gap between columns and rows */
+    }
+
+    /* Grid Positioning for 2-column layout */
+    .gridRow1Left { grid-column: 1; grid-row: 1; }
+    .gridRow1Right { grid-column: 2; grid-row: 1; }
+    .gridRow2Left { grid-column: 1; grid-row: 2; }
+    .gridRow2Right { grid-column: 2; grid-row: 2; }
+    .gridRow3Left { grid-column: 1; grid-row: 3; }
+    .gridRow3Right { grid-column: 2; grid-row: 3; }
+
+    /* Optional: Add background colors to rows for visual grouping */
+    /* Uncomment these to see the effect */
+    /* .gridRow1Left, .gridRow1Right { background-color: #f0f8ff; padding-bottom: 2rem; } */
+    /* .gridRow2Left, .gridRow2Right { background-color: #f8fff0; padding-bottom: 2rem; } */
+    /* .gridRow3Left, .gridRow3Right { background-color: #fff0f8; padding-bottom: 2rem; } */
+
+    /* Adjust padding within grid sections to control internal spacing */
+    .gridSection {
+        padding: 0; /* Remove default padding here, individual sections will add */
+    }
+}
+
+
+/* --- Shared Section Styling for Grid Items --- */
+.gridSection {
+    margin: 0; /* Ensure no external margins interfere with grid layout */
+    /* This will be inherited by sections that are direct grid children */
+}
+
+.gridSectionHeaderLeft {
     text-align: left;
-}
-.introSection h3 {
-    color: var(--text-primary);
-    font-size: 1.3em;
+    margin-bottom: 0.5rem;
     margin-top: 0;
-    text-align: center; /* Keep heading centered */
-    border-bottom: 1px solid var(--border-secondary);
-    padding-bottom: var(--space-sm);
-    margin-bottom: var(--space-md);
 }
-.introSection h4 {
-    color: var(--text-secondary);
-    font-size: 1.1em;
-    margin-top: var(--space-lg);
-    margin-bottom: var(--space-sm);
-    text-align: left; /* Ensure subheadings are left aligned */
+.gridSectionHeaderCenter {
+    text-align: center;
+    margin-bottom: 0.5rem;
+    margin-top: 0;
 }
-.introSection ol {
-    padding-left: 1.5rem;
+
+
+/* --- Individual Section Styles --- */
+
+.infographicHeaderLeft { /* Specific for the top-left Pareto View header */
+    text-align: left;
+    margin: 0;
+    padding-bottom: 0.5rem;
+}
+
+.mainTitleRow { /* NEW: Flex container for Pareto title and 80/20 visual */
+    display: flex;
+    align-items: baseline; /* Aligns their baselines or bottom edges */
+    gap: 0.5rem; /* Space between title and 80/20 */
+    margin-bottom: 0; /* Ensure no extra space below this row */
+}
+
+.mainTitle {
+    font-size: clamp(2rem, 4vw, 4.25rem);
+    font-weight: 900;
+    color: #00A0B0;
+    margin-bottom: 0; /* Ensure no default margin pushes 80/20 down */
+}
+.subTitle {
+    font-size: clamp(0.9rem, 2vw, 1.25rem);
+    font-weight: 700;
+    color: #6A4A3C;
+    margin-top: 0;
+}
+.sectionTitle {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #3c626a;
+    margin-bottom: 1rem;
+}
+.sectionSubtext {
+    font-size: 1rem;
+    color: #333;
+    max-width: 100%;
+    margin: 0 auto 0.5rem auto;
+    margin-bottom: 1rem;
+}
+
+.premiseTextContainer {
+    text-align: left; /* Keep text centered in its new single-element container */
+}
+.premiseHeading {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #CC333F;
+    margin-top: 3.1rem;
     margin-bottom: 0;
-    text-align: left; /* Ensure ordered list items are left aligned */
 }
-.introSection ul {
-    list-style: disc;
-    margin-top: var(--space-xs);
-    margin-bottom: var(--space-md);
-    padding-left: 1.5rem;
-    text-align: left; /* Ensure unordered list items are left aligned */
+.premiseText {
+    font-size: 1rem;
+    color: #6A4A3C;
+    margin-top: 0;
+    line-height: 1.5;
 }
-.introSection li {
-    margin-bottom: var(--space-sm);
-    text-align: left; /* Ensure list items themselves are left aligned */
-}
-.introSection p {
-    text-align: left; /* Ensure paragraphs are left aligned */
-}
-/* --- End Introduction Styles --- */
 
+.eightyTwentyVisual { /* MODIFIED: Sized down for inline display */
+    display: flex; /* Keep flex for inner numbers */
+    align-items: flex-end; /* Align numbers within visual */
+    justify-content: center; /* Still center numbers inside */
+    padding: 0 1rem; /* Remove padding for compactness */
+    font-weight: 700;
+    font-size: clamp(1.2rem, 3vw, 4.5rem); /* Significantly smaller font size */
+    color: #EB6841;
+    line-height: 1; /* Tighter line height */
+}
+.eightyTwentySlash { /* MODIFIED: Sized down for inline display */
+    font-size: clamp(1rem, 3vw, 3.2rem); /* Significantly smaller font size */
+    font-weight: 700;
+    color: #00A0B0;
+    margin: 0;
+}
 
-/* --- Axis Grid (Stacked Cards) --- */
+.axesSection {
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 5px 10px -2px rgba(0,0,0,0.1), 0 2px 3px -1px rgba(0,0,0,0.05);
+    padding: 1rem;
+}
+.groupTitle {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border-light);
+    padding-bottom: 0.5rem;
+}
+
 .axisGrid {
     display: flex;
     flex-direction: column;
-    gap: 2mm; /* Specific spacing */
-    width: 100%;
+    gap: 0.25rem;
 }
 
-/* Styling for each axis card */
+/* --- Axis Card Styles --- */
 .axisCard {
-    background-color: var(--bg-panel); /* Arctic */
-    border: 1px solid var(--border-primary); /* Spruce */
-    border-radius: 8px;
-    padding: var(--space-sm) var(--space-lg); /* Adjusted padding */
-    box-shadow: 0 2px 4px var(--shadow-color);
+    background-color: var(--bg-panel);
+    border: 1px solid var(--border-primary);
+    border-radius: 6px;
+    padding: 0.75rem 0.75rem;
     box-sizing: border-box;
-    height: 1cm; /* NEW: Fixed height */
-    display: flex;
-    align-items: center; /* Vertically center content */
-    overflow: hidden; /* Hide overflow */
+    background-color: #cde6e8;
 }
-
-/* Flex container inside the card */
 .cardContent {
     display: flex;
-    align-items: center; /* Vertically align title and goals */
-    gap: var(--space-lg); /* Space between left and right */
-    width: 100%; /* Ensure content fills card */
-    overflow: hidden; /* Prevent internal content from overflowing card */
-}
-
-/* Left side of the card */
-.cardLeft {
-    flex: 1; /* Take up available space */
-    text-align: left;
-    padding-right: var(--space-md); /* Space before goals */
-    overflow: hidden; /* Hide overflowing title */
-    white-space: nowrap;
-    text-overflow: ellipsis;
-}
-
-.axisTitle { /* Renamed from axisTitleLg */
-    font-size: 1.4em; /* Adjusted size for 1cm height */
-    color: var(--text-primary); /* Peacock */
-    margin: 0;
-    line-height: 1.1;
-    font-weight: bold;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-/* Right side of the card */
-.cardRight {
-    flex-basis: 65%; /* Adjusted basis */
-    text-align: right;
-    display: flex;
     flex-direction: column;
-    align-items: flex-end; /* Align goals to the right */
-    gap: 0; /* Remove gap for tighter fit */
-    overflow: hidden; /* Hide overflow */
+    text-align: left;
+    gap: .25rem;
 }
-
-.stretchGoalText {
-    font-size: 0.8em; /* Adjusted size */
-    color: var(--text-secondary); /* Spruce */
-    margin: 0;
-    font-style: italic; /* Italicize stretch goal */
-    line-height: 1.1; /* Adjust line height */
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    width: 100%; /* Ensure it takes width for ellipsis */
+.titleContainer {
+    display: flex;
+    align-items: baseline;
+    gap: 0.25rem;
 }
-
-.yearlyGoalText {
-    font-size: 0.9em; /* Adjusted size */
-    color: var(--text-primary); /* Peacock */
-    margin: 0;
-    font-weight: 500; /* Slightly bolder */
-    line-height: 1.1; /* Adjust line height */
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    width: 100%; /* Ensure it takes width for ellipsis */
+.axisTitle {
+    font-size: 1.1em;
+    margin-top: 0.5rem;
+    color: var(--text-primary);
+    font-weight: bold;
+    flex-shrink: 0;
+    cursor: pointer;
 }
-
-.notSet {
+.colorSwatch {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 1px solid var(--border-secondary);
+    flex-shrink: 0;
+    margin-right: 0.25rem;
+}
+.axisSubtext {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
     font-style: italic;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.collapsibleContent {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease-in-out, padding-top 0.4s ease-in-out;
+    padding-left: calc(10px + 0.25rem);
+}
+.collapsibleContent.expanded {
+    max-height: 500px;
+    padding-top: 0.25rem;
+}
+.axisDescription {
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    line-height: 1.4;
+    margin: 0;
+    padding-bottom: 0.05rem;
+}
+.goalContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    border-top: 1px solid var(--border-light);
+    padding-top: 0.25rem;
+    margin-top: 0.25rem;
+}
+.stretchGoalText {
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    font-weight: 700;
+}
+.notSet {
     opacity: 0.7;
     color: var(--text-muted);
+    font-weight: 400;
+}
+.carrotToggle {
+    font-size: 1rem;
+    color: var(--text-accent);
+    cursor: pointer;
+    transition: transform 0.3s ease-in-out;
+    padding: 0 0.25rem;
+}
+.carrotToggle.expanded {
+    transform: rotate(180deg);
 }
 
-/* Responsive adjustments */
-@media (max-width: 600px) {
-    .axisCard {
-        height: auto; /* Allow height to adjust on mobile */
-        min-height: 1cm; /* Set a minimum */
-        padding: var(--space-md); /* Adjust padding */
-        align-items: flex-start; /* Align top on mobile */
+/* --- Methodology Section --- */
+.methodologyStepsContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 0.2rem;
+    text-align: center;
+}
+
+.methodologyStep {
+    background-color: white;
+    padding: .3rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.02);
+    width: 100%;
+    box-sizing: border-box;
+}
+.methodologyStep h3 {
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: 0rem;
+}
+.methodologyStep p {
+    color: #00A0B0;
+    font-size: 0.9rem;
+    line-height: 1.8;
+}
+.flowArrow {
+    font-size: 1.5rem;
+    font-weight:500;
+    color: #EDC951;
+    line-height: 1.1;
+}
+.arrowVertical {
+    display: block;
+}
+.arrowHorizontal {
+    display: none;
+}
+/* --- Roadmap Section --- */
+
+/* The main container for the timeline */
+.timeline {
+    position: relative; /* Essential for absolutely positioned ::before (the line) */
+    padding-left: 2rem; /* Horizontal space for the line and dots */
+    border-left: none; /* The border is explicitly removed here; the line is now a ::before pseudo-element */
+    /* If you had a margin-top here for overall vertical positioning, keep your adjusted value */
+    /* margin-top: YOUR_ADJUSTED_VALUE; */
+}
+
+/* This is the new, independent vertical line for the timeline */
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 1rem; /* Adjust this: Horizontal position of the line within .timeline's padding-left */
+                /* (e.g., if padding-left is 2rem (32px), 1rem (16px) places the line roughly in the middle of that space) */
+    top: 6rem; /* <<<--- ADJUST THIS: Line's start point (align with center of 1st dot) */
+    bottom: 2.7rem; /* <<<--- ADJUST THIS: Line's end point (align with center of last dot) */
+    width: 3px; /* Thickness of the line */
+    background-color: #00A0B0;
+    z-index: 0; /* Ensures the line is behind the dots */
+}
+
+/* Each individual item in the timeline */
+.timelineItem {
+    display: flex; /* Make it a flex container to align dot and text */
+    align-items: center; /* Vertically center the dot with the text content */
+    margin-bottom: 1rem; /* Adjust space between timeline items */
+    position: relative; /* IMPORTANT: Dot's absolute position is relative to this item */
+    z-index: 1; /* Ensures dots are above the line */
+    padding-top: 3rem;
+}
+
+/* Ensures the very last timeline item has no bottom margin, making the line end correctly */
+.timelineItem:last-child {
+    margin-bottom: 0;
+}
+
+/* Styles for the yellow circle (the bullet point) */
+.timelineDot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background-color: #EDC951;
+    border: 3px solid #00A0B0;
+    flex-shrink: 0; /* Prevent the dot from shrinking */
+
+    /* Position the dot precisely over the vertical line */
+    position: absolute;
+    left: -1.5rem; /* <<<--- ADJUST THIS: Horizontal position of the dot relative to its timelineItem */
+                  /* This value depends on .timeline::before's 'left' and .timeline's 'padding-left'.
+                     Adjust to make the dot's center align with the line's center. */
+
+    /* No top/transform needed here because align-items: center on timelineItem handles vertical alignment */
+}
+
+/* Styles for the wrapper around the h4 and p text within each timeline item */
+.timelineTextContent {
+    flex-grow: 1; /* Allows text to take available space */
+    padding-left: 3rem; /* <<<--- ADJUST THIS: Space between the dot and the text */
+                          /* This should cover the dot's width and the desired gap */
+}
+
+/* Styles for the h4 and p within timeline items (ensure no extra margins interfere) */
+.timelineItem h4 {
+    font-weight: 700;
+    font-size: 1.1rem; /* Smaller font */
+    color: #00A0B0;
+    margin-top: .5rem; /* Remove default top margin */
+    margin-bottom: 0rem; /* Adjust if needed for spacing below h4 */
+}
+.timelineItem p {
+    color: #6A4A3C;
+    font-size: 0.9rem; /* Smaller font */
+    line-height: 1.4; /* More compact line height */
+    margin-top: 0; /* Remove default top margin */
+    margin-bottom: 0; /* Remove default bottom margin for compactness */
+}
+/* Specific colors for roadmap h4 titles */
+.timelineItem:nth-child(2) h4 { color: #EB6841; margin-top: 0rem; }
+.timelineItem:nth-child(3) h4 { color: #CC333F; margin-top: 1rem; }
+
+
+/* --- Roadmap Header Specific Styles (for "The 5-Year Roadmap" title and intro text) --- */
+
+/* This class makes the main title for the Roadmap section unique */
+.roadmapTitle {
+    font-size: 1.2rem; /* Example override: slightly smaller than premiseHeading */
+    color: #3c626a; /* Example override: a different color */
+    margin-top: 2rem;
+    margin-bottom: 0.25rem; /* Adjust spacing below title */
+    padding-left: 2rem;
+    
+}
+
+/* This class makes the intro text for the Roadmap section unique */
+.roadmapIntroText {
+    font-size: 0.95rem; /* Example override: slightly smaller text */
+    line-height: 1.5; /* Example override: a different line height */
+    color: #333; /* Example override: a darker color */
+    margin-left: 3rem;
+}
+
+/* This class controls the alignment of the Roadmap section's header content */
+.roadmapHeaderRight {
+    text-align: right; /* This will right-align the title and intro text */
+}
+/* --- Tools Section (Radar Chart) --- */
+.toolsSection {
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 5px 10px -2px rgba(0,0,0,0.1), 0 2px 3px -1px rgba(0,0,0,0.05);
+    padding: 1rem;
+    text-align: center;
+}
+.chartContainer {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+    height: 300px;
+}
+@media (min-width: 768px) {
+    .chartContainer {
+        height: 350px;
     }
-    .cardContent {
-        flex-direction: column; /* Stack title and goals */
-        align-items: flex-start; /* Align left */
-        text-align: left;
-        gap: var(--space-sm); /* Reduce gap */
-    }
-    .cardRight {
-        flex-basis: auto; /* Reset basis */
-        align-items: flex-start; /* Align left */
-        text-align: left;
-        margin-top: var(--space-sm);
-        white-space: normal; /* Allow wrapping on mobile */
-        overflow: visible;
-        text-overflow: clip;
-        width: 100%;
-    }
-     .stretchGoalText, .yearlyGoalText {
-        text-align: left;
-        white-space: normal;
-        overflow: visible;
-        text-overflow: clip;
-        width: auto;
-    }
-    /* Ensure intro text is left-aligned on mobile too */
-    .introSection, .introSection ol, .introSection ul, .introSection li, .introSection p {
-        text-align: left;
-    }
+}
+.chartCaption {
+    text-align: center;
+    font-size: 0.8rem;
+    color: #6A4A3C;
+    margin-top: 0.5rem;
+    line-height: 1.3;
 }

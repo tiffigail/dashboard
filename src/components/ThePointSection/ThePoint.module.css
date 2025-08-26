@@ -15,13 +15,13 @@
     background-color: #283a4d; 
     color: white;
     border: none;
-    padding: 0.6rem 1.2rem;
-    border-radius: 5px;
+    padding: 0.6rem .4rem;
+    border-radius: 1px;
     cursor: pointer;
-    font-size: 0.9rem;
+    font-size: 0.65rem;
     font-weight: bold;
     transition: background-color 0.2s ease;
-    margin-bottom: 0.75rem; 
+    margin-bottom: 0.25rem; 
 }
 
 .pointButton:hover {
@@ -30,14 +30,13 @@
 
 .pointDisplayBand {
     width: 100%; 
-    height: 70px; /* Fixed height for the band, adjust as needed */
+    height: 30px; /* Fixed height for the band, adjust as needed */
     background-color: transparent; /* Match surrounding background */
     border: none; /* No border */
     padding: 0; /* No padding */
     display: flex;
     align-items: center; 
     justify-content: center; /* Center text horizontally */
-    overflow: hidden; /* Hide overflow if text is too long/tall */
     box-sizing: border-box;
     text-align: center; /* Ensure text within the p tag is centered */
 }
@@ -55,15 +54,15 @@
 /* Adjusted font sizes to be much larger to fill the 70px height */
 /* These are aggressive, assuming line-height: 1. Adjust as needed. */
 .pointTextLarge {
-    font-size: 56px; /* Approx 3.5rem if 1rem=16px. Adjust based on actual height and font. */
+    font-size: 20px; /* Approx 3.5rem if 1rem=16px. Adjust based on actual height and font. */
 }
 
 .pointTextMedium {
-    font-size: 42px; /* Approx 2.6rem */
+    font-size: 15px; /* Approx 2.6rem */
 }
 
 .pointTextSmall {
-    font-size: 28px; /* Approx 1.75rem */
+    font-size: 10px; /* Approx 1.75rem */
 }
 
 .loadingText,

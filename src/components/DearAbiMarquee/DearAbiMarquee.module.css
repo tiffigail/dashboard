@@ -2,7 +2,6 @@
 
 .marqueeContainer {
     background-color: white;
-    padding: 20px; /* Adjust padding as needed */
     border-radius: 8px; /* Optional: for rounded corners */
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Optional: for a subtle shadow */
     overflow: hidden; /* Keep this to hide content outside the marquee's visible area */
@@ -45,5 +44,4 @@
 .loadingText,
 .errorText {
     text-align: center;
-    padding: 20px;
 }

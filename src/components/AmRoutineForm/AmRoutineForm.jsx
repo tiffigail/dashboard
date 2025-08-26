@@ -14,6 +14,8 @@ import {
 
 // Define the checklist items for the AM routine
 const amRoutineItems = [
+  "AM Lumen",
+  "Pray",
   "Light",
   "Charge Watch",
   "Meditate",

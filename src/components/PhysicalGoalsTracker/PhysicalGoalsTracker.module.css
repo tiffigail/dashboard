@@ -1,0 +1,134 @@
+/* src/components/PhysicalGoalsTracker/PhysicalGoalsTracker.module.css */
+:root {
+  --primary-accent: tomato;
+  --text-color: #e0e0e0;
+  --label-color: #c5c5c5;
+  --input-bg: #ffffff;
+  --input-text: #222222;
+  --input-border: #cccccc;
+  --input-border-focus: tomato;
+  --container-border: #444;
+}
+
+.container {
+  border-top: 1px solid var(--container-border);
+  padding-top: 20px;
+  margin-top: 20px;
+}
+
+.sectionTitle {
+  color: var(--primary-accent);
+  margin-bottom: 18px;
+  font-size: 1.2em;
+  font-weight: 600;
+  border-left: 3px solid var(--primary-accent);
+  padding-left: 10px;
+}
+
+.inputGroup {
+  margin-bottom: 18px;
+}
+
+.inputGroup label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--label-color);
+  font-size: 0.95em;
+  font-weight: 500;
+}
+
+.inputField {
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid var(--input-border);
+  background-color: var(--input-bg);
+  color: var(--input-text);
+  font-size: 1em;
+  transition: border-color 0.2s ease-in-out;
+}
+
+.inputField:focus {
+  outline: none;
+  border-color: var(--input-border-focus);
+  box-shadow: 0 0 5px rgba(255, 99, 71, 0.5); /* Tomato glow */
+}
+
+/* Water Drop Styles */
+.waterDropsContainer {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.waterDrop {
+  font-size: 2.2em; /* Bigger drops */
+  cursor: pointer;
+  filter: grayscale(100%);
+  opacity: 0.5;
+  transition: all 0.2s ease;
+}
+
+.waterDrop:hover {
+  opacity: 0.75;
+  transform: scale(1.1);
+}
+
+.waterDrop.filled {
+  filter: grayscale(0%);
+  opacity: 1;
+}
+
+.waterDrop.disabled {
+  cursor: not-allowed;
+  filter: grayscale(100%) !important;
+  opacity: 0.4 !important;
+}
+
+/* Meal & Gym Checkbox Styles */
+.mealCheckGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px 25px; /* Row and column gap */
+}
+
+.checkItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.checkItem label {
+  color: var(--label-color);
+  user-select: none;
+  cursor: pointer;
+  margin-bottom: 0; /* Override default label margin */
+}
+
+.checkbox {
+  /* Custom Checkbox Appearance */
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--input-border);
+  border-radius: 4px;
+  background-color: var(--input-bg);
+  cursor: pointer;
+  position: relative;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.checkbox:checked {
+  background-color: var(--primary-accent);
+  border-color: var(--primary-accent);
+}
+
+.checkbox:checked::after {
+  content: '✔';
+  font-size: 14px;
+  color: white;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}

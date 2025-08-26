@@ -42,13 +42,49 @@
     padding: var(--space-sm) var(--space-lg); /* Adjusted padding */
     box-shadow: 0 2px 4px var(--shadow-color);
     box-sizing: border-box;
-    /* display: flex; */ /* REMOVED - Let content flow naturally */
-    height: 1.8cm; /* NEW: Fixed height */
     display: flex; /* Re-add flex to use align-items */
     align-items: center; /* NEW: Vertically center content */
     overflow: hidden; /* Hide overflow if content exceeds fixed height */
+    height: auto; /* Allow card to grow based on its content */
+    min-height: 100px; /* Set a minimum height to keep things looking consistent */
 }
-/* --- End Modification --- */
+/* PROGRESS BAR*/
+
+.progressWrapper {
+    margin-top: auto; /* Pushes the progress bar to the bottom of the card */
+    padding-top: 8px;
+    width: 150px;
+}
+
+/* This div gets the peacock gradient background */
+.peacockBorder {
+    border-radius: 8px;
+    padding: 2px; /* This padding creates the border thickness */
+    background-color: #053229; 
+}
+
+/* This is the track (background) of the progress bar */
+.progressBarContainer {
+    background-color: #f1f5f9; /* A light, neutral background for the track */
+    border-radius: 6px; /* Slightly smaller than the parent's radius */
+    height: 12px;
+    overflow: hidden;
+}
+
+/* This is the colored "filler" part of the bar */
+.progressBar {
+    height: 100%;
+    transition: width 0.4s ease-in-out;
+}
+
+/* The small percentage text moved underneath the bar */
+.progressLabel {
+    font-size: 0.75rem; /* 12px */
+    color: #64748b;
+    text-align: right;
+    margin: 2px 4px 0 0;
+    padding: 0;
+}
 
 /* Flex container inside the card */
 .cardContent {
@@ -56,6 +92,7 @@
     align-items: center; /* Vertically align title and goals */
     gap: var(--space-lg); /* Space between left and right */
     width: 100%; /* Ensure content fills card */
+    padding-top: 15px; 
 }
 
 /* Left side of the card */
@@ -146,4 +183,40 @@
         text-overflow: clip;
         width: auto;
     }
+}
+
+.checkinSection {
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1.5rem 2rem;
+  margin-top: 2.5rem;
+  text-align: center;
+}
+
+.checkinSection h3 {
+  margin-top: 0;
+  color: #1e293b;
+}
+
+.checkinSection p {
+  color: #475569;
+  max-width: 450px;
+  margin: 0.5rem auto 1.5rem;
+}
+
+.checkinButton {
+  background-color: #4f46e5;
+  color: white;
+  font-weight: bold;
+  font-size: 1rem;
+  padding: 0.75rem 2rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.checkinButton:hover {
+  background-color: #4338ca;
 }

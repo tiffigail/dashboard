@@ -2,18 +2,21 @@
 import React, { useState, useEffect } from 'react';
 import styles from './PmRoutineForm.module.css';
 import { db } from '../../firebaseConfig';
-import {
-    collection,
-    addDoc,
-    serverTimestamp,
-    query,      // <-- Import query
-    where,      // <-- Import where
-    limit,      // <-- Import limit
-    getDocs     // <-- Import getDocs
-} from "firebase/firestore";
+import { collection, addDoc, serverTimestamp, query, where, limit, getDocs, doc, setDoc } from "firebase/firestore";
+import PhysicalGoalsTracker from '../PhysicalGoalsTracker/PhysicalGoalsTracker';
+import StudyTracker from '../StudyTracker/StudyTracker';
+
+// Helper to get today's date string
+const getTodayString = () => {
+    const now = new Date();
+    const timezoneOffset = now.getTimezoneOffset() * 60000;
+    const localDate = new Date(now - timezoneOffset);
+    return localDate.toISOString().split('T')[0];
+};
 
 // Define the checklist items for the PM routine
 const pmRoutineItems = [
+  "PM Lumen",
   "Brush teeth",
   "Ready for Tomorrow",
   "Clothes",
@@ -21,9 +24,9 @@ const pmRoutineItems = [
   "Drink",
   "Things I want to Remember (to learn in my sleep)",
   "N+1 Review",
-  "Write Recite and Envision", // <-- Journal entry will go after this AND Recitation
+  "Write Recite and Envision",
   "Lotion",
-  "Tap Out",
+  "Pray",
   "Meditate"
 ];
 
@@ -32,15 +35,11 @@ function PmRoutineForm({ onSubmit, onClose }) {
 
   // == State for Checklist Items ==
   const [checkedItems, setCheckedItems] = useState(() => {
-    // Client-side only check for localStorage
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('pmRoutineCheckedItems');
       try {
-        // Ensure saved data structure matches current items if possible
         const parsed = saved ? JSON.parse(saved) : {};
-        // Initialize with defaults, then override with saved values
         const initialState = pmRoutineItems.reduce((acc, item) => ({ ...acc, [item]: false }), {});
-        // Only use saved value if the key exists in current items
         for (const key in parsed) {
             if (initialState.hasOwnProperty(key)) {
                 initialState[key] = parsed[key];
@@ -49,24 +48,35 @@ function PmRoutineForm({ onSubmit, onClose }) {
         return initialState;
       } catch (e) {
         console.warn('Error parsing saved checked items:', e);
-        // Fallback to default state if parsing fails
       }
     }
-    // Default state if no localStorage or parsing error
     return pmRoutineItems.reduce((acc, item) => ({ ...acc, [item]: false }), {});
   });
 
   // == State for Metric Inputs ==
-  // Only access localStorage on client-side after mount or via initial state function
   const [epiphanyCount, setEpiphanyCount] = useState(() => typeof window !== 'undefined' ? localStorage.getItem('pmRoutineEpiphanyCount') || '' : '');
   const [despairCount, setDespairCount] = useState(() => typeof window !== 'undefined' ? localStorage.getItem('pmRoutineDespairCount') || '' : '');
   const [pmJournalEntry, setPmJournalEntry] = useState(() => typeof window !== 'undefined' ? localStorage.getItem('pmRoutineJournalEntry') || '' : '');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
-
-  // --- NEW: State for Recitation ---
   const [pmRecitation, setPmRecitation] = useState("Loading recitation...");
-  // --- End Recitation State ---
+
+  // == State for Trackers ==
+  const [physicalGoals, setPhysicalGoals] = useState(() => {
+    if (typeof window !== 'undefined') {
+        const saved = localStorage.getItem('physicalGoalsData');
+        return saved ? JSON.parse(saved) : {};
+    }
+    return {};
+  });
+
+  const [studyData, setStudyData] = useState(() => {
+    if (typeof window !== 'undefined') {
+        const saved = localStorage.getItem('pmStudyData');
+        return saved ? JSON.parse(saved) : {};
+    }
+    return {};
+  });
 
   // == LocalStorage Persistence ==
   useEffect(() => {
@@ -75,32 +85,31 @@ function PmRoutineForm({ onSubmit, onClose }) {
           localStorage.setItem('pmRoutineEpiphanyCount', epiphanyCount);
           localStorage.setItem('pmRoutineDespairCount', despairCount);
           localStorage.setItem('pmRoutineJournalEntry', pmJournalEntry);
+          localStorage.setItem('physicalGoalsData', JSON.stringify(physicalGoals));
+          localStorage.setItem('pmStudyData', JSON.stringify(studyData));
       }
-  }, [checkedItems, epiphanyCount, despairCount, pmJournalEntry]);
+  }, [checkedItems, epiphanyCount, despairCount, pmJournalEntry, physicalGoals, studyData]);
 
-  // --- NEW: Effect to fetch active PM recitation ---
+  // --- Effect to fetch active PM recitation ---
   useEffect(() => {
     const fetchRecitation = async () => {
       console.log("Fetching active PM recitation...");
-      setPmRecitation("Loading recitation..."); // Reset on fetch
+      setPmRecitation("Loading recitation...");
       try {
         const recitationsRef = collection(db, "recitations");
-        // Query for the document where activeContext is "PM" AND isArchived is false
         const q = query(
           recitationsRef,
-          where("activeContext", "==", "PM"),   // Check the activeContext field
-          where("isArchived", "==", false),      // Check the isArchived field
-          limit(1)                               // Expect only one result
+          where("activeContext", "==", "PM"),
+          where("isArchived", "==", false),
+          limit(1)
         );
         const querySnapshot = await getDocs(q);
 
         if (!querySnapshot.empty) {
           const docSnap = querySnapshot.docs[0];
-          setPmRecitation(docSnap.data().text || "Recitation text missing."); // Set text or default
-          console.log("Found active PM recitation:", docSnap.id, "Recitation ID:", docSnap.data().recitationId);
+          setPmRecitation(docSnap.data().text || "Recitation text missing.");
         } else {
-          console.log("No active, non-archived PM recitation found in Firestore.");
-          setPmRecitation("No active PM recitation set."); // Default text
+          setPmRecitation("No active PM recitation set.");
         }
       } catch (error) {
         console.error("Error fetching PM recitation: ", error);
@@ -109,13 +118,20 @@ function PmRoutineForm({ onSubmit, onClose }) {
     };
 
     fetchRecitation();
-  }, []); // Run once on component mount
-  // --- End Fetch Effect ---
+  }, []);
 
   // == Handlers ==
   const handleCheckboxChange = (event) => {
     const { name, checked } = event.target;
     setCheckedItems(prevItems => ({ ...prevItems, [name]: checked }));
+  };
+
+  const handlePhysicalGoalsChange = (data) => {
+    setPhysicalGoals(data);
+  };
+
+  const handleStudyDataChange = (data) => {
+    setStudyData(data);
   };
 
   const handleSubmit = async (event) => {
@@ -135,44 +151,70 @@ function PmRoutineForm({ onSubmit, onClose }) {
       type: 'pmRoutine',
       checklist: completedChecklistItems,
       completionPercentage: completionPercentage,
-      epiphanyCount: epiphanyCount.trim() ? Number(epiphanyCount) : null, // Ensure number or null
-      despairCount: despairCount.trim() ? Number(despairCount) : null,   // Ensure number or null
+      epiphanyCount: epiphanyCount.trim() ? Number(epiphanyCount) : null,
+      despairCount: despairCount.trim() ? Number(despairCount) : null,
       completedAt: serverTimestamp()
-      // Optionally add pmRecitation here if needed
     };
-
+    
     const journalText = pmJournalEntry.trim();
-
-    console.log("Attempting to save PM Routine Data:", { ...baseFormData, journalEntry: journalText });
+    const dateString = getTodayString();
+    const now = new Date();
 
     try {
-      // Save routine completion log
+      // 1. Save routine completion log
       const routineDocRef = await addDoc(collection(db, "pmRoutineLogs"), baseFormData);
       console.log("PM Routine Log Document written with ID: ", routineDocRef.id);
 
-      // If journal entry exists, save it separately
+      // 2. If journal entry exists, save it
       if (journalText) {
-        const now = new Date();
-        const dateString = now.toISOString().split('T')[0];
-        const dayOfWeek = now.getDay();
-
         const journalData = {
           entryText: journalText,
           createdAt: serverTimestamp(),
           dateString: dateString,
-          dayOfWeek: dayOfWeek,
+          dayOfWeek: now.getDay(),
           timeOfDay: 'PM',
         };
-        const journalDocRef = await addDoc(collection(db, "journalEntries"), journalData);
-        console.log("PM Journal Entry Document written with ID: ", journalDocRef.id);
+        await addDoc(collection(db, "journalEntries"), journalData);
       }
 
-      // Clear local storage on successful submission
+      // 3. Save physical goals data
+      if (Object.keys(physicalGoals).length > 0 && Object.values(physicalGoals).some(v => v)) {
+          const goalsData = {
+              steps: Number(physicalGoals.steps) || 0,
+              waterCount: physicalGoals.waterCount || 0,
+              meals: physicalGoals.meals || { Breakfast: false, Lunch: false, Dinner: false, Snacks: false },
+              wentToGym: physicalGoals.wentToGym || false,
+              date: serverTimestamp(),
+              dateString: dateString
+          };
+          await addDoc(collection(db, "physicalGoalsLogs"), goalsData);
+          console.log("Physical Goals Log written.");
+      }
+
+      // 4. Save daily study log
+      const hasStudyData = studyData.studyMinutes > 0 || studyData.flashcardMinutes > 0 || (studyData.linkedinMinutes && Number(studyData.linkedinMinutes) > 0);
+      if (hasStudyData) {
+          const totalMinutes = (studyData.studyMinutes || 0) + (studyData.flashcardMinutes || 0) + Number(studyData.linkedinMinutes || 0);
+          const dailyLogData = {
+              studyModalMinutes: studyData.studyMinutes || 0,
+              flashcardsModalMinutes: studyData.flashcardMinutes || 0,
+              linkedinMinutes: Number(studyData.linkedinMinutes || 0),
+              totalMinutes: totalMinutes,
+              lastUpdatedAt: serverTimestamp(),
+          };
+          const dailyLogDocRef = doc(db, "dailyStudyLogs", dateString);
+          await setDoc(dailyLogDocRef, dailyLogData, { merge: true });
+          console.log("Daily Study Log saved/updated for:", dateString);
+      }
+
+      // 5. Clear local storage on successful submission
       if (typeof window !== 'undefined') {
-            localStorage.removeItem('pmRoutineCheckedItems');
-            localStorage.removeItem('pmRoutineEpiphanyCount');
-            localStorage.removeItem('pmRoutineDespairCount');
-            localStorage.removeItem('pmRoutineJournalEntry');
+          localStorage.removeItem('pmRoutineCheckedItems');
+          localStorage.removeItem('pmRoutineEpiphanyCount');
+          localStorage.removeItem('pmRoutineDespairCount');
+          localStorage.removeItem('pmRoutineJournalEntry');
+          localStorage.removeItem('physicalGoalsData');
+          localStorage.removeItem('pmStudyData');
       }
 
       if (onSubmit) {
@@ -184,7 +226,7 @@ function PmRoutineForm({ onSubmit, onClose }) {
     } catch (e) {
       console.error("Error adding document(s): ", e);
       setSubmitError("Failed to save routine. Please try again.");
-      setIsSubmitting(false); // Re-enable button on error
+      setIsSubmitting(false);
     }
   };
 
@@ -198,31 +240,26 @@ function PmRoutineForm({ onSubmit, onClose }) {
       <div className={styles.section}>
         <h4 className={styles.sectionTitle}>PM Routine Checklist:</h4>
         {pmRoutineItems.map((item) => (
-          <React.Fragment key={item}> {/* Use Fragment to wrap items */}
+          <React.Fragment key={item}>
             <div className={styles.checkItem}>
               <input
                 type="checkbox"
                 id={`pm-${item.replace(/\s+/g, '-')}`}
                 name={item}
-                checked={checkedItems[item]}
+                checked={!!checkedItems[item]}
                 onChange={handleCheckboxChange}
                 className={styles.checkbox}
                 disabled={isSubmitting}
               />
               <label htmlFor={`pm-${item.replace(/\s+/g, '-')}`}>{item}</label>
             </div>
-
-            {/* --- Display Recitation and Journal after 'Write Recite and Envision' --- */}
             {item === "Write Recite and Envision" && (
-              <> {/* Use Fragment to group Recitation and Journal */}
-                {/* Display Recitation */}
+              <>
                 {(pmRecitation && pmRecitation !== "Loading recitation..." && pmRecitation !== "No active PM recitation set." && pmRecitation !== "Error loading recitation.") && (
-                   <div className={styles.recitationDisplay}>
-                      <p className={styles.recitationText}>{pmRecitation}</p>
-                   </div>
-                 )}
-
-                {/* Journal Textarea */}
+                    <div className={styles.recitationDisplay}>
+                        <p className={styles.recitationText}>{pmRecitation}</p>
+                    </div>
+                )}
                 <div className={styles.journalField}>
                   <label htmlFor="pmJournalEntry">Thoughts on the Day:</label>
                   <textarea
@@ -237,11 +274,24 @@ function PmRoutineForm({ onSubmit, onClose }) {
                 </div>
               </>
             )}
-            {/* --- End Recitation and Journal Display --- */}
-
           </React.Fragment>
         ))}
       </div>
+
+      {/* Physical Goals Tracker Section */}
+      <PhysicalGoalsTracker
+        onDataChange={handlePhysicalGoalsChange}
+        initialData={physicalGoals}
+        disabled={isSubmitting}
+      />
+      
+      {/* Study Tracker Section */}
+      <StudyTracker
+        onDataChange={handleStudyDataChange}
+        initialData={studyData}
+        disabled={isSubmitting}
+      />
+      
       {submitError && <p className={styles.errorText}>Error: {submitError}</p>}
       <button type="submit" className={styles.submitButton} disabled={isSubmitting}>
         {isSubmitting ? 'Saving...' : 'Complete PM Routine'}

@@ -1,273 +1,284 @@
 /* src/components/WeeklyPlanner/WeeklyPlanner.module.css */
-/* Using CSS Variables from global file */
 
-/* Overall modal content styling */
+/* --- Overall Modal & Layout --- */
 .weeklyPlannerModalContent {
-  padding: var(--space-lg, 1.5rem);
-  background-color: var(--bg-primary, #fff);
-  border-radius: 8px; /* Match modal style */
-  max-height: 100vh; /* Limit height */
-  width: 95%;
-  max-width: 900px; /* Allow wider modal for two columns */
+  padding: 2rem;
+  background-color: #f7f9fc; /* A very light, soft blue-gray background */
+  border-radius: 16px;
+  box-shadow: 0 10px 30px -5px rgba(0, 20, 50, 0.1);
+  width: 75%; /* Widened to 75% of the screen */
+  margin: 0 auto; /* Center the container on the screen */
   box-sizing: border-box;
+  border: 1px solid #e6e9f0;
 }
 
 .plannerTitle {
   text-align: center;
-  color: var(--text-primary);
-  font-size: 1.6rem;
+  color: #2d3748; /* Darker, more professional text */
+  font-size: 1.75rem;
+  font-weight: 700;
   margin-top: 0;
-  margin-bottom: var(--space-xs);
+  margin-bottom: 0.25rem;
 }
 
 .weekRange {
   text-align: center;
-  color: var(--text-secondary);
-  font-size: 0.9rem;
-  margin-bottom: var(--space-lg);
+  color: #718096; /* Softer secondary text */
+  font-size: 1rem;
+  margin-bottom: 2rem;
 }
 
-/* Two-column layout */
 .plannerLayout {
   display: flex;
-  gap: var(--space-lg, 1.5rem);
-  margin-bottom: var(--space-lg);
+  gap: 2rem;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
 }
 
-/* Left column for ContextMap */
 .contextMapArea {
-  flex: 1 1 40%; /* Adjust flex-basis as needed */
-  min-width: 250px; /* Ensure context map has enough space */
+  flex: 1 1 40%;
+  min-width: 280px;
+  background-color: #ffffff;
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid #e6e9f0;
 }
 
-/* Right column for inputs */
 .inputsArea {
   flex: 1 1 60%;
   display: flex;
   flex-direction: column;
-  gap: var(--space-md); /* Space between input sections */
 }
 
 .errorText {
-  color: var(--text-error);
+  color: #e53e3e;
+  background-color: #fed7d7;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
   font-size: 0.9rem;
-  margin-bottom: var(--space-sm);
+  font-weight: 500;
 }
 
-/* Goal Section */
-.axisGoalSection {
+/* --- Input & Section Styling --- */
+.axisGoalSection, .nextStepsSection {
+  background-color: #ffffff;
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid #e6e9f0;
   display: flex;
   flex-direction: column;
+  gap: 1rem;
 }
 
-.axisGoalLabel {
-  font-weight: bold;
-  margin-bottom: var(--space-xs);
-  color: var(--text-secondary);
+.axisGoalLabel, .nextStepsLabel {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: #4a5568;
 }
 
-.axisGoalInput {
+.axisGoalInput, .stepInput {
   width: 100%;
-  padding: var(--space-sm);
-  border: 1px solid var(--border-light);
-  border-radius: 4px;
+  padding: 0.75rem 1rem;
+  border: 1px solid #cbd5e0;
+  border-radius: 8px;
   font-size: 1rem;
-  resize: vertical; /* Allow vertical resize */
-  min-height: 60px;
   box-sizing: border-box;
+  background-color: #f7fafc;
+  color: #2d3748;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
-.axisGoalInput:disabled {
-  background-color: var(--bg-disabled);
+
+.axisGoalInput:focus, .stepInput:focus {
+  outline: none;
+  border-color: #4299e1;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+}
+
+.axisGoalInput:disabled, .stepInput:disabled {
+  background-color: #edf2f7;
   cursor: not-allowed;
 }
 
-
 .divider {
-  border: none;
-  border-top: 1px solid var(--border-light);
-  margin: var(--space-md) 0;
+  display: none; /* Replaced by section separation */
 }
 
-/* Next Steps Section */
-.nextStepsSection {
-  display: flex;
-  flex-direction: column;
-}
-
-.nextStepsLabel {
-  font-weight: bold;
-  margin-bottom: var(--space-sm);
-  color: var(--text-secondary);
-}
-
-/* --- Styles for Dynamic Step Inputs --- */
-
-/* Container for all the step input rows */
+/* --- Dynamic Step Inputs --- */
 .stepInputContainer {
   display: flex;
   flex-direction: column;
-  gap: var(--space-xs); /* Space between step input rows */
-  margin-bottom: var(--space-sm); /* Space below the list of inputs */
+  gap: 1rem;
 }
 
-/* Styles for each row containing an input and remove button */
+.stepEntry {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
 .stepInputRow {
   display: flex;
   align-items: center;
-  gap: var(--space-xs);
+  gap: 0.5rem;
 }
 
-/* The text input for a step */
-.stepInput {
-  flex-grow: 1; /* Take available space */
-  padding: var(--space-xs) var(--space-sm);
-  border: 1px solid var(--border-light);
-  border-radius: 4px;
-  font-size: 0.95rem;
-  box-sizing: border-box;
-}
-.stepInput:disabled {
-  background-color: var(--bg-disabled);
-  cursor: not-allowed;
-}
-
-
-/* Button to remove a specific step */
 .removeStepButton {
-  flex-shrink: 0; /* Don't shrink */
-  background-color: transparent;
-  border: none;
-  color: var(--text-error, #dc3545);
-  font-size: 1.4rem; /* Make the 'x' bigger */
+  flex-shrink: 0;
+  background-color: #fef2f2;
+  color: #ef4444;
+  border: 1px solid #fecaca;
+  height: 36px;
+  width: 36px;
+  border-radius: 50%;
+  font-size: 1.2rem;
   font-weight: bold;
   cursor: pointer;
-  padding: 0 var(--space-xs);
-  line-height: 1; /* Adjust line height for better alignment */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
 }
+
 .removeStepButton:hover:not(:disabled) {
-  color: var(--text-error-dark, #a0202d);
+  background-color: #fee2e2;
+  color: #dc2626;
+  transform: scale(1.1);
 }
+
 .removeStepButton:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-/* Button to add a new step input field */
 .addStepButton {
-  align-self: flex-start; /* Align button to the left */
-  padding: var(--space-xs) var(--space-sm);
-  margin-top: var(--space-sm); /* Space above the add button */
+  align-self: flex-start;
+  padding: 0.5rem 1rem;
   font-size: 0.9rem;
-  border-radius: 4px;
+  font-weight: 600;
+  border-radius: 8px;
   cursor: pointer;
-  background-color: var(--button-secondary-bg, #e9ecef);
-  border: 1px solid var(--button-secondary-border, #ced4da);
-  color: var(--button-secondary-text);
-  transition: background-color 0.2s;
+  background-color: #e2e8f0;
+  border: 1px solid transparent;
+  color: #4a5568;
+  transition: all 0.2s;
 }
+
 .addStepButton:hover:not(:disabled) {
-  background-color: var(--button-secondary-hover-bg, #dee2e6);
+  background-color: #cbd5e0;
+  transform: translateY(-1px);
 }
+
 .addStepButton:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
-/* --- End Dynamic Step Input Styles --- */
-
-
-/* Day Assignment Section */
-.dayAssignmentSection {
-  margin-top: var(--space-md); /* Space above day checkboxes */
-}
-
-.dayAssignmentLabel {
-  font-weight: bold;
-  margin-bottom: var(--space-sm);
-  display: block; /* Make it block to take full width */
-  color: var(--text-secondary);
-}
-
+/* --- Day Checkboxes --- */
 .dayCheckboxes {
   display: flex;
-  flex-wrap: wrap; /* Allow checkboxes to wrap */
-  gap: var(--space-md); /* Space between checkbox groups */
-  justify-content: space-around; /* Distribute checkboxes */
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  padding-left: 0.25rem;
 }
 
 .dayCheckboxItem {
   display: flex;
   align-items: center;
-  gap: var(--space-xxs);
+  gap: 0.3rem;
 }
 
 .dayCheckboxItem label {
   cursor: pointer;
   font-size: 0.9rem;
+  color: #4a5568;
+  user-select: none;
 }
 
 .dayCheckbox {
   cursor: pointer;
-  margin-right: var(--space-xxs);
+  height: 18px;
+  width: 18px;
+  accent-color: #3182ce;
 }
 .dayCheckbox:disabled {
   cursor: not-allowed;
+  accent-color: #a0aec0;
 }
 
+.allDaysButton {
+  margin-left: 0.75rem;
+  padding: 4px 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background-color: #edf2f7;
+  color: #4a5568;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px; /* Pill shape */
+  cursor: pointer;
+  transition: all 0.2s;
+}
 
-/* Navigation Buttons */
+.allDaysButton:hover:not(:disabled) {
+  background-color: #e2e8f0;
+  border-color: #cbd5e0;
+}
+
+/* --- Navigation --- */
 .navigation {
   display: flex;
   justify-content: space-between;
-  margin-top: var(--space-lg);
-  padding-top: var(--space-md);
-  border-top: 1px solid var(--border-light);
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e6e9f0;
 }
 
 .navButton {
-  padding: var(--space-sm) var(--space-md);
-  font-size: 0.95rem;
-  border-radius: 5px;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px;
   cursor: pointer;
-  border: 1px solid var(--button-secondary-border, #ced4da);
-  background-color: var(--button-secondary-bg, #e9ecef);
-  color: var(--button-secondary-text);
-  transition: background-color 0.2s;
+  border: 1px solid #cbd5e0;
+  background-color: #ffffff;
+  color: #4a5568;
+  transition: all 0.2s;
 }
+
 .navButton:hover:not(:disabled) {
-  background-color: var(--button-secondary-hover-bg, #dee2e6);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px -2px rgba(0, 20, 50, 0.1);
+  border-color: #a0aec0;
 }
+
 .navButton:disabled {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
 .finishButton {
-  background-color: var(--button-success-bg, #28a745);
-  border-color: var(--button-success-border, #218838);
-  color: var(--button-success-text, #fff);
-  font-weight: bold;
-}
-.finishButton:hover:not(:disabled) {
-  background-color: var(--button-success-hover-bg, #218838);
+  background-image: linear-gradient(to right, #2f80ed, #56ccf2);
+  border: none;
+  color: white;
+  box-shadow: 0 4px 15px -5px rgba(47, 128, 237, 0.4);
 }
 
-/* Responsive adjustments */
+.finishButton:hover:not(:disabled) {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 6px 20px -5px rgba(47, 128, 237, 0.5);
+}
+
+/* --- Responsive Design --- */
 @media (max-width: 768px) {
-  .plannerLayout {
-      flex-direction: column; /* Stack columns on smaller screens */
+  .weeklyPlannerModalContent {
+    padding: 1rem;
   }
-  .contextMapArea,
-  .inputsArea {
-      flex-basis: auto; /* Reset flex basis */
-      width: 100%;
+  .plannerLayout {
+    flex-direction: column;
   }
   .navigation {
-      flex-direction: column;
-      gap: var(--space-sm);
-  }
-  .navButton {
-      width: 100%;
-      text-align: center;
+    flex-direction: column;
+    gap: 0.75rem;
   }
 }

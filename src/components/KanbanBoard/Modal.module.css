@@ -1,0 +1,186 @@
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modalContent {
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  color: #333;
+}
+
+.largeModal {
+    max-width: 900px;
+    width: 95%;
+}
+
+.closeButton {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: #aaa;
+  cursor: pointer;
+}
+
+.closeButton:hover {
+    color: #333;
+}
+
+.formGroup {
+  margin-bottom: 20px;
+}
+
+.label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.input,
+.textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 1rem;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.submitButton {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: white;
+  background-color: #007bff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.submitButton:hover:not(:disabled) {
+  background-color: #0056b3;
+}
+
+.submitButton:disabled {
+  background-color: #aaa;
+  cursor: not-allowed;
+}
+
+.subHeader {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 8px;
+}
+
+.reviewGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.reviewSection {
+    padding: 10px;
+}
+
+.fullWidth {
+    grid-column: 1 / -1;
+}
+
+.logContainer {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #eee;
+    border-radius: 6px;
+    padding: 10px;
+    background-color: #f9f9f9;
+}
+
+.logList {
+    padding-left: 20px;
+    margin: 0;
+}
+
+.logItem {
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #eee;
+}
+.logItem:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+.logItem p {
+    margin: 4px 0 0 0;
+    color: #555;
+}
+
+.retroGrid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 24px;
+    margin-bottom: 20px;
+}
+
+.retroColumn {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Add to bottom of Modal.module.css */
+
+.buttonGroup {
+  display: flex;
+  gap: 1rem;
+}
+
+.deleteButton {
+  background-color: #dc3545; /* A standard red color for delete actions */
+}
+
+.deleteButton:hover:not(:disabled) {
+  background-color: #c82333;
+}
+
+/* Add to bottom of Modal.module.css */
+.completeProjectSection {
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: #fffbe6;
+  border: 1px solid #f2e7c3;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.completeProjectSection label {
+    font-weight: 600;
+    cursor: pointer;
+}

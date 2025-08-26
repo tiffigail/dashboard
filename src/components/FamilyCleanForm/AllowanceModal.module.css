@@ -1,0 +1,211 @@
+/*
+  The critical fix is here:
+  - We remove `display: flex` and `align-items: center`.
+  - We add `overflow-y: auto` to make the entire overlay scrollable.
+*/
+.modalOverlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(0, 0, 0, 0.75);
+    z-index: 1050;
+    overflow-y: auto; /* This makes the entire modal window scrollable */
+    padding: 40px 0; /* Adds space at the top and bottom when you scroll */
+}
+
+/*
+  The critical fix is here:
+  - We remove any `max-height` that would conflict with the overlay's scrolling.
+  - We add `margin: 0 auto` to center the modal horizontally within the now-scrollable overlay.
+*/
+.modalContent {
+    background: #fafad9;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+    width: 95%;
+    max-width: 850px;
+    border: 1px solid #cfe0f1;
+    margin: 0 auto; /* This centers the modal horizontally */
+}
+
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #c1d5ea;
+    padding-bottom: 12px;
+    margin-bottom: 15px;
+}
+
+.modalTitle {
+    font-size: 1.3rem;
+    margin: 0;
+    color: #059bc9;
+}
+
+.closeButton {
+    background: none; border: none;
+    color: #bdc3c7; font-size: 1.8rem;
+    cursor: pointer; line-height: 1;
+}
+
+/* --- Two-Column Dashboard Layout --- */
+.dashboardLayout {
+    display: grid;
+    grid-template-columns: 3fr 4fr;
+    gap: 20px;
+}
+
+.leftColumn, .rightColumn {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* We no longer need a max-height or scrollbar here because the main .modalOverlay handles all scrolling.
+  This simplifies the user experience to a single, predictable scrollbar.
+*/
+.rightColumn {
+    background-color: #f5f5aa;
+    border-radius: 8px;
+    padding: 15px;
+}
+
+.section {
+    background-color: #f5f5aa;
+    border-radius: 8px;
+    padding: 15px;
+}
+
+.sectionTitle {
+    font-size: 1.1rem;
+    color: #059bc9;
+    margin-top: 0;
+    margin-bottom: 15px;
+    text-align: center;
+    border-bottom: 1px solid #059bc9;
+    padding-bottom: 8px;
+}
+
+.trackerContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* --- Compact Allowance Tracker Styles --- */
+.personTracker {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    background-color: #f7f74d;
+    border-radius: 6px;
+}
+
+.personName {
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.allowanceTotal {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #24bfc1;
+}
+
+.deductionControls {
+    display: contents;
+}
+
+.itemsInput {
+    width: 45px;
+    padding: 6px;
+    text-align: center;
+    border: 1px solid #7f8c8d;
+    border-radius: 4px;
+    background: #ecf0f1;
+    font-size: 0.9rem;
+}
+
+.deductButton {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* --- Last Week Styles --- */
+.lastWeekSection .sectionTitle {
+    color: #f36112;
+}
+
+.lastWeekTracker {
+    grid-template-columns: 1fr auto;
+}
+
+.allowanceTotalLastWeek {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #24bfc1;
+}
+
+/* --- Compact Room Rating Styles --- */
+.ratingsGrid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+}
+
+.ratingItem {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 10px;
+    background-color: #f9f94b;
+    padding: 8px;
+    border-radius: 6px;
+}
+
+.ratingLabel {
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ratingInput {
+    width: 50px;
+    padding: 6px;
+    text-align: center;
+    border: 1px solid #7f8c8d;
+    border-radius: 4px;
+    background: #ecf0f1;
+    font-size: 0.9rem;
+}
+
+.modalFooter {
+    margin-top: 15px;
+    text-align: center;
+}
+
+.saveButton {
+    width: 100%;
+    padding: 10px;
+    font-size: 1rem;
+    background-color: #059bc9;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.saveButton:disabled {
+    background-color: #95a5a6;
+    cursor: not-allowed;
+}

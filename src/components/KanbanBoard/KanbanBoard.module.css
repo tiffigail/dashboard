@@ -1,0 +1,252 @@
+.boardContainer {
+  display: flex;
+  gap: 16px;
+  padding: 24px;
+  height: 90vh;
+  background-color: var(--axis-color-light);
+  overflow-x: auto;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+.column {
+  flex: 0 0 320px;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--axis-color-medium);
+  border-radius: 12px;
+  max-height: 100%;
+}
+
+.columnHeader {
+  padding: 16px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--axis-color-dark);
+  flex-shrink: 0;
+}
+
+.cardList {
+  padding: 0 8px;
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+.columnFooter {
+  padding: 8px;
+  flex-shrink: 0;
+  border-top: 1px solid var(--axis-color-light);
+}
+
+.card {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  cursor: pointer;
+  transition: box-shadow 0.2s ease-in-out;
+}
+
+.card:hover {
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #172b4d;
+}
+
+.cardContent {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #e9ecef;
+}
+
+.acceptanceTitle {
+  font-weight: 600;
+  font-size: 0.8rem;
+  color: #5e6c84;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.acceptanceList {
+  list-style-type: disc;
+  padding-left: 20px;
+  margin: 0;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.acceptanceList li {
+  margin-bottom: 6px;
+  word-wrap: break-word;
+}
+
+.addCardButton {
+  width: 100%;
+  padding: 8px;
+  border: none;
+  background-color: transparent;
+  color: var(--axis-color-dark);
+  border-radius: 8px;
+  text-align: left;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.addCardButton:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+/* --- Edit Mode Styles --- */
+.editButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  color: #6b778c;
+  padding: 4px;
+  border-radius: 4px;
+}
+
+.editButton:hover {
+  background-color: #f4f5f7;
+  color: #172b4d;
+}
+
+.editForm {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.editInput, .editTextArea {
+  width: 100%;
+  padding: 8px;
+  border: 2px solid #0079bf;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.editTextArea {
+  font-size: 0.9rem;
+  resize: vertical;
+}
+
+.editControls {
+  display: flex;
+  gap: 8px;
+}
+
+.saveButton {
+  background-color: #0079bf;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.saveButton:hover {
+  background-color: #026aa7;
+}
+
+.cancelButton {
+  background-color: #f4f5f7;
+  color: #172b4d;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.cancelButton:hover {
+  background-color: #dfe1e6;
+}
+
+.boardHeader {
+  padding: 10px 24px;
+  display: flex;
+  gap: 10px;
+  background-color: #f4f5f7;
+  border-bottom: 1px solid #dfe1e6;
+}
+
+.headerButton {
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: #fff;
+  color: #444;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.headerButton:hover:not(:disabled) {
+  background-color: #f0f0f0;
+  border-color: #bbb;
+}
+
+.headerButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Example of using the dynamic theme color */
+.headerButton:hover:not(:disabled) {
+    background-color: var(--axis-color-dark);
+    color: white;
+    border-color: var(--axis-color-dark);
+}
+
+
+.dailyScrumPanel {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dfe1e6;
+  padding: 0 24px;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+}
+
+.dailyScrumPanel.isOpen {
+  padding: 20px 24px;
+  max-height: 500px; /* Adjust as needed */
+  transition: max-height 0.4s ease-in, padding 0.4s ease-in;
+}
+
+/* Styles for the form elements inside the panel */
+.formGroup { margin-bottom: 15px; }
+.label { display: block; font-weight: 500; margin-bottom: 5px; color: #333; }
+.textarea { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-family: inherit; font-size: 0.9rem; box-sizing: border-box; }
+.submitButton { padding: 10px 20px; font-weight: 500; color: white; background-color: var(--axis-color-dark); border: none; border-radius: 6px; cursor: pointer; }
+.submitButton:disabled { background-color: #aaa; }
+
+.headerControls {
+  display: flex;
+  gap: 10px;
+}
+
+.visionDisplay {
+  margin-top: 15px;
+  padding: 10px;
+  background-color: rgba(255, 255, 255, 0.5);
+  border-radius: 6px;
+  font-size: 0.9rem;
+  color: var(--axis-color-dark);
+}
+
+.visionDisplay strong {
+    margin-right: 5px;
+}

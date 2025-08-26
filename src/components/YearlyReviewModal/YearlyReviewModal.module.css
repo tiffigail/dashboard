@@ -1,0 +1,170 @@
+/* General Modal Styling */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(10, 10, 10, 0.75);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modalContent {
+    background: #ffffff;
+    padding: 2rem;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 700px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    color: #333;
+}
+
+.closeButton {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #888;
+    cursor: pointer;
+}
+
+.closeButton:hover {
+    color: #333;
+}
+
+.modalContent h2 {
+    margin-top: 0;
+    color: #1a202c;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+/* Form Specifics */
+.axisSelector {
+    margin-bottom: 1.5rem;
+}
+.axisSelector label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+    color: #4a5568;
+}
+.dropdown {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #cbd5e0;
+    border-radius: 6px;
+    font-size: 1rem;
+    background-color: #f7fafc;
+}
+
+.goalHeader {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border-left: 5px solid; /* Color will be set via inline style */
+    border-radius: 4px;
+}
+.goalHeader p {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.questionsContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.questionBlock label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #2d3748;
+}
+
+.questionBlock textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #cbd5e0;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-family: inherit;
+    resize: vertical;
+    transition: border-color 0.2s;
+}
+.questionBlock textarea:focus {
+    outline: none;
+    border-color: #4A90E2;
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+}
+
+/* Actions and Feedback */
+.modalActions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e2e8f0;
+}
+
+.timelineButton, .submitButton {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+}
+.timelineButton:active, .submitButton:active {
+    transform: translateY(1px);
+}
+.timelineButton {
+    background-color: #e2e8f0;
+    color: #4a5568;
+}
+.timelineButton:hover {
+    background-color: #cbd5e0;
+}
+.submitButton {
+    background-color: #4299e1;
+    color: white;
+}
+.submitButton:hover {
+    background-color: #3182ce;
+}
+.submitButton:disabled {
+    background-color: #a0aec0;
+    cursor: not-allowed;
+}
+
+.pleaseSelect {
+    text-align: center;
+    padding: 2rem;
+    color: #718096;
+    font-style: italic;
+}
+
+.errorText {
+    color: #e53e3e;
+    text-align: right;
+    margin-top: 0.5rem;
+}
+
+.successText {
+    color: #38a169;
+    font-weight: bold;
+    text-align: center;
+}

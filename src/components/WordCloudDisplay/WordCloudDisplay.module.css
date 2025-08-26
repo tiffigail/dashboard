@@ -1,0 +1,48 @@
+/* src/components/WordCloudDisplay/WordCloudDisplay.module.css */
+
+.container {
+    background-color: #fefdfa; /* Off-white, like paper */
+    border: 1px solid #e0e0e0;
+    padding: 2rem;
+    margin: 2rem;
+    box-shadow: 5px 5px 15px rgba(0,0,0,0.1);
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.container h2 {
+    text-align: center;
+    font-size: 2rem;
+    color: #333;
+    border-bottom: 2px dashed #ccc;
+    padding-bottom: 1rem;
+    margin-bottom: 2rem;
+}
+
+.wordCloudWrapper {
+    height: 60vh;
+    width: 100%;
+}
+
+/* We add a custom class to the wrapper in our JSX to target this */
+.customCloudColors :global(text) {
+  fill: #333 !important; /* Default color */
+  transition: fill 0.3s ease;
+}
+
+.customCloudColors :global(text:hover) {
+  fill: #ff6b6b !important; /* A bright hover color */
+}
+
+/* Create a 4-color palette that will now override the library's default */
+.customCloudColors :global(text:nth-child(4n + 1)) {
+  fill: #2e2a4d !important; /* Deep purple */
+}
+.customCloudColors :global(text:nth-child(4n + 2)) {
+  fill: #4c4579 !important; /* Medium purple */
+}
+.customCloudColors :global(text:nth-child(4n + 3)) {
+  fill: #5f4196 !important; /* Lavender */
+}
+.customCloudColors :global(text:nth-child(4n + 0)) {
+  fill: #52485f !important; /* Muted grey-purple */
+}

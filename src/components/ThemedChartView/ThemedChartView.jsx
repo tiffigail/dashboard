@@ -8,7 +8,7 @@ import {
 } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { db } from '../../firebaseConfig';
-import { collection, query, where, orderBy, getDocs, doc, getDoc, Timestamp, documentId } from 'firebase/firestore'; // Added documentId
+import { collection, query, where, orderBy, getDocs, Timestamp } from 'firebase/firestore';
 
 import styles from './ThemedChartView.module.css';
 import Modal from '../Modal/Modal';
@@ -18,36 +18,53 @@ ChartJS.register(
     Title, Tooltip, Legend, ChartDataLabels, Filler
 );
 
-const getAxisThemeColor = (axisName, opacity = '0.7') => { /* ... same ... */
-    if (typeof window === 'undefined' || typeof document === 'undefined') return `rgba(201, 203, 207, ${opacity})`;
-    if (!axisName || typeof axisName !== 'string') { const defaultColorVar = getComputedStyle(document.documentElement).getPropertyValue('--axis-color-default-2')?.trim(); return defaultColorVar ? `rgba(${defaultColorVar}, ${opacity})` : `rgba(201, 203, 207, ${opacity})`; }
+// --- Helper Functions ---
+const getAxisThemeColor = (axisName, opacity = '0.7') => {
+    if (typeof window === 'undefined' || typeof document === 'undefined') {
+        return `rgba(201, 203, 207, ${opacity})`;
+    }
+    if (!axisName || typeof axisName !== 'string') {
+        const defaultColorVar = getComputedStyle(document.documentElement).getPropertyValue('--axis-color-default-2')?.trim();
+        return defaultColorVar ? `rgba(${defaultColorVar}, ${opacity})` : `rgba(201, 203, 207, ${opacity})`;
+    }
     const cssVarSuffix = axisName.trim().toLowerCase().replace(/\s+/g, '-').replace(/\+/g, '-plus-');
     const colorVar = getComputedStyle(document.documentElement).getPropertyValue(`--axis-color-${cssVarSuffix}-2`)?.trim();
-    if (colorVar) return `rgba(${colorVar}, ${opacity})`;
+    if (colorVar) {
+        return `rgba(${colorVar}, ${opacity})`;
+    }
     const fallbackColorVar = getComputedStyle(document.documentElement).getPropertyValue('--axis-color-default-2')?.trim();
     return fallbackColorVar ? `rgba(${fallbackColorVar}, ${opacity})` : `rgba(201, 203, 207, ${opacity})`;
 };
-const cleanerColors = { /* ... same ... */
-    "Abi": "rgba(0, 123, 255, 0.9)", "Izi": "rgba(122, 77, 255, 0.9)",
-    "Tiffany": "rgba(199, 21, 133, 0.9)", "Default": "rgba(108, 117, 125, 0.9)"
+
+const cleanerColors = {
+    "Abi": "rgba(0, 123, 255, 0.9)", 
+    "Izi": "rgba(122, 77, 255, 0.9)",
+    "Tiffany": "rgba(199, 21, 133, 0.9)", 
+    "Default": "rgba(108, 117, 125, 0.9)"
 };
-const parseWeightFromString = (checklistArray) => { /* ... same ... */
-    if (!Array.isArray(checklistArray)) return null;
-    const weightEntry = checklistArray.find(item => typeof item === 'string' && item.toLowerCase().startsWith("weight:"));
-    if (weightEntry) { const weightVal = parseFloat(weightEntry.split(":")[1]); return isNaN(weightVal) ? null : weightVal; } return null;
-};
-const getSafeMax = (arrValues, defaultMax, paddingFactor = 0.1, minPad = 2) => { /* ... same ... */
+
+const getSafeMax = (arrValues, defaultMax, paddingFactor = 0.1, minPad = 5) => {
     const validNumbers = arrValues.flat().filter(val => typeof val === 'number' && !isNaN(val));
     if (validNumbers.length === 0) return defaultMax;
     const maxVal = Math.max(0, ...validNumbers);
     return Math.max(defaultMax, maxVal + Math.max(Math.ceil(maxVal * paddingFactor), minPad));
 };
-const getSafeMinMax = (arrValues, defaultMin, defaultMax, paddingFactor = 0.1, minPad = 2) => { /* ... same ... */
-    const validNumbers = arrValues.flat().filter(val => typeof val === 'number' && !isNaN(val));
-    if (validNumbers.length === 0) return {min: defaultMin, max: defaultMax};
-    const maxVal = Math.max(...validNumbers); const minVal = Math.min(...validNumbers);
-    return { min: Math.min(defaultMin, minVal - Math.max(Math.ceil(Math.abs(minVal) * paddingFactor), minPad)), max: Math.max(defaultMax, maxVal + Math.max(Math.ceil(Math.abs(maxVal) * paddingFactor), minPad)) };
+
+const linearRegression = (data) => {
+    const n = data.length;
+    if (n < 2) return { slope: 0, intercept: data[0]?.[1] || 0 };
+    let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
+    data.forEach(([x, y]) => {
+        sumX += x;
+        sumY += y;
+        sumXY += x * y;
+        sumXX += x * x;
+    });
+    const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
+    const intercept = (sumY - slope * sumX) / n;
+    return { slope, intercept };
 };
+
 
 const ThemedChartView = ({ theme, dateRange: dateRangeProp, containerSize = 'medium' }) => {
     const [chartData, setChartData] = useState(null);
@@ -59,270 +76,262 @@ const ThemedChartView = ({ theme, dateRange: dateRangeProp, containerSize = 'med
     const [modalChartData, setModalChartData] = useState(null);
     const [modalChartOptions, setModalChartOptions] = useState({});
     const [modalChartType, setModalChartType] = useState('line');
+    const [cachedData, setCachedData] = useState({});
 
     const internalDateRange = useMemo(() => {
+        console.log("LOG 1: Is a dateRangeProp being passed?", dateRangeProp);
         if (dateRangeProp) return dateRangeProp;
+        
         const endDate = new Date();
         const startDate = new Date();
-        // --- MODIFIED: Default to 1 month back ---
-        startDate.setMonth(startDate.getMonth() - 1); 
-        startDate.setDate(1); // Start from the 1st day of that month
-        startDate.setHours(0,0,0,0);
-        endDate.setHours(23,59,59,999);
+        startDate.setMonth(startDate.getMonth() - 1);
+        
+        console.log("LOG 2: Calculated default startDate:", startDate.toString());
+
+        startDate.setHours(0, 0, 0, 0);
+        endDate.setHours(23, 59, 59, 999);
         return { startDate, endDate };
     }, [dateRangeProp]);
 
     const chartConfigs = useMemo(() => ({
-        "Default": {
-            fetchData: async (range, currentThemeForData = "Default") => {
-                try { // Add try...catch within fetchData
-                    const endDate = range?.endDate || new Date();
-                    const startDate = range?.startDate || new Date(new Date().setMonth(endDate.getMonth() - 1)); // 1 month
-                    startDate.setHours(0,0,0,0); endDate.setHours(23,59,59,999);
-                    
-                    const dateLabels = []; const productivityScoresData = [];
-                    const epiphanyCountsData = []; const despairCountsData = [];
-                    const themeSpecificTaskCountsData = [];
-                    const weeklyStepsRef = collection(db, "weeklySteps");
-                    const dailyMetricsRef = collection(db, "dailyMetrics"); // For batching reads
+        "Financial": {
+            fetchData: async (range) => {
+                const { startDate, endDate } = range;
+                const budgetLogsRef = collection(db, "budgetLogs");
+                const q = query(budgetLogsRef, where("completedAt", ">=", Timestamp.fromDate(startDate)), where("completedAt", "<=", Timestamp.fromDate(endDate)), orderBy("completedAt", "asc"));
+                const querySnapshot = await getDocs(q);
+                const logs = querySnapshot.docs.map(doc => doc.data());
+                
+                const labels = [];
+                const bettermentData = [];
+                let currentDate = new Date(startDate);
 
-                    const dateStringsToFetch = [];
-                    for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
-                        const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-                        dateLabels.push(new Date(d).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }));
-                        dateStringsToFetch.push(dateStr);
+                logs.forEach(log => {
+                    const logDate = log.completedAt.toDate();
+                    while (currentDate < logDate) {
+                        labels.push(currentDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }));
+                        bettermentData.push(null);
+                        currentDate.setDate(currentDate.getDate() + 1);
                     }
+                    labels.push(logDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }));
+                    bettermentData.push(log.bettermentBalance || null);
+                    currentDate.setDate(currentDate.getDate() + 1);
+                });
 
-                    // Batch read dailyMetrics if possible (Firestore 'in' query limit is 10-30 depending on SDK version)
-                    const dailyMetricsMap = new Map();
-                    if (dateStringsToFetch.length > 0) {
-                        // Chunk dateStringsToFetch if it's too large for 'in' query
-                        const chunkSize = 10; 
-                        for (let i = 0; i < dateStringsToFetch.length; i += chunkSize) {
-                            const chunk = dateStringsToFetch.slice(i, i + chunkSize);
-                            if (chunk.length > 0) {
-                                const metricsQuery = query(dailyMetricsRef, where(documentId(), 'in', chunk));
-                                const metricsSnapshot = await getDocs(metricsQuery);
-                                metricsSnapshot.forEach(snap => dailyMetricsMap.set(snap.id, snap.data()));
-                            }
-                        }
-                    }
-                    
-                    for (const dateStr of dateStringsToFetch) {
-                        const metricData = dailyMetricsMap.get(dateStr);
-                        productivityScoresData.push(metricData?.productivityScore || 0);
-                        epiphanyCountsData.push(metricData?.epiphanyCount || 0);
-                        despairCountsData.push(metricData?.despairCount || 0);
-
-                        if (currentThemeForData !== "Default") {
-                            let themeTasksDone = 0;
-                            try {
-                                const themeTasksQ = query(weeklyStepsRef, where("axisTheme", "==", currentThemeForData), where("currentAssignedDate", "==", dateStr), where("status", "==", "completed"));
-                                themeTasksDone = (await getDocs(themeTasksQ)).size;
-                            } catch(e) { console.warn(`Error fetching '${currentThemeForData}' tasks for ${dateStr}:`, e); }
-                            themeSpecificTaskCountsData.push(themeTasksDone);
-                        }
-                    }
-                    
-                    const datasets = [ /* ... same dataset definitions as before, all using yAxisID: 'y' ... */
-                        { label: 'Productivity Score', data: productivityScoresData, type: 'line', borderColor: 'rgba(54, 162, 235, 0.9)', backgroundColor: 'rgba(54, 162, 235, 0.2)', tension: 0.1, fill: true, yAxisID: 'y', order: 0 },
-                        { label: 'Epiphanies (E)', data: epiphanyCountsData, type: 'line', borderColor: 'rgba(255, 205, 86, 0.9)', backgroundColor: 'rgba(255, 205, 86, 0.2)', tension: 0.3, yAxisID: 'y', borderDash: [5, 5], order: 1, spanGaps: true, fill: false },
-                        { label: 'Despairs (D)', data: despairCountsData, type: 'line', borderColor: 'rgba(104, 67, 188, 0.9)', backgroundColor: 'rgba(104, 67, 188, 0.2)', tension: 0.3, yAxisID: 'y', borderDash: [5, 5], order: 2, spanGaps: true, fill: false }
-                    ];
-                    if (currentThemeForData !== "Default") { // No need for && themeSpecificTaskCountsData.length > 0 here
-                        datasets.push({ label: `${currentThemeForData} Tasks`, data: themeSpecificTaskCountsData, type: 'bar', backgroundColor: getAxisThemeColor(currentThemeForData, '0.6'), borderColor: getAxisThemeColor(currentThemeForData, '1'), yAxisID: 'y', order: 3, borderWidth: 1 });
-                    }
-                    return { labels: dateLabels, datasets, productivityScoresData, epiphanyCountsData, despairCountsData, themeSpecificTaskCountsData };
-                } catch (error) {
-                    console.error(`fetchData for ${currentThemeForData} failed:`, error);
-                    return { labels: [], datasets: [], productivityScoresData: [], epiphanyCountsData: [], despairCountsData: [], themeSpecificTaskCountsData: [] }; // Ensure valid structure on error
+                while (currentDate <= endDate) {
+                    labels.push(currentDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }));
+                    bettermentData.push(null);
+                    currentDate.setDate(currentDate.getDate() + 1);
                 }
+
+                const monthlyContribution = 1000;
+                const dailyContribution = monthlyContribution / 30.44;
+                const projectionData = new Array(labels.length).fill(null);
+                const lastDataIndex = bettermentData.findLastIndex(d => d !== null);
+
+                if (lastDataIndex !== -1) {
+                    projectionData[lastDataIndex] = bettermentData[lastDataIndex];
+                    for (let i = lastDataIndex + 1; i < labels.length; i++) {
+                        projectionData[i] = projectionData[i - 1] + dailyContribution;
+                    }
+                }
+
+                const datasets = [
+                    { label: 'Betterment Balance', data: bettermentData, type: 'line', tension: 0.1, borderColor: 'rgba(0, 123, 255, 0.9)', backgroundColor: 'rgba(0, 123, 255, 0.2)', yAxisID: 'y', spanGaps: true, fill: true },
+                    { label: 'Projected Balance', data: projectionData, type: 'line', tension: 0.1, borderColor: 'rgba(40, 167, 69, 0.9)', backgroundColor: 'rgba(40, 167, 69, 0.1)', yAxisID: 'y', borderDash: [5, 5], spanGaps: true }
+                ];
+                return { labels, datasets };
             },
-            options: (titleSuffix = '', currentThemeForOptions = "Default", fetchedRawData = {}) => ({
-                plugins: { 
-                    title: { display: true, text: `${currentThemeForOptions === "Default" ? "Overall" : currentThemeForOptions} Performance ${titleSuffix}` },
-                    legend: { position: 'top' }, tooltip: { mode: 'index', intersect: false, callbacks: { label: function(context) { let label = context.dataset.label || ''; if (label) { label += ': '; } if (context.parsed.y !== null) { label += context.parsed.y; } return label; } } }
-                },
-                scales: { 
-                    y: { type: 'linear', display: true, position: 'left', beginAtZero: true, title: { display: true, text: 'Value / Count' }, },
-                    x: { title: {display: true, text: 'Date'} }
-                }
+            options: (titleSuffix, _, fetchedRawData) => ({
+                plugins: { title: { display: true, text: `Betterment Balance ${titleSuffix}` }, legend: { position: 'top' }, tooltip: { mode: 'index', intersect: false } },
+                scales: { y: { beginAtZero: false, title: { display: true, text: 'USD ($)' }, suggestedMax: getSafeMax(fetchedRawData.datasets.map(ds => ds.data), 10000) }, x: { title: { display: true, text: 'Date' } } }
             }),
             type: 'line',
         },
-        "Financial": {
-            fetchData: async (range) => {
-                try {
-                    const baseData = await chartConfigs.Default.fetchData(range, "Financial");
-                    if (!baseData || !baseData.labels) return { labels: [], datasets: [] }; // Guard against undefined baseData
-
-                    const endDate = range?.endDate || new Date();
-                    const startDate = range?.startDate || new Date(new Date().setMonth(endDate.getMonth() - 1)); // 1 month
-                    const netWorthData = []; const totalDebtData = []; const bettermentBalanceData = [];
-                    
-                    const budgetLogsByDate = new Map();
-                    if (baseData.labels.length > 0) {
-                        const budgetLogsRef = collection(db, "budgetLogs");
-                        const budgetQ = query(budgetLogsRef, where("completedAt", ">=", Timestamp.fromDate(startDate)), where("completedAt", "<=", Timestamp.fromDate(endDate)), orderBy("completedAt", "asc"));
-                        const budgetSnapshot = await getDocs(budgetQ);
-                        budgetSnapshot.forEach(docSnap => {
-                            const log = docSnap.data();
-                            if (log.completedAt?.toDate) budgetLogsByDate.set(log.completedAt.toDate().toISOString().split('T')[0], log);
-                        });
-                    }
-
-                    for (let i = 0; i < baseData.labels.length; i++) {
-                        const currentDate = new Date(startDate); currentDate.setDate(startDate.getDate() + i);
-                        const dateStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(currentDate.getDate()).padStart(2, '0')}`;
-                        const budgetLog = budgetLogsByDate.get(dateStr);
-                        netWorthData.push(budgetLog?.netWorth || null); totalDebtData.push(budgetLog?.totalDebt || null); bettermentBalanceData.push(budgetLog?.bettermentBalance || null);
-                    }
-
-                    baseData.datasets.unshift(
-                        { label: 'Net Worth', data: netWorthData, type: 'line', tension: 0.1, borderColor: 'rgba(40, 167, 69, 0.9)', backgroundColor: 'rgba(40, 167, 69, 0.2)', yAxisID: 'y', spanGaps: true, order: -3 },
-                        { label: 'Betterment Balance', data: bettermentBalanceData, type: 'line', tension: 0.1, borderColor: 'rgba(0, 123, 255, 0.6)', backgroundColor: 'rgba(0, 123, 255, 0.1)', yAxisID: 'y', spanGaps: true, order: -2, borderDash: [3,3] },
-                        { label: 'Total Debt', data: totalDebtData, type: 'line', tension: 0.1, borderColor: 'rgba(255, 77, 77, 0.9)', backgroundColor: 'rgba(255, 77, 77, 0.2)', yAxisID: 'y', spanGaps: true, order: -1 }
-                    );
-                    baseData.netWorthData = netWorthData; baseData.totalDebtData = totalDebtData; baseData.bettermentBalanceData = bettermentBalanceData; // For suggestedMax
-                    return baseData;
-                } catch (error) { console.error("fetchData for Financial failed:", error); return { labels: [], datasets: [] }; }
-            },
-            options: (titleSuffix, _, fetchedRawData) => chartConfigs.Default.options(titleSuffix, "Financial", fetchedRawData),
-            type: 'line',
-        },
         "Physical": {
-             fetchData: async (range) => {
-                try {
-                    const baseData = await chartConfigs.Default.fetchData(range, "Physical");
-                    if (!baseData || !baseData.labels) return { labels: [], datasets: [] };
-                    const endDate = range?.endDate || new Date();
-                    const startDate = range?.startDate || new Date(new Date().setMonth(endDate.getMonth() - 1)); // 1 month
-                    const weightData = []; const bodyfatData = [];
-                    
-                    // More efficient fetching for readyForWorkLogs (assuming date string IDs)
-                    const dateStringsToFetchRFW = [];
-                    for (let i = 0; i < baseData.labels.length; i++) {
-                        const currentDate = new Date(startDate); currentDate.setDate(startDate.getDate() + i);
-                        dateStringsToFetchRFW.push(`${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(currentDate.getDate()).padStart(2, '0')}`);
+            fetchData: async (range) => {
+                const { startDate, endDate } = range;
+                const logsRef = collection(db, "readyForWorkLogs");
+                const q = query(logsRef, where("completedAt", ">=", Timestamp.fromDate(startDate)), where("completedAt", "<=", Timestamp.fromDate(endDate)), orderBy("completedAt", "asc"));
+                const querySnapshot = await getDocs(q);
+                const logs = querySnapshot.docs.map(doc => doc.data());
+
+                const labels = [];
+                const weightData = [];
+                let currentDate = new Date(startDate);
+
+                logs.forEach(log => {
+                    const logDate = log.completedAt.toDate();
+                    while (currentDate < logDate) {
+                        labels.push(currentDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }));
+                        weightData.push(null);
+                        currentDate.setDate(currentDate.getDate() + 1);
                     }
-                    const rfwLogsMap = new Map();
-                    if (dateStringsToFetchRFW.length > 0) {
-                        const chunkSize = 10;
-                        for (let i = 0; i < dateStringsToFetchRFW.length; i += chunkSize) {
-                            const chunk = dateStringsToFetchRFW.slice(i, i + chunkSize);
-                            if(chunk.length > 0) {
-                                const rfwQuery = query(collection(db, "readyForWorkLogs"), where(documentId(), 'in', chunk));
-                                const rfwSnapshot = await getDocs(rfwQuery);
-                                rfwSnapshot.forEach(snap => rfwLogsMap.set(snap.id, snap.data()));
-                            }
+                    labels.push(logDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }));
+                    weightData.push(log.weight || null);
+                    currentDate.setDate(currentDate.getDate() + 1);
+                });
+
+                while (currentDate <= endDate) {
+                    labels.push(currentDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }));
+                    weightData.push(null);
+                    currentDate.setDate(currentDate.getDate() + 1);
+                }
+
+                const projectionData = new Array(labels.length).fill(null);
+                const validWeightData = weightData.map((y, x) => (y !== null ? [x, y] : null)).filter(Boolean);
+                if (validWeightData.length >= 2) {
+                    const { slope, intercept } = linearRegression(validWeightData);
+                    const lastDataIndex = weightData.findLastIndex(d => d !== null);
+                    if (lastDataIndex !== -1) {
+                        for (let i = lastDataIndex; i < labels.length; i++) {
+                            projectionData[i] = slope * i + intercept;
                         }
                     }
-                    dateStringsToFetchRFW.forEach(dateStr => {
-                        const rfwData = rfwLogsMap.get(dateStr);
-                        bodyfatData.push(rfwData?.bodyfatPercentage || null);
-                        weightData.push(rfwData ? parseWeightFromString(rfwData.checklistCompleted) : null);
-                    });
-
-                    baseData.datasets.push(
-                        { label: 'Weight', data: weightData, type: 'line', tension: 0.1, borderColor: getAxisThemeColor("Physical", '0.8'), backgroundColor: getAxisThemeColor("Physical", '0.1'), yAxisID: 'y', spanGaps: true, order: 4 },
-                        { label: 'Body Fat %', data: bodyfatData, type: 'line', tension: 0.1, borderColor: 'rgba(255, 159, 64, 0.7)', backgroundColor: 'rgba(255, 159, 64, 0.1)', yAxisID: 'y', spanGaps: true, order: 5, borderDash: [2,2] }
-                    );
-                    baseData.weightData = weightData; baseData.bodyfatData = bodyfatData;
-                    return baseData;
-                } catch (error) { console.error("fetchData for Physical failed:", error); return { labels: [], datasets: [] }; }
+                }
+                const datasets = [
+                    { label: 'Weight (lbs)', data: weightData, type: 'line', tension: 0.2, borderColor: getAxisThemeColor("Physical", '0.9'), backgroundColor: getAxisThemeColor("Physical", '0.2'), yAxisID: 'y', spanGaps: true, fill: false, pointRadius: 2 },
+                    { label: 'Trend Line', data: projectionData, type: 'line', borderColor: 'rgba(255, 99, 132, 0.8)', yAxisID: 'y', borderDash: [5, 5], spanGaps: true, pointRadius: 0 }
+                ];
+                return { labels, datasets };
             },
-            options: (titleSuffix, _, fetchedRawData) => chartConfigs.Default.options(titleSuffix, "Physical", fetchedRawData),
+            options: (titleSuffix, _, fetchedRawData) => ({
+                plugins: { title: { display: true, text: `Weight Trend ${titleSuffix}` }, legend: { position: 'top' }, tooltip: { mode: 'index', intersect: false } },
+                scales: { y: { min: 160, max: 180, title: { display: true, text: 'Weight (lbs)' } }, x: { title: { display: true, text: 'Date' } } }
+            }),
             type: 'line',
         },
-        "Gear": { fetchData: (range) => chartConfigs.Default.fetchData(range, "Gear"), options: (titleSuffix, _, fetchedRawData) => chartConfigs.Default.options(titleSuffix, "Gear", fetchedRawData), type: 'line', },
-        "Environment": { /* ... Distinct Environment logic ... */
+        "Environment": {
             fetchData: async (range) => {
-                try {
-                    const endDate = range?.endDate || new Date(); const startDate = range?.startDate || new Date(new Date().setMonth(endDate.getMonth() - 1)); // 1 month
-                    startDate.setHours(0, 0, 0, 0); endDate.setHours(23, 59, 59, 999);
-                    const logsRef = collection(db, "familyCleanLogs");
-                    const q = query(logsRef, where("completedAt", ">=", Timestamp.fromDate(startDate)), where("completedAt", "<=", Timestamp.fromDate(endDate)), orderBy("completedAt", "asc"));
-                    const querySnapshot = await getDocs(q); const logs = []; querySnapshot.forEach(docSnap => logs.push({ id: docSnap.id, ...docSnap.data() }));
-                    if (logs.length === 0) return { labels: [], datasets: [], avgPostRatings:[], cleanerImprovementData:{} };
-                    const logsByDate = {}; logs.forEach(log => { if (log.completedAt?.toDate) { const dateStr = log.completedAt.toDate().toISOString().split('T')[0]; if (!logsByDate[dateStr]) logsByDate[dateStr] = []; logsByDate[dateStr].push(log); }});
-                    const dateLabels = Object.keys(logsByDate).sort();
-                    const avgPostRatings = dateLabels.map(dateStr => { const dayLogs = logsByDate[dateStr]; const sum = dayLogs.reduce((acc, curr) => acc + (curr.postCleaningRating || 0), 0); return dayLogs.length > 0 ? parseFloat((sum / dayLogs.length).toFixed(1)) : 0; });
-                    const cleanerNames = ["Abi", "Izi", "Tiffany"]; const cleanerImprovementData = {};
-                    cleanerNames.forEach(name => { cleanerImprovementData[name] = dateLabels.map(dateStr => { const dayLogsForCleaner = logsByDate[dateStr].filter(log => log.cleanerName === name); return dayLogsForCleaner.reduce((acc, curr) => acc + ((curr.postCleaningRating || 0) - (curr.preCleaningRating || 0)), 0); }); });
-                    const datasets = [ { label: 'Avg. Room Rating', data: avgPostRatings, borderColor: 'rgba(0,0,0,0.9)', backgroundColor: 'rgba(0,0,0,0.1)', type: 'line', tension: 0.1, yAxisID: 'y', order: 0 }];
-                    cleanerNames.forEach(name => { datasets.push({ label: `${name}'s Improvement`, data: cleanerImprovementData[name], borderColor: cleanerColors[name] || cleanerColors["Default"], backgroundColor: (cleanerColors[name] || cleanerColors["Default"]).replace('0.9', '0.2'), type: 'line', tension: 0.3, borderDash: [5, 5], yAxisID: 'y', order: cleanerNames.indexOf(name) + 1 }); });
-                    return { labels: dateLabels.map(d => new Date(d + 'T00:00:00Z').toLocaleDateString(undefined, {month:'short', day:'numeric'})), datasets, avgPostRatings, cleanerImprovementData };
-                } catch (error) { console.error("fetchData for Environment failed:", error); return { labels: [], datasets: [] }; }
+                const { startDate, endDate } = range;
+                const logsRef = collection(db, "familyCleanLogs");
+                const q = query(logsRef, where("completedAt", ">=", Timestamp.fromDate(startDate)), where("completedAt", "<=", Timestamp.fromDate(endDate)), orderBy("completedAt", "asc"));
+                const querySnapshot = await getDocs(q);
+                const logs = querySnapshot.docs.map(doc => ({ ...doc.data(), completedAt: doc.data().completedAt.toDate() }));
+
+                if (logs.length === 0) return { labels: [], datasets: [], avgPostRatings: [], cleanerImprovementData: {} };
+
+                const cleanerNames = ["Abi", "Izi", "Tiffany"];
+                const dataByDate = new Map();
+
+                for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+                    const dateStr = d.toISOString().split('T')[0];
+                    dataByDate.set(dateStr, {
+                        label: d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
+                        logs: []
+                    });
+                }
+                
+                logs.forEach(log => {
+                    const dateStr = log.completedAt.toISOString().split('T')[0];
+                    if (dataByDate.has(dateStr)) {
+                        dataByDate.get(dateStr).logs.push(log);
+                    }
+                });
+                
+                const labels = [];
+                const avgPostRatings = [];
+                const cleanerImprovementData = Object.fromEntries(cleanerNames.map(name => [name, []]));
+
+                dataByDate.forEach(dayData => {
+                    labels.push(dayData.label);
+                    if (dayData.logs.length === 0) {
+                        avgPostRatings.push(null);
+                        cleanerNames.forEach(name => cleanerImprovementData[name].push(null));
+                    } else {
+                        const sum = dayData.logs.reduce((acc, curr) => acc + (curr.postCleaningRating || 0), 0);
+                        avgPostRatings.push(parseFloat((sum / dayData.logs.length).toFixed(1)));
+
+                        cleanerNames.forEach(name => {
+                            const cleanerLogs = dayData.logs.filter(log => log.cleanerName === name);
+                            const improvement = cleanerLogs.reduce((acc, curr) => acc + ((curr.postCleaningRating || 0) - (curr.preCleaningRating || 0)), 0);
+                            cleanerImprovementData[name].push(improvement);
+                        });
+                    }
+                });
+
+                const datasets = [{ label: 'Avg. Room Rating', data: avgPostRatings, borderColor: 'rgba(0,0,0,0.9)', backgroundColor: 'rgba(0,0,0,0.1)', type: 'line', tension: 0.1, yAxisID: 'y', order: 0, spanGaps: true }];
+                cleanerNames.forEach(name => {
+                    datasets.push({ label: `${name}'s Improvement`, data: cleanerImprovementData[name], borderColor: cleanerColors[name] || cleanerColors["Default"], backgroundColor: (cleanerColors[name] || cleanerColors["Default"]).replace('0.9', '0.2'), type: 'line', tension: 0.3, borderDash: [5, 5], yAxisID: 'y', order: cleanerNames.indexOf(name) + 1, spanGaps: true });
+                });
+                
+                return { labels, datasets, avgPostRatings, cleanerImprovementData };
             },
             options: (titleSuffix = '', _, fetchedRawData) => ({
                 plugins: { title: { display: true, text: `Room Cleanliness & Cleaner Impact ${titleSuffix}` }, legend: { position: 'top' }, tooltip: { mode: 'index', intersect: false }, },
-                scales: { y: { type: 'linear', display: true, position: 'left', beginAtZero: true, title: {display:true, text:'Rating / Improvement Score'}, suggestedMax: getSafeMax([fetchedRawData?.avgPostRatings || [], ...Object.values(fetchedRawData?.cleanerImprovementData || {})], 10)}, x:{title:{display:true, text:'Date'}}}
-            }), type: 'line',
-        },
-        "ON TRACK N+1": { fetchData: (range) => chartConfigs.Default.fetchData(range, "ON TRACK N+1"), options: (titleSuffix, _, fetchedRawData) => chartConfigs.Default.options(titleSuffix, "ON TRACK N+1", fetchedRawData), type: 'line',},
-        "Misdirect": { // Added Misdirect
-            fetchData: (range) => chartConfigs.Default.fetchData(range, "Misdirect"),
-            options: (titleSuffix, _, fetchedRawData) => chartConfigs.Default.options(titleSuffix, "Misdirect", fetchedRawData),
+                scales: { y: { type: 'linear', display: true, position: 'left', beginAtZero: true, title: { display: true, text: 'Rating / Improvement Score' }, suggestedMax: getSafeMax([fetchedRawData?.avgPostRatings || [], ...Object.values(fetchedRawData?.cleanerImprovementData || {})], 10) }, x: { title: { display: true, text: 'Date' } } }
+            }),
             type: 'line',
         },
-        "Rest and preparation": { fetchData: (range) => chartConfigs.Default.fetchData(range, "Rest and preparation"), options: (titleSuffix, _, fetchedRawData) => chartConfigs.Default.options(titleSuffix, "Rest and preparation", fetchedRawData), type: 'line',}
-    }), [theme]); // Only theme is a direct dependency for the definition block
+        "Gear": { type: 'placeholder' },
+        "ON TRACK N+1": { type: 'placeholder' },
+        "Misdirect": { type: 'placeholder' },
+        "Rest and preparation": { type: 'placeholder' }
+    }), [theme]);
 
     useEffect(() => {
         const loadChart = async () => {
-            setIsLoading(true); setError(null);
-            const config = chartConfigs[theme] || chartConfigs["Default"];
-            if (!config || !config.fetchData) { setError(`No chart configuration for theme: ${theme}`); setIsLoading(false); return; }
+            console.log("LOG 3: useEffect is using startDate:", internalDateRange.startDate.toString());
+            setIsLoading(true); 
+            setError(null);
+
+            const cacheKey = `${theme}-${internalDateRange.startDate.toISOString()}-${internalDateRange.endDate.toISOString()}`;
+            if (cachedData[cacheKey]) {
+                const { chartData, chartOptions, chartType } = cachedData[cacheKey];
+                setChartData(chartData);
+                setChartOptions(chartOptions);
+                setChartType(chartType);
+                setIsLoading(false);
+                return;
+            }
+            
+            const config = chartConfigs[theme] || { type: 'placeholder' };
+            if (config.type === 'placeholder' || !config.fetchData) {
+                setChartData(null);
+                setIsLoading(false);
+                return;
+            }
+
             try {
-                const fetchedData = await config.fetchData(internalDateRange, theme);
-                
-                // Check if fetchedData or fetchedData.datasets is undefined before proceeding
+                const fetchedData = await config.fetchData(internalDateRange);
                 if (!fetchedData || !fetchedData.datasets) {
-                    console.error(`fetchData for theme ${theme} returned undefined or no datasets object.`);
-                    setError(`Data structure error for ${theme} chart.`);
-                    setChartData({ labels: [], datasets: [] }); // Set to empty valid structure
-                    setIsLoading(false);
-                    return;
+                    throw new Error("Data fetching returned invalid structure.");
                 }
-
                 const baseOptions = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: (fetchedData.datasets?.length || 0) > 1, position: 'top' }, datalabels: { display: false } } };
-                let specificOptions = config.options ? config.options('', theme, fetchedData) : {}; // Pass fetchedData
+                let specificOptions = config.options ? config.options('', theme, fetchedData) : {};
                 
-                if (specificOptions.scales?.y && fetchedData.datasets) {
-                    const allYDataForMainAxis = fetchedData.datasets.reduce((acc, ds) => {
-                        if (ds.yAxisID === 'y' || !ds.yAxisID) {
-                           return acc.concat(ds.data.filter(v => typeof v === 'number' && !isNaN(v)))
-                        }
-                        return acc;
-                    }, []);
+                const finalChartData = { ...fetchedData };
+                const finalChartOptions = { ...baseOptions, ...specificOptions, plugins: { ...baseOptions.plugins, ...specificOptions.plugins } };
+                const finalChartType = config.type || 'line';
 
-                    if (allYDataForMainAxis.length > 0) {
-                       specificOptions.scales.y.suggestedMax = getSafeMax(allYDataForMainAxis, 10);
-                       const minVal = Math.min(...allYDataForMainAxis);
-                       if (minVal < 0) { // Only set suggestedMin if there are negative values
-                           specificOptions.scales.y.suggestedMin = getSafeMinMax(allYDataForMainAxis, -10, 0).min;
-                           specificOptions.scales.y.beginAtZero = false; 
-                       } else {
-                           specificOptions.scales.y.beginAtZero = true;
-                       }
-                    } else {
-                        specificOptions.scales.y.suggestedMax = 10;
-                        specificOptions.scales.y.beginAtZero = true;
+                setChartData(finalChartData);
+                setChartOptions(finalChartOptions);
+                setChartType(finalChartType);
+
+                setCachedData(prevCache => ({
+                    ...prevCache,
+                    [cacheKey]: {
+                        chartData: finalChartData,
+                        chartOptions: finalChartOptions,
+                        chartType: finalChartType
                     }
-                }
+                }));
 
-                setChartData(fetchedData);
-                setChartOptions({ ...baseOptions, ...specificOptions, plugins: {...baseOptions.plugins, ...specificOptions.plugins}});
-                setChartType(config.type || 'line');
-            } catch (e) { console.error(`Error in loadChart for theme ${theme}:`, e); setError(`Failed to load data for ${theme} chart (exception).`); }
-            finally { setIsLoading(false); }
+            } catch (e) {
+                console.error(`Error in loadChart for theme ${theme}:`, e);
+                setError(`Failed to load data for ${theme} chart.`);
+            } finally {
+                setIsLoading(false);
+            }
         };
         if (theme) loadChart();
-    }, [theme, internalDateRange, chartConfigs]);
+    }, [theme, internalDateRange, chartConfigs, cachedData]);
 
-    const handleChartClick = () => { /* ... same ... */
+    const handleChartClick = () => {
         if (!chartData) return;
-        const config = chartConfigs[theme] || chartConfigs["Default"];
+        const config = chartConfigs[theme] || { type: 'placeholder' };
+        if (config.type === 'placeholder') return;
+
         const modalSpecificOptions = config.options ? config.options('(Expanded View)', theme, chartData) : {};
         setModalChartData(chartData);
         setModalChartOptions({ ...chartOptions, ...modalSpecificOptions, plugins: { ...chartOptions.plugins, ...modalSpecificOptions.plugins, datalabels: { display: true, anchor: 'end', align: 'end', color: '#333' } }, });
@@ -330,22 +339,33 @@ const ThemedChartView = ({ theme, dateRange: dateRangeProp, containerSize = 'med
         setIsModalOpen(true);
     };
 
-    const renderChart = (data, options, type) => { /* ... same ... */
-        if (!data || !data.datasets || data.datasets.length === 0 || data.datasets.every(ds => !ds.data || ds.data.length === 0 || ds.data.every(pt => pt === null))) {
-            return <p className={styles.noDataMessage}>No data available for this {theme} chart for the selected period.</p>;
+    const renderChart = (data, options, type) => {
+        const config = chartConfigs[theme] || { type: 'placeholder' };
+
+        if (config.type === 'placeholder') {
+            return <div className={styles.placeholder}>
+                <h2>{theme} Chart</h2>
+                <p>Coming Soon!</p>
+            </div>;
         }
-        const ChartComponent = { bar: Bar, line: Line, doughnut: Doughnut, pie: Pie }[type] || Bar;
+        if (!data || !data.datasets || data.datasets.length === 0 || data.datasets.every(ds => !ds.data || ds.data.length === 0 || ds.data.every(pt => pt === null))) {
+            return <p className={styles.noDataMessage}>No data available for the {theme} chart in this period.</p>;
+        }
+
+        const ChartComponentMap = { bar: Bar, line: Line, doughnut: Doughnut, pie: Pie };
+        const ChartComponent = ChartComponentMap[type] || Line;
+
         return <ChartComponent options={options} data={data} />;
     };
-    
+
     const containerClass = `${styles.chartContainer} ${styles[containerSize]}`;
     if (isLoading) return <div className={containerClass}><p>Loading {theme} chart...</p></div>;
-    if (error) return <div className={containerClass}><p style={{color: 'red'}}>{error}</p></div>;
+    if (error) return <div className={containerClass}><p style={{ color: 'red' }}>{error}</p></div>;
 
     return (
         <>
             <div className={containerClass} onClick={handleChartClick} title={`Click to expand ${theme} chart`}>
-                {chartData && renderChart(chartData, chartOptions, chartType)}
+                {renderChart(chartData, chartOptions, chartType)}
             </div>
             {isModalOpen && modalChartData && (
                 <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={`${theme.replace(/([A-Z0-9+]+)/g, ' $1').trim()} Chart - Expanded View`}>

@@ -3,7 +3,7 @@
 
 .weeklyViewContainer {
   padding: var(--space-lg);
-  max-width: 1200px; /* Increased max-width for horizontal layout */
+  max-width: 1200px;
   margin: 0 auto;
   color: var(--text-primary);
 }
@@ -26,25 +26,25 @@
 /* --- Container for top buttons --- */
 .topButtonContainer {
   display: flex;
-  justify-content: center; /* Center buttons */
-  gap: var(--space-md, 1rem); /* Space between buttons */
-  margin-top: var(--space-lg); /* Add space above buttons */
-  margin-bottom: var(--space-lg, 1.5rem); /* Space below buttons */
-  flex-wrap: wrap; /* Allow wrapping on smaller screens */
+  justify-content: center;
+  gap: var(--space-md, 1rem);
+  margin-top: var(--space-lg);
+  margin-bottom: var(--space-lg, 1.5rem);
+  flex-wrap: wrap;
 }
 
 /* --- Generic Action Button Style --- */
 .actionButton {
-  padding: var(--space-sm, 0.5rem) var(--space-lg, 1.5rem); /* Generous padding */
+  padding: var(--space-sm, 0.5rem) var(--space-lg, 1.5rem);
   font-size: 1rem;
   font-weight: 600;
   border-radius: 6px;
   cursor: pointer;
   transition: background-color 0.2s, box-shadow 0.2s, color 0.2s, border-color 0.2s;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  border: 1px solid var(--button-primary-border, #355E58); /* Default to primary */
+  border: 1px solid var(--button-primary-border, #355E58);
   background-color: var(--button-primary-bg, #72B0AB);
-  color: var(--button-primary-text, #fff);
+  color: var(--button-primary-text, #faf8f8);
 }
 .actionButton:hover:not(:disabled) {
   background-color: var(--button-primary-hover-bg, #355E58);
@@ -57,46 +57,60 @@
 
 /* --- Specific Style for Budget Button --- */
 .budgetButton {
-  /* Use Financial Axis Colors */
-  background-color: var(--axis-color-financial-3, #927aaa); /* Darkest Financial Purple */
-  border-color: var(--axis-color-financial-2, #b8a7cd); /* Medium Financial Purple border */
-  color: var(--color-white, #fff); /* White text for contrast */
+  background-color: var(--axis-color-financial-3, #927aaa);
+  border-color: var(--axis-color-financial-2, #b8a7cd);
+  color: var(--color-white, #fff);
 }
 .budgetButton:hover:not(:disabled) {
-  background-color: var(--axis-color-financial-2, #b8a7cd); /* Medium Financial Purple on hover */
-  border-color: var(--axis-color-financial-3, #927aaa); /* Dark Financial Purple border on hover */
-  color: var(--text-primary, #053229); /* Peacock text on hover */
+  background-color: var(--axis-color-financial-2, #b8a7cd);
+  border-color: var(--axis-color-financial-3, #927aaa);
+  color: var(--text-primary, #f1f4f3);
 }
 
-/* --- NEW: Styles for Horizontal Weekday Visualization --- */
+.prepareButton {
+    /* Uses the main color for the 'Rest and preparation' axis */
+    background-color: var(--axis-color-rest-and-preparation-2, #b7dcfc);
+    border-color: var(--axis-color-rest-and-preparation-3, #80a0be);
+    color: #304254; /* Corrected syntax: No 'var()' around the hex code */
+    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
+/* Style for when you hover over the button */
+.prepareButton:hover:not(:disabled) {
+    /* Uses the darker shade for the 'Rest and preparation' axis */
+    background-color: var(--axis-color-rest-and-preparation-3, #80a0be); 
+    border-color: var(--axis-color-rest-and-preparation-2, #b7dcfc);
+    color: #ffffff; /* Corrected syntax */}
+
+/* --- Horizontal Weekday Visualization --- */
 .weekDaysContainerHorizontal {
   display: flex;
-  justify-content: space-between; /* Distribute space between cards */
-  gap: var(--space-sm, 0.5rem); /* Gap between day cards */
-  margin-bottom: var(--space-xl, 2rem); /* Space below the visualization */
-  overflow-x: auto; /* Allow horizontal scrolling on small screens if needed */
-  padding-bottom: var(--space-sm); /* Add padding for scrollbar */
-  border: 1px solid var(--border-light); /* Optional border around container */
-  padding: var(--space-sm); /* Optional padding inside container */
-  border-radius: 6px; /* Optional rounded corners */
-  background-color: var(--bg-secondary, #f8f9fa); /* Optional light background */
+  justify-content: space-between;
+  gap: var(--space-sm, 0.5rem);
+  margin-bottom: var(--space-xl, 2rem);
+  overflow-x: auto;
+  padding-bottom: var(--space-sm);
+  border: 1px solid var(--border-light);
+  padding: var(--space-sm);
+  border-radius: 6px;
+  background-color: var(--bg-secondary, #f8f9fa);
 }
 
 .dayCardHorizontal {
-  flex: 1 1 calc(100% / 7 - var(--space-sm) * 6 / 7); /* Calculate basis for 7 cards with gaps */
-  min-width: 120px; /* Minimum width for readability */
-  border: 2px solid; /* Border color set by inline style */
+  flex: 1 1 calc(100% / 7 - var(--space-sm) * 6 / 7);
+  min-width: 120px;
+  border: 2px solid;
   border-radius: 8px;
   padding: var(--space-sm);
-  background-color: var(--bg-panel); /* Base background, overridden by inline style */
+  background-color: var(--bg-panel);
   display: flex;
   flex-direction: column;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
   box-sizing: border-box;
-  transition: transform 0.2s ease-in-out; /* Add slight hover effect */
+  transition: transform 0.2s ease-in-out;
 }
 .dayCardHorizontal:hover {
-  transform: translateY(-2px); /* Lift card slightly on hover */
+  transform: translateY(-2px);
 }
 
 .dayName {
@@ -104,8 +118,8 @@
   font-weight: bold;
   text-align: center;
   margin: 0 0 var(--space-xs) 0;
-  color: var(--text-primary); /* Use primary text color */
-  border-bottom: 1px solid rgba(0,0,0,0.1); /* Separator line */
+  color: var(--text-primary);
+  border-bottom: 1px solid rgba(0,0,0,0.1);
   padding-bottom: var(--space-xs);
 }
 
@@ -114,36 +128,34 @@
   font-style: italic;
   text-align: center;
   margin: 0 0 var(--space-sm) 0;
-  color: var(--text-secondary); /* Use secondary text color */
+  color: var(--text-secondary);
   opacity: 0.8;
 }
 
 .dayContent {
-  flex-grow: 1; /* Allow content to fill space */
+  flex-grow: 1;
   display: flex;
   flex-direction: column;
-  gap: var(--space-md); /* Space between sections (Goal, Steps, Routines) */
-  overflow-y: auto; /* Allow content scrolling if card height is fixed */
-  max-height: 200px; /* Example max height, adjust as needed */
+  gap: var(--space-md);
+  overflow-y: auto;
+  max-height: 200px;
 }
 
 .daySection {
-  /* Container for Goal, Steps, or Routines within a day card */
-   margin-bottom: var(--space-sm); /* Add space below each section */
+  margin-bottom: var(--space-sm);
 }
 .daySection:last-child {
-  margin-bottom: 0; /* Remove margin from last section */
+  margin-bottom: 0;
 }
-
 
 .daySectionTitle {
   font-size: 0.9rem;
   font-weight: 600;
-  display: block; /* Make title block level */
+  display: block;
   margin-bottom: var(--space-xxs);
   color: var(--text-secondary);
-  text-transform: uppercase; /* Optional: Uppercase title */
-  letter-spacing: 0.5px; /* Optional: Slight letter spacing */
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .dayGoalText {
@@ -151,7 +163,7 @@
   margin: 0;
   line-height: 1.3;
   color: var(--text-primary);
-  font-style: italic; /* Italicize goal text */
+  font-style: italic;
 }
 
 .dayTaskList {
@@ -165,67 +177,55 @@
 
 .dayTaskList li {
   margin-bottom: var(--space-xxs);
-  padding-left: 0; /* Remove padding if no bullet */
+  padding-left: 0;
   position: relative;
 }
-/* REMOVED bullet point style */
-/* .dayTaskList li::before {
-  content: '•';
-  position: absolute;
-  left: 0;
-  color: var(--text-secondary);
-  font-size: 0.9em;
-  line-height: inherit;
-} */
 
-/* --- End Horizontal Viz Styles --- */
-
-
-/* --- Existing Axis Grid (Lower Section) --- */
+/* --- Main Axis Grid --- */
 .axisGrid {
   display: flex;
   flex-direction: column;
-  gap: 2mm; /* Specific spacing */
+  gap: 2mm;
   width: 100%;
-  margin-top: var(--space-xl); /* Add space above the lower grid */
+  margin-top: var(--space-xl);
   margin-bottom: var(--space-lg, 1.5rem);
 }
 
 .axisCard {
-  background-color: var(--bg-panel, #BCDDDC); /* Arctic */
-  border: 1px solid var(--border-primary, #355E58); /* Spruce */
+  background-color: var(--bg-panel, #BCDDDC);
+  border: 1px solid var(--border-primary, #355E58);
   border-radius: 8px;
-  padding: var(--space-sm) var(--space-lg); /* Adjusted padding */
+  padding: var(--space-sm) var(--space-lg);
   box-shadow: 0 2px 4px var(--shadow-color);
   box-sizing: border-box;
-  height: 1in; /* Fixed height (approx 2.54cm) */
+  height: 1in;
   display: flex;
-  align-items: center; /* Vertically center content */
-  overflow: ellipsis; /* Hide overflow */
+  align-items: center;
+  overflow: hidden; 
+  position: relative;
+  z-index: 1;
 }
 
-/* Flex container inside the card */
 .cardContent {
   display: flex;
   align-items: center;
   gap: var(--space-lg);
   width: 100%;
-  overflow: ellipsis; /* Prevent internal content from overflowing card */
+  overflow: hidden;
 }
 
-/* Left side of the card */
 .cardLeft {
-  flex: 0 0 20%; /* Give title a fixed percentage */
+  flex: 0 0 20%;
   text-align: left;
   padding-right: var(--space-md);
-  overflow: hidden; /* Hide overflowing title */
+  overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
 
-.axisTitle { /* Renamed from axisTitleLg for clarity */
-  font-size: 1.2em; /* Adjusted size */
-  color: var(--text-primary); /* Peacock */
+.axisTitle {
+  font-size: 1.2em;
+  color: var(--text-primary);
   margin: 0;
   line-height: 1.1;
   font-weight: bold;
@@ -234,32 +234,36 @@
   text-overflow: ellipsis;
 }
 
-/* Right side of the card */
 .cardRight {
-  flex: 1 1 auto; /* Allow right side to take remaining space */
-  text-align: left; /* Align content left */
+  flex: 1 1 auto;
+  text-align: left;
   display: flex;
   flex-direction: column;
-  gap: var(--space-xs); /* Tighten gap */
-  overflow: hidden; /* Hide overflow */
+  gap: var(--space-xs);
+  overflow: hidden;
 }
+
+/* --- Tooltip Fix --- */
+.axisCard:hover {
+  z-index: 10;
+}
+.axisCard:hover .cardLeft {
+  overflow: visible;
+}
+
 
 /* Styling for Goal, Milestone, Steps rows */
 .goalDisplay,
 .milestoneDisplay,
 .stepsDisplay {
   display: flex;
-  align-items: center; /* Align label/checkbox and text */
+  align-items: center;
   gap: var(--space-sm);
   width: 100%;
-  overflow: hidden; /* Prevent wrapping/overflow */
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  font-size: 0.9em; /* Slightly smaller text */
 }
 
 .goalCheckbox {
-  flex-shrink: 0; /* Prevent checkbox shrinking */
+  flex-shrink: 0;
   margin: 0;
   cursor: pointer;
   accent-color: var(--text-secondary);
@@ -269,13 +273,16 @@
   opacity: 0.6;
 }
 
+/* --- ELLIPSIS FIX IS HERE --- */
 .goalText {
-  margin: 0;
-  flex-grow: 1; /* Allow text to take space */
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  flex-grow: 1;
   color: var(--text-primary);
+  margin: 0;
+  /* Required for ellipsis to work in a flex container */
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .completedGoal {
   text-decoration: line-through;
@@ -283,21 +290,24 @@
   font-style: italic;
 }
 
-.label { /* Label for Milestone/Steps */
+.label {
   font-weight: bold;
   color: var(--text-secondary);
   flex-shrink: 0;
 }
 
-.value { /* Value text for Milestone/Steps */
+/* --- ELLIPSIS FIX IS HERE --- */
+.value { /* Used by Milestone and Steps */
   flex-grow: 1;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
   color: var(--text-primary);
+  /* Required for ellipsis to work in a flex container */
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.milestoneDueDate { /* Specific style for due date part */
+.milestoneDueDate {
   font-style: italic;
   font-size: 0.9em;
   color: var(--text-muted);
@@ -311,73 +321,68 @@
 }
 
 
-/* Responsive adjustments */
-@media (max-width: 900px) { /* Adjust breakpoint for horizontal viz */
+/* --- Responsive Adjustments --- */
+@media (max-width: 900px) {
   .weekDaysContainerHorizontal {
-      flex-wrap: wrap; /* Allow wrapping */
-      justify-content: flex-start; /* Align wrapped items to start */
+    flex-wrap: wrap;
+    justify-content: flex-start;
   }
   .dayCardHorizontal {
-      /* Allow 3 cards per row on medium screens */
-      flex-basis: calc(100% / 3 - var(--space-sm) * 2 / 3);
-      min-width: 150px; /* Adjust min-width */
-      margin-bottom: var(--space-sm); /* Add bottom margin when wrapped */
+    flex-basis: calc(100% / 3 - var(--space-sm) * 2 / 3);
+    min-width: 150px;
+    margin-bottom: var(--space-sm);
   }
 }
 
 @media (max-width: 600px) {
-   /* Stack horizontal day cards vertically */
   .weekDaysContainerHorizontal {
-      flex-direction: column;
-      flex-wrap: nowrap; /* Prevent wrapping when stacked */
-      overflow-x: visible; /* Disable horizontal scroll when stacked */
+    flex-direction: column;
+    flex-wrap: nowrap;
+    overflow-x: visible;
   }
   .dayCardHorizontal {
-      flex-basis: auto; /* Reset basis */
-      width: 100%; /* Take full width */
-      min-width: unset; /* Reset min-width */
-      margin-bottom: var(--space-md); /* Increase margin when stacked */
+    flex-basis: auto;
+    width: 100%;
+    min-width: unset;
+    margin-bottom: var(--space-md);
   }
 
-  /* Stack axis cards vertically */
   .axisCard {
-      height: auto; /* Allow height to adjust on mobile */
-      min-height: 1in; /* Set a minimum */
-      padding: var(--space-md); /* Adjust padding */
-      align-items: flex-start; /* Align top on mobile */
-      margin-bottom: var(--space-lg, 1.5rem);
+    height: auto;
+    min-height: 1in;
+    padding: var(--space-md);
+    align-items: flex-start;
+    margin-bottom: var(--space-lg, 1.5rem);
+    overflow: visible;
   }
-  .cardContent {
-      flex-direction: column; /* Stack title and goals */
-      align-items: flex-start; /* Align left */
-      text-align: left;
-      gap: var(--space-sm); /* Reduce gap */
+  .cardContent, .cardRight {
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    gap: var(--space-sm);
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    width: 100%;
   }
-  .cardRight {
-      flex-basis: auto; /* Reset basis */
-      align-items: flex-start; /* Align left */
-      text-align: left;
-      margin-top: var(--space-sm);
-      white-space: normal; /* Allow wrapping on mobile */
-      overflow: visible;
-      text-overflow: clip;
-      width: 100%; /* Take full width */
+  .cardLeft {
+    overflow: visible;
   }
   .goalDisplay, .milestoneDisplay, .stepsDisplay {
-      white-space: normal;
-      overflow: visible;
-      text-overflow: clip;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
   }
   .goalText, .value {
-     white-space: normal;
-     overflow: visible;
-     text-overflow: clip;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
   }
   .topButtonContainer {
-      flex-direction: column; /* Stack top buttons */
-      align-items: stretch;
+    flex-direction: column;
+    align-items: stretch;
   }
   .actionButton {
-      width: 100%;
+    width: 100%;
   }
 }

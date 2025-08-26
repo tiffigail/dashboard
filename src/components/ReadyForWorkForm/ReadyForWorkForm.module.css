@@ -68,7 +68,7 @@
 .recitationDisplay {
     grid-column: span 2; /* Make it span both columns below the checklist item */
     padding: 5px 10px 5px 30px; /* Indent similar to label */
-    margin-top: -5px; /* Adjust spacing */
+    margin-top: 1.5rem; /* Adjust spacing */
     margin-bottom: 5px;
 }
 

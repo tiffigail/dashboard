@@ -1,0 +1,11 @@
+[
+  {
+    "origin": ["http://localhost:3000","https://dashboard-bb237.web.app/","https://firebasestorage.googleapis.com"],
+    "method": ["GET", "POST", "PUT", "DELETE", "HEAD"],
+    "responseHeader": [
+      "Content-Type",
+      "X-Goog-Resumable"
+    ],
+    "maxAgeSeconds": 3600
+  }
+]

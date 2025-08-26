@@ -76,7 +76,7 @@
   font-size: 1.2rem;
   font-weight: 600;
   color: var(--text-secondary, #355E58);
-  margin-top: 0;
+  margin-top: .5rem;
   margin-bottom: var(--space-md, 1rem);
   border-bottom: 1px solid var(--border-secondary, #72B0AB);
   padding-bottom: var(--space-sm, 0.5rem);
@@ -245,11 +245,6 @@
 .saveJournalButton:hover:not(:disabled) {
   background-color: var(--button-primary-hover-bg, #355E58);
 }
-.saveJournalButton:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
 
 /* Center Panel Specifics */
 .centerPanel { grid-area: center; }
@@ -414,7 +409,7 @@
   box-shadow: none;
 }
 .taskItem:last-child {
-  margin-bottom: 0;
+  margin-bottom: .25rem;
 }
 
 /* ::before pseudo-element for stripes */
@@ -655,16 +650,21 @@
     padding: var(--space-sm, 0.5rem); /* Was var(--space-md, 1rem) */
   }
   
-  .leftPanel,
-  .centerPanel,
-  .rightPanel {
+  .centerPanel {
     /* These properties might already be in your panel's mobile rule */
     max-width: none;
     width: 100%;
-  
     /* ADDED/MODIFIED: Reduce internal padding for each panel */
     padding: var(--space-sm, 0.5rem); /* Base style was var(--space-md, 1rem) */
   }
+
+  .leftPanel,
+  .rightPanel {
+    margin-top: var(--space-lg, 1.5rem);
+    padding: var(--space-sm, 0.5rem);
+    max-width: none;
+    width: 100%;
+}
   /* .breakPlaceholder removed as it was noted as old */
   .momentsTracker, .productivityDisplay, .timerSection, .contextMapPlaceholder, .journalPlaceholder, .taskListContainer, .adHocForm {
       max-width: 100%; /* Allow content to fill panel */
@@ -691,7 +691,7 @@
     display: none; /* This line hides the date input */
   }
   .taskItem {
-    padding: var(--space-sm, 0.25rem) var(--space-md, .5rem);
+    padding: var(1rem) var(1rem);
     padding-left: calc(.01mm + var(--space-md, .5rem)); /* Space for stripes */
     padding-top: 0.25rem;    /* Example: smaller value */
     padding-bottom: 0.25rem; /* Example: smaller value */

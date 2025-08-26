@@ -1,0 +1,49 @@
+/* src/components/PrepareModal/PrepareModal.module.css */
+.prepareContainer {
+    width: 100%;
+}
+
+.modalTitle {
+    margin-top: 0;
+    margin-bottom: 25px;
+    text-align: center;
+    color: #4a5d62;
+}
+
+/* All other styles for .section, .sectionTitle, .goalList, etc. remain the same */
+.section { margin-bottom: 20px; }
+.sectionTitle { color: #ccc; border-bottom: 1px solid #444; padding-bottom: 8px; margin-bottom: 15px; font-size: 1.9em; color: #a2cbd8;}
+.goalList {
+    list-style-type: none; /* Removes bullet points */
+    text-align: left;      /* Removes default padding */
+    font-size: 1.5rem;
+}
+.goalList li { margin-bottom: 8px; }
+.checkItem { display: flex; align-items: center; margin-left: 2.7rem; gap: 10px; font-size: 1.5rem; }
+.checkItem label { cursor: pointer; }
+.taskEntry { display: flex; gap: 10px; }
+.textInput {
+    flex-grow: 1;
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #555;
+    background-color: #ffffff; /* Set background to white */
+    color: #222222;           /* Set text color to dark grey */
+}
+.taskEntry button { padding: 8px 15px; border: none; border-radius: 4px; background-color: #b2dae7; color: #20232a; font-weight: bold; cursor: pointer; }
+.taskEntry button:disabled { background-color: #b2dae7; color: #040404; }
+.submitButton {
+    width: 100%;
+    padding: 12px;
+    font-size: 1.1em;
+    font-weight: bold;
+    border: 5px solid #345363;
+    border-radius: 5px;
+    /* Use the axis color variable, with green as a fallback */
+    background-color: var(--axis-color-rest-and-preparation-2, #b2dae7);
+    color: 345363;
+    cursor: pointer;
+    margin-top: 10px;
+}
+.submitButton:disabled { background-color: #555; }
+.errorText { color: #ff4d4d; text-align: center; margin-top: 15px; }

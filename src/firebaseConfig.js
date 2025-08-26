@@ -10,7 +10,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyC83ZohFJ9gRd9pWNJbJlTKNzg94O0381E",
   authDomain: "dashboard-bb237.firebaseapp.com",
   projectId: "dashboard-bb237",
-  storageBucket: "dashboard-bb237.appspot.com",
+  storageBucket: "dashboard-bb237.firebasestorage.app",
   messagingSenderId: "913925574800",
   appId: "1:913925574800:web:1487a2148c228202578815"
 };

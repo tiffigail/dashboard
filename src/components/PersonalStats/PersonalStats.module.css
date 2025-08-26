@@ -1,0 +1,69 @@
+/* src/components/PersonalStats/PersonalStats.module.css */
+
+.statsContainer {
+    width: 100%;
+    margin-top: 40px;
+    padding: 20px;
+    background-color: #f4f7f9; /* A light background for the section */
+    border-radius: 8px;
+}
+
+.statsViewTitle {
+    color: #333;
+    text-align: center;
+    margin-bottom: 24px;
+    font-size: 1.75rem;
+    font-weight: 600;
+}
+
+.statsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 20px;
+}
+
+.statCard {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.statCard:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.statIcon {
+    font-size: 2.5rem; /* Makes icons larger */
+    line-height: 1;
+}
+
+.statContent {
+    display: flex;
+    flex-direction: column;
+}
+
+.statTitle {
+    font-size: 0.9rem;
+    color: #667085; /* A muted color for the title */
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.statValue {
+    font-size: 1.75rem;
+    color: #101828;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.statUnit {
+    font-size: 0.8rem;
+    color: #98A2B3;
+}

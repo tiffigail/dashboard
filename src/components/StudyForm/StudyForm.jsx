@@ -1,11 +1,11 @@
 // src/components/StudyForm/StudyForm.jsx
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import styles from './StudyForm.module.css';
 import { db } from '../../firebaseConfig';
-import { collection, doc, addDoc, setDoc, updateDoc, arrayUnion, serverTimestamp, Timestamp } from "firebase/firestore"; // Import Timestamp
+import { doc, setDoc, arrayUnion, serverTimestamp, Timestamp } from "firebase/firestore";
+import { useTimeAggregator } from '../../hooks/useTimeAggregator';
 
 // Define the checklist items for the Family Clean routine
-// (Assuming these might be used elsewhere, keeping them for context, though not used in this specific form)
 const familyCleanItems = [
     "Dishes", "Laundry", "Floors", "Tidy Surface", "Bathrooms",
     "Trash", "Recycling", "Surfaces", "Dusting",
@@ -17,6 +17,9 @@ const people = ["Abi", "Izi", "Tiffany"];
 
 // Props: onSubmit, onClose, axisQuestion (passed from DailyView)
 function StudyForm({ onSubmit, onClose, axisQuestion }) {
+    // This hook continuously tracks total time this modal is open in localStorage
+    useTimeAggregator('studyModalTime');
+
     // == State ==
     const [topic, setTopic] = useState('');
     const [axisAnswer, setAxisAnswer] = useState('');
@@ -26,7 +29,7 @@ function StudyForm({ onSubmit, onClose, axisQuestion }) {
     const [addInsightError, setAddInsightError] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitError, setSubmitError] = useState(null);
-    const startTimeRef = useRef(Date.now()); // Record when the modal opens
+    const startTimeRef = useRef(Date.now()); // Records when the modal opens for the per-session log
 
     // == Handlers ==
     const handleInputChange = (event) => {
@@ -55,22 +58,17 @@ function StudyForm({ onSubmit, onClose, axisQuestion }) {
             topic: topic.trim(),
             title: insightTitle.trim(),
             answer: insightAnswer.trim(),
-            // UPDATED: Use client-side Timestamp.now() instead of serverTimestamp()
             addedAt: Timestamp.now()
         };
 
-        // Reference the single 'flashcards' document within the 'study' collection
         const flashcardsDocRef = doc(db, "study", "flashcards");
 
         try {
-            // Use setDoc with merge:true to create/update the document
-            // and arrayUnion to add the new insight to the 'insights' array
             await setDoc(flashcardsDocRef, {
-                insights: arrayUnion(flashcardData) // Add the object to the array
-            }, { merge: true }); // merge:true creates the doc/array if it doesn't exist
+                insights: arrayUnion(flashcardData)
+            }, { merge: true });
 
             console.log("Insight added to flashcards:", flashcardData);
-            // Clear the insight fields
             setInsightTitle('');
             setInsightAnswer('');
         } catch (e) {
@@ -83,46 +81,44 @@ function StudyForm({ onSubmit, onClose, axisQuestion }) {
 
     // Handler for completing the entire study session
     const handleCompleteStudy = async (event) => {
-        event.preventDefault(); // Prevent default form submission
+        event.preventDefault();
         setIsSubmitting(true);
         setSubmitError(null);
 
-        // Calculate duration
+        // Calculate duration for the individual session log
         const endTime = Date.now();
         const durationMinutes = Math.round((endTime - startTimeRef.current) / (1000 * 60));
 
         const studyLogData = {
             type: 'studySession',
             topic: topic.trim(),
-            axisQuestion: axisQuestion || "N/A", // Include the axis question
+            axisQuestion: axisQuestion || "N/A",
             axisAnswer: axisAnswer.trim(),
             durationMinutes: durationMinutes,
-            completedAt: serverTimestamp() // Use server timestamp for the main log document
+            completedAt: serverTimestamp()
         };
 
         console.log("Attempting to save Study Session Log:", studyLogData);
 
         try {
-            // Save to a new dated document in the 'study' collection
-            const dateString = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format for doc ID
-            const docId = `${dateString}-${Date.now()}`; // Add timestamp for uniqueness
+            const dateString = new Date().toISOString().split('T')[0];
+            const docId = `${dateString}-${Date.now()}`;
             const studyLogDocRef = doc(db, "study", docId);
-            await setDoc(studyLogDocRef, studyLogData); // Use setDoc for custom ID
+            await setDoc(studyLogDocRef, studyLogData);
 
             console.log("Study Session Log Document written with ID: ", studyLogDocRef.id);
 
             if (onSubmit) {
-                onSubmit(studyLogData); // Pass data back if needed
+                onSubmit(studyLogData);
             }
             if (onClose) {
-                onClose(); // Close the modal
+                onClose();
             }
         } catch (e) {
             console.error("Error adding study log document: ", e);
             setSubmitError("Failed to save study session. Please try again.");
-            setIsSubmitting(false); // Only keep modal open on error
+            setIsSubmitting(false);
         }
-        // Don't set isSubmitting false here if successful, as modal closes
     };
 
     return (
@@ -141,7 +137,7 @@ function StudyForm({ onSubmit, onClose, axisQuestion }) {
                         onChange={handleInputChange}
                         placeholder="Enter the main study topic"
                         className={styles.textInput}
-                        required // Make topic required for the session
+                        required
                         disabled={isSubmitting}
                     />
                 </div>
@@ -197,7 +193,7 @@ function StudyForm({ onSubmit, onClose, axisQuestion }) {
                  </div>
                  {addInsightError && <p className={styles.errorTextInline}>{addInsightError}</p>}
                  <button
-                    type="button" // Important: type="button" prevents form submission
+                    type="button"
                     onClick={handleAddInsight}
                     className={styles.addInsightButton}
                     disabled={isSubmitting || isAddingInsight || !insightTitle.trim() || !insightAnswer.trim()}
@@ -205,7 +201,6 @@ function StudyForm({ onSubmit, onClose, axisQuestion }) {
                     {isAddingInsight ? 'Adding...' : 'Add Insight'}
                  </button>
             </div>
-
 
             {/* Final Submission */}
             {submitError && <p className={styles.errorText}>Error: {submitError}</p>}

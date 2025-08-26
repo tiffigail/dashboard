@@ -18,8 +18,9 @@ const workChecklistItems = {
   "Shut down computer": false,
 };
 const homeChecklistItems = {
-  "Change Clothes": false,
+  "Mr. Rogers": false,
   "Use Landing Zone": false,
+  "Zoom Out": false,
   "Land!": false,
   "Orient": false,
   "Hydrate": false,
