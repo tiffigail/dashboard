@@ -1,0 +1,101 @@
+.statsContainer {
+    padding: 1rem 2rem;
+    background-color: #FFFBEB;
+    color: #4B5563;
+    width: 100%;
+}
+
+.title {
+    color: #92400E;
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 2rem;
+}
+
+.statsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.statCard {
+    background-color: #FEF3C7;
+    border: 1px solid #FDE68A;
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.statCard h3 {
+    margin-top: 0;
+    color: #92400E;
+    border-bottom: 1px solid #FDE68A;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.rankedList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    text-align: left;
+}
+
+.rankedList li {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #FDE68A;
+}
+
+.rankedList li:last-child {
+    border-bottom: none;
+}
+
+.statValue {
+    font-weight: bold;
+    color: #059669;
+}
+
+.consistencyValue {
+    font-size: 4rem;
+    font-weight: bold;
+    color: #92400E;
+    margin: 1rem 0 0 0;
+    line-height: 1;
+}
+
+.consistencyValue span {
+    font-size: 1.5rem;
+    vertical-align: super;
+}
+
+.consistencySubtext {
+    margin: 0;
+    color: #6B7280;
+}
+
+.chartSection {
+    background-color: #FEF3C7;
+    border: 1px solid #FDE68A;
+    border-radius: 8px;
+    padding: 2rem;
+}
+
+.sectionTitle {
+    text-align: center;
+    color: #eadb0d;
+    margin-top: 0;
+}
+
+.chartWrapper {
+    width: 100%;
+    height: 400px;
+    font-size: 0.9rem;
+}
+
+.error {
+    color: #DC2626;
+    text-align: center;
+}

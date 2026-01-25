@@ -1,0 +1,108 @@
+{
+  "new_tasks": [
+    {
+      "id": "task-no1MKGEnCEYKC39Ae66T",
+      "title": "Finalize Q3 budget report",
+      "status": "completed",
+      "axisTheme": "Financial",
+      "completedAt": { "seconds": 1751059705, "nanoseconds": 780000000 },
+      "assignedDate": "2025-08-26"
+    },
+    {
+      "id": "task-ygrYZt2P1GkudOoHcvTU",
+      "title": "Draft technical specification for new feature",
+      "status": "todo",
+      "axisTheme": "Gear",
+      "completedAt": null,
+      "assignedDate": "2025-09-06"
+    },
+    {
+      "id": "task-9c3xnIxJMEsMFb3YGg7t",
+      "title": "Review user feedback from last sprint",
+      "status": "todo",
+      "axisTheme": "On Track N+1",
+      "completedAt": null,
+      "assignedDate": "2025-09-06"
+    },
+    {
+      "id": "task-eUiughOLIRc3yowfldbq",
+      "title": "Submit monthly expense report",
+      "status": "completed",
+      "axisTheme": "Financial",
+      "completedAt": { "seconds": 1751059963, "nanoseconds": 377000000 },
+      "assignedDate": "2025-08-26"
+    },
+    {
+      "id": "task-XkwI0qjvrl0uQOqd9YUS",
+      "title": "Research new project management software",
+      "status": "completed",
+      "axisTheme": "Gear",
+      "completedAt": { "seconds": 1751063645, "nanoseconds": 649000000 },
+      "assignedDate": "2025-08-25"
+    },
+    {
+      "id": "task-ERYjRlPqZQv2VX6W17w9",
+      "title": "Morning run",
+      "status": "todo",
+      "axisTheme": "Physical",
+      "completedAt": null,
+      "assignedDate": "2025-09-05"
+    },
+    {
+      "id": "task-FGnw4DCC9alfBNQ9zPPb",
+      "title": "Organize digital file archive",
+      "status": "todo",
+      "axisTheme": "Environment",
+      "completedAt": null,
+      "assignedDate": "2025-09-05"
+    },
+    {
+      "id": "routine_study",
+      "title": "Study: Read one chapter of 'Designing Data-Intensive Applications'",
+      "status": "completed",
+      "type": "recurring",
+      "axisTheme": "Gear",
+      "completedAt": { "seconds": 1751025546, "nanoseconds": 431000000 }
+    },
+    {
+      "id": "routine_exercise",
+      "title": "30-minute workout session",
+      "status": "completed",
+      "type": "recurring",
+      "axisTheme": "Physical",
+      "completedAt": { "seconds": 1751028040, "nanoseconds": 46000000 }
+    },
+    {
+      "id": "routine_am",
+      "title": "AM Routine: Plan top 3 priorities for the day",
+      "status": "completed",
+      "type": "recurring",
+      "axisTheme": "On Track N+1",
+      "completedAt": { "seconds": 1751032497, "nanoseconds": 955000000 }
+    },
+    {
+      "id": "task-kgGNRTmMbyL8Hv0vatm0",
+      "title": "Weekly planning session",
+      "status": "completed",
+      "axisTheme": "Rest and preparation",
+      "completedAt": { "seconds": 1751075855, "nanoseconds": 142000000 },
+      "assignedDate": "2025-08-24"
+    },
+    {
+      "id": "routine_famclean",
+      "title": "15-minute office tidy-up",
+      "status": "completed",
+      "type": "recurring",
+      "axisTheme": "Environment",
+      "completedAt": { "seconds": 1751075725, "nanoseconds": 668000000 }
+    },
+    {
+      "id": "task-7UTVwxKccQZAPndIkUSR",
+      "title": "Brainstorm new ideas for side project",
+      "status": "completed",
+      "axisTheme": "Misdirect",
+      "completedAt": { "seconds": 1751075718, "nanoseconds": 837000000 },
+      "assignedDate": "2025-08-25"
+    }
+  ]
+}

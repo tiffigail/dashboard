@@ -1,0 +1,876 @@
+{
+  "new_goals": [
+    {
+      "id": "0iSDHlKDDMnIVqmxbNA4",
+      "dueDate": {
+        "seconds": 1861833600,
+        "nanoseconds": 0
+      },
+      "year": 2028,
+      "title": "Achieve Senior-Level Compensation",
+      "completionDate": null,
+      "axisId": "financial",
+      "type": "yearly",
+      "goalId": "0iSDHlKDDMnIVqmxbNA4",
+      "createdAt": {
+        "seconds": 1752011151,
+        "nanoseconds": 748000000
+      },
+      "status": "todo"
+    },
+    {
+      "id": "1Jh7dt77QGNkabywBhjD",
+      "year": 2028,
+      "goalId": "1Jh7dt77QGNkabywBhjD",
+      "axisId": "misdirect",
+      "title": "Sing publicly",
+      "type": "yearly",
+      "createdAt": {
+        "seconds": 1752011517,
+        "nanoseconds": 885000000
+      },
+      "status": "todo",
+      "dueDate": {
+        "seconds": 1861833600,
+        "nanoseconds": 0
+      },
+      "completionDate": null
+    },
+    {
+      "id": "2bO4EwVWMH4gRGZs8VJ0",
+      "goalId": "2bO4EwVWMH4gRGZs8VJ0",
+      "status": "todo",
+      "type": "yearly",
+      "axisId": "environment",
+      "completionDate": null,
+      "year": 2027,
+      "dueDate": {
+        "seconds": 1830211200,
+        "nanoseconds": 0
+      },
+      "title": "Only own things I love and be particular in arrangement",
+      "createdAt": {
+        "seconds": 1751905916,
+        "nanoseconds": 271000000
+      }
+    },
+    {
+      "id": "43BuxY7uXr7bppWWQUj7",
+      "status": "todo",
+      "goalId": "43BuxY7uXr7bppWWQUj7",
+      "axisId": "rest-and-preparation",
+      "title": "Follow the track",
+      "dueDate": {
+        "seconds": 1887494400,
+        "nanoseconds": 0
+      },
+      "year": 2029,
+      "type": "yearly",
+      "createdAt": {
+        "seconds": 1752013128,
+        "nanoseconds": 398000000
+      },
+      "completionDate": null
+    },
+    {
+      "id": "4Du5uXdBmzihk3oj1wVW",
+      "type": "pareto",
+      "axisId": "physical",
+      "goalId": "4Du5uXdBmzihk3oj1wVW",
+      "title": "Learn to move like an optiAchieve a Flow State on Demand Through Breathwork"
+    },
+    {
+      "id": "6oSwF0f6QOqV6Ec8CCXb",
+      "title": "List of Projects",
+      "axisId": "misdirect",
+      "type": "yearly",
+      "completionDate": {
+        "seconds": 1735603200,
+        "nanoseconds": 0
+      },
+      "year": 2024,
+      "status": "completed",
+      "createdAt": {
+        "seconds": 1751666020,
+        "nanoseconds": 534000000
+      },
+      "goalId": "6oSwF0f6QOqV6Ec8CCXb",
+      "dueDate": {
+        "seconds": 1735603200,
+        "nanoseconds": 0
+      }
+    },
+    {
+      "id": "84uLSh4O4w9OgTmQ2Wpg",
+      "status": "todo",
+      "year": 2028,
+      "createdAt": {
+        "seconds": 1752011482,
+        "nanoseconds": 808000000
+      },
+      "completionDate": null,
+      "goalId": "84uLSh4O4w9OgTmQ2Wpg",
+      "axisId": "physical",
+      "title": "Enter a contest",
+      "dueDate": {
+        "seconds": 1861833600,
+        "nanoseconds": 0
+      },
+      "type": "yearly"
+    },
+    {
+      "id": "9W59UpRspBO0eunxlhUZ",
+      "dueDate": {
+        "seconds": 1861833600,
+        "nanoseconds": 0
+      },
+      "title": "Write book",
+      "goalId": "9W59UpRspBO0eunxlhUZ",
+      "createdAt": {
+        "seconds": 1752011969,
+        "nanoseconds": 354000000
+      },
+      "status": "todo",
+      "type": "yearly",
+      "year": 2028,
+      "axisId": "gear",
+      "completionDate": null
+    },
+    {
+      "id": "9iCGcNxJjbfxf7bjXzw5",
+      "title": "Create a system of mental control that allows me to maximize the brain I have",
+      "type": "stretch",
+      "goalId": "9iCGcNxJjbfxf7bjXzw5",
+      "axisId": "gear",
+      "dueDate": {
+        "seconds": 1893369600,
+        "nanoseconds": 0
+      }
+    },
+    {
+      "id": "9iTH3LhmjWTtLeuKa4FK",
+      "goalId": "9iTH3LhmjWTtLeuKa4FK",
+      "createdAt": {
+        "seconds": 1751665928,
+        "nanoseconds": 448000000
+      },
+      "type": "yearly",
+      "year": 2024,
+      "title": "Establish Positive Net Worth",
+      "completionDate": {
+        "seconds": 1735668921,
+        "nanoseconds": 455000000
+      },
+      "status": "completed",
+      "axisId": "financial"
+    },
+    {
+      "id": "CzVBT3f8VnpJzVEENxK5",
+      "goalId": "CzVBT3f8VnpJzVEENxK5",
+      "createdAt": {
+        "seconds": 1751905751,
+        "nanoseconds": 355000000
+      },
+      "status": "todo",
+      "type": "yearly",
+      "completionDate": null,
+      "title": "Establish a source of passive income",
+      "year": 2027,
+      "dueDate": {
+        "seconds": 1830211200,
+        "nanoseconds": 0
+      },
+      "axisId": "financial"
+    },
+    {
+      "id": "FhatwpWvyj0AMAL0hMvW",
+      "axisId": "gear",
+      "title": "Create a system of mental control that allows me to maximize the brain I have",
+      "goalId": "FhatwpWvyj0AMAL0hMvW",
+      "type": "pareto"
+    },
+    {
+      "id": "FpaLbiirZnAiW1TNVxZV",
+      "dueDate": {
+        "seconds": 1798675200,
+        "nanoseconds": 0
+      },
+      "goalId": "FpaLbiirZnAiW1TNVxZV",
+      "year": 2026,
+      "title": "Develop and Execute a High-Yield Savings Plan for Farm Down Payment",
+      "axisId": "financial",
+      "createdAt": {
+        "seconds": 1751847112,
+        "nanoseconds": 574000000
+      },
+      "completionDate": null,
+      "status": "todo",
+      "type": "yearly"
+    },
+    {
+      "id": "FrfD12qU8QYeh1JIMR3q",
+      "createdAt": {
+        "seconds": 1751855876,
+        "nanoseconds": 861000000
+      },
+      "status": "todo",
+      "goalId": "FrfD12qU8QYeh1JIMR3q",
+      "type": "yearly",
+      "dueDate": {
+        "seconds": 1861833600,
+        "nanoseconds": 0
+      },
+      "axisId": "rest-and-preparation",
+      "title": "Full year designed and prepared for",
+      "completionDate": null,
+      "year": 2028
+    },
+    {
+      "id": "FzPqmLUgp0RuoeedXNTi",
+      "axisId": "rest-and-preparation",
+      "title": "Creation of Preparedness concept",
+      "dueDate": {
+        "seconds": 1735603200,
+        "nanoseconds": 0
+      },
+      "createdAt": {
+        "seconds": 1753016542,
+        "nanoseconds": 569000000
+      },
+      "status": "completed",
+      "type": "yearly",
+      "completionDate": {
+        "seconds": 1735430400,
+        "nanoseconds": 0
+      },
+      "year": 2024,
+      "goalId": "FzPqmLUgp0RuoeedXNTi"
+    },
+    {
+      "id": "GZHtiY89jo3TvHmBZSxT",
+      "axisId": "physical",
+      "createdAt": {
+        "seconds": 1751905824,
+        "nanoseconds": 110000000
+      },
+      "status": "todo",
+      "year": 2027,
+      "title": "Perform a Physical Feat",
+      "type": "yearly",
+      "completionDate": null,
+      "dueDate": {
+        "seconds": 1830211200,
+        "nanoseconds": 0
+      },
+      "goalId": "GZHtiY89jo3TvHmBZSxT"
+    },
+    {
+      "id": "GiegImr5LmZaooP0vXwX",
+      "goalId": "GiegImr5LmZaooP0vXwX",
+      "createdAt": {
+        "seconds": 1752011203,
+        "nanoseconds": 278000000
+      },
+      "axisId": "financial",
+      "completionDate": null,
+      "status": "todo",
+      "title": "Working farm",
+      "type": "yearly",
+      "dueDate": {
+        "seconds": 1878163200,
+        "nanoseconds": 0
+      },
+      "year": 2029
+    },
+    {
+      "id": "J02GT6tIQWWySWDTafV8",
+      "year": 2027,
+      "title": "Map out mental modes and protocols and approaches",
+      "axisId": "gear",
+      "createdAt": {
+        "seconds": 1751855693,
+        "nanoseconds": 911000000
+      },
+      "status": "todo",
+      "goalId": "J02GT6tIQWWySWDTafV8",
+      "completionDate": null,
+      "type": "yearly",
+      "dueDate": {
+        "seconds": 1830211200,
+        "nanoseconds": 0
+      }
+    },
+    {
+      "id": "JHC3KOsiqSpIJ127KjEx",
+      "type": "pareto",
+      "goalId": "JHC3KOsiqSpIJ127KjEx",
+      "axisId": "rest-and-preparation",
+      "title": "Have habits in place that make me feel prepared for anything"
+    },
+    {
+      "id": "JKHnwsRp4A6o3mYmetMZ",
+      "goalId": "JKHnwsRp4A6o3mYmetMZ",
+      "status": "todo",
+      "axisId": "misdirect",
+      "completionDate": null,
+      "title": "Make something that will connect me to people",
+      "type": "yearly",
+      "createdAt": {
+        "seconds": 1751906199,
+        "nanoseconds": 629000000
+      },
+      "dueDate": {
+        "seconds": 1830211200,
+        "nanoseconds": 0
+      },
+      "year": 2027
+    },
+    {
+      "id": "Js10wq3m7EpCRVfWSInk",
+      "title": "Fully Fund a 6-Month Emergency Protocol",
+      "dueDate": {
+        "seconds": 1767139200,
+        "nanoseconds": 0
+      },
+      "year": 2025,
+      "type": "yearly",
+      "axisId": "financial",
+      "status": "completed",
+      "completionDate": {
+        "seconds": 1751760000,
+        "nanoseconds": 0
+      },
+      "goalId": "Js10wq3m7EpCRVfWSInk"
+    },
+    {
+      "id": "MdwQVVDts0VRUXSJow0O",
+      "axisId": "misdirect",
+      "goalId": "MdwQVVDts0VRUXSJow0O",
+      "type": "yearly",
+      "year": 2025,
+      "dueDate": {
+        "seconds": 1767139200,
+        "nanoseconds": 0
+      },
+      "title": "Cultivate Core Personal Relationships: Spend intentional time with My child"
+    },
+    {
+      "id": "ORUJH8GSPgrIPi8lp7Xf",
+      "type": "yearly",
+      "status": "todo",
+      "createdAt": {
+        "seconds": 1751847499,
+        "nanoseconds": 458000000
+      },
+      "title": "\"Published\" year 3 summary of Dashboard and the shape of my brain",
+      "axisId": "On Track N+1",
+      "year": 2026,
+      "completionDate": null,
+      "goalId": "ORUJH8GSPgrIPi8lp7Xf",
+      "dueDate": {
+        "seconds": 1798675200,
+        "nanoseconds": 0
+      }
+    },
+    {
+      "id": "QMsaeEd2AQdKdpW0hS3F",
+      "status": "todo",
+      "createdAt": {
+        "seconds": 1751847415,
+        "nanoseconds": 627000000
+      },
+      "year": 2026,
+      "completionDate": null,
+      "axisId": "rest-and-preparation",
+      "title": "Emergency Ready",
+      "goalId": "QMsaeEd2AQdKdpW0hS3F",
+      "type": "yearly",
+      "dueDate": {
+        "seconds": 1798675200,
+        "nanoseconds": 0
+      }
+    },
+    {
+      "id": "QaQjUP8HmFkIkVxgM4fb",
+      "createdAt": {
+        "seconds": 1752013042,
+        "nanoseconds": 0
+      },
+      "status": "todo",
+      "axisId": "physical",
+      "goalId": "QaQjUP8HmFkIkVxgM4fb",
+      "type": "yearly",
+      "dueDate": {
+        "seconds": 1884384000,
+        "nanoseconds": 0
+      },
+      "title": "Performance Art",
+      "completionDate": null,
+      "year": 2029
+    },
+    {
+      "id": "RbMKiVQb30rXlZzq51uo",
+      "axisId": "environment",
+      "type": "yearly",
+      "dueDate": {
+        "seconds": 1767139200,
+        "nanoseconds": 0
+      },
+      "title": "Family Clean Habit and Stats Chart",
+      "year": 2025,
+      "goalId": "RbMKiVQb30rXlZzq51uo"
+    },
+    {
+      "id": "SWgWDyJci3C3tmiiRqOx",
+      "completionDate": null,
+      "type": "yearly",
+      "year": 2026,
+      "axisId": "physical",
+      "goalId": "SWgWDyJci3C3tmiiRqOx",
+      "title": "Learn a choreographed dance",
+      "status": "todo",
+      "createdAt": {
+        "seconds": 1751804210,
+        "nanoseconds": 214000000
+      },
+      "dueDate": {
+        "seconds": 1798675200,
+        "nanoseconds": 0
+      }
+    },
+    {
+      "id": "T1rHxlyNW5BKzvZM8Arx",
+      "goalId": "T1rHxlyNW5BKzvZM8Arx",
+      "title": "Figure out how to use misdirects to recharge, to shift, to surf the Ebbs and Flows of Reality",
+      "axisId": "misdirect",
+      "type": "pareto"
+    },
+    {
+      "id": "TznfQZgozB5CMAo5H1gF",
+      "goalId": "TznfQZgozB5CMAo5H1gF",
+      "type": "yearly",
+      "year": 2025,
+      "dueDate": {
+        "seconds": 1767139200,
+        "nanoseconds": 0
+      },
+      "axisId": "On Track N+1",
+      "completionDate": null,
+      "status": "todo",
+      "title": "On track habits and reviews"
+    },
+    {
+      "id": "ZOij9Irbq2Ntf5ktFlzP",
+      "type": "yearly",
+      "goalId": "ZOij9Irbq2Ntf5ktFlzP",
+      "dueDate": {
+        "seconds": 1830211200,
+        "nanoseconds": 0
+      },
+      "year": 2027,
+      "title": "Care kits for the modes outlined in gear",
+      "completionDate": null,
+      "axisId": "rest-and-preparation",
+      "status": "todo",
+      "createdAt": {
+        "seconds": 1751855822,
+        "nanoseconds": 523000000
+      }
+    },
+    {
+      "id": "ZQDd38L63XtWVDggARH6",
+      "year": 2029,
+      "status": "todo",
+      "type": "yearly",
+      "createdAt": {
+        "seconds": 1752013076,
+        "nanoseconds": 362000000
+      },
+      "title": "Design My Living Space as a 'Sensory Dashboard' to Calibrate Mood",
+      "axisId": "environment",
+      "dueDate": {
+        "seconds": 1879632000,
+        "nanoseconds": 0
+      },
+      "goalId": "ZQDd38L63XtWVDggARH6",
+      "completionDate": null
+    },
+    {
+      "id": "Za8AkNnno2fOQIuRiplJ",
+      "title": "illustrate that book",
+      "status": "todo",
+      "type": "yearly",
+      "axisId": "misdirect",
+      "year": 2029,
+      "completionDate": null,
+      "goalId": "Za8AkNnno2fOQIuRiplJ",
+      "dueDate": {
+        "seconds": 1882137600,
+        "nanoseconds": 0
+      },
+      "createdAt": {
+        "seconds": 1752011569,
+        "nanoseconds": 218000000
+      }
+    },
+    {
+      "id": "a3s5LldU4JIrIosj4L9y",
+      "year": 2029,
+      "axisId": "gear",
+      "status": "todo",
+      "createdAt": {
+        "seconds": 1752011267,
+        "nanoseconds": 768000000
+      },
+      "completionDate": null,
+      "goalId": "a3s5LldU4JIrIosj4L9y",
+      "dueDate": {
+        "seconds": 1884816000,
+        "nanoseconds": 0
+      },
+      "type": "yearly",
+      "title": "Publish a book"
+    },
+    {
+      "id": "bJO1zPgSWveziYeTayrA",
+      "status": "todo",
+      "dueDate": {
+        "seconds": 1798675200,
+        "nanoseconds": 0
+      },
+      "type": "yearly",
+      "goalId": "bJO1zPgSWveziYeTayrA",
+      "title": "Yard Planned and in motion FoodForest",
+      "completionDate": null,
+      "axisId": "environment",
+      "year": 2026,
+      "createdAt": {
+        "seconds": 1751847311,
+        "nanoseconds": 678000000
+      }
+    },
+    {
+      "id": "c26VpLAGQC0EIRsPyAPB",
+      "title": "Habits",
+      "axisId": "gear",
+      "type": "yearly",
+      "goalId": "c26VpLAGQC0EIRsPyAPB",
+      "createdAt": {
+        "seconds": 1751665995,
+        "nanoseconds": 661000000
+      },
+      "completionDate": {
+        "seconds": 1735603200,
+        "nanoseconds": 0
+      },
+      "status": "completed",
+      "year": 2024
+    },
+    {
+      "id": "dGzsZyC4qyZkbhnO8PM3",
+      "dueDate": {
+        "seconds": 1767160800,
+        "nanoseconds": 891000000
+      },
+      "year": 2025,
+      "type": "yearly",
+      "title": "Dashboard (gearshift Model)",
+      "goalId": "dGzsZyC4qyZkbhnO8PM3",
+      "axisId": "gear"
+    },
+    {
+      "id": "eHqfkFI4WdArOIjXsimD",
+      "title": "Stay on track",
+      "completionDate": null,
+      "year": 2029,
+      "status": "todo",
+      "dueDate": {
+        "seconds": 1887667200,
+        "nanoseconds": 0
+      },
+      "createdAt": {
+        "seconds": 1752013187,
+        "nanoseconds": 288000000
+      },
+      "type": "yearly",
+      "axisId": "On Track N+1",
+      "goalId": "eHqfkFI4WdArOIjXsimD"
+    },
+    {
+      "id": "fG2ihhGqdqWD9LAbvoeR",
+      "createdAt": {
+        "seconds": 1752014031,
+        "nanoseconds": 44000000
+      },
+      "status": "todo",
+      "dueDate": {
+        "seconds": 1767139200,
+        "nanoseconds": 0
+      },
+      "completionDate": null,
+      "title": "Scrum Certification",
+      "goalId": "fG2ihhGqdqWD9LAbvoeR",
+      "axisId": "financial",
+      "type": "yearly",
+      "year": 2025
+    },
+    {
+      "id": "fRTLQMWDQd5ZusXKO7Yi",
+      "dueDate": {
+        "seconds": 1861833600,
+        "nanoseconds": 0
+      },
+      "year": 2028,
+      "type": "yearly",
+      "createdAt": {
+        "seconds": 1752012699,
+        "nanoseconds": 347000000
+      },
+      "completionDate": null,
+      "goalId": "fRTLQMWDQd5ZusXKO7Yi",
+      "status": "todo",
+      "title": "Sculpt a monument",
+      "axisId": "environment"
+    },
+    {
+      "id": "fzNAzJHewR5MoHpIZowC",
+      "goalId": "fzNAzJHewR5MoHpIZowC",
+      "axisId": "On Track N + 1",
+      "title": "",
+      "type": "pareto"
+    },
+    {
+      "id": "hb1dU0Gm3UoFhi5qJvVt",
+      "goalId": "hb1dU0Gm3UoFhi5qJvVt",
+      "axisId": "physical",
+      "year": 2025,
+      "title": "Achieve Key Physical Performance Metric",
+      "dueDate": {
+        "seconds": 1767139200,
+        "nanoseconds": 0
+      },
+      "type": "yearly"
+    },
+    {
+      "id": "hqi9uPGlNshDLzzAZDcM",
+      "year": 2024,
+      "createdAt": {
+        "seconds": 1751665858,
+        "nanoseconds": 941000000
+      },
+      "status": "completed",
+      "title": "MindMap",
+      "completionDate": {
+        "seconds": 1735668861,
+        "nanoseconds": 908000000
+      },
+      "axisId": "environment",
+      "type": "yearly",
+      "goalId": "hqi9uPGlNshDLzzAZDcM"
+    },
+    {
+      "id": "maJSQymXLhFv3KaWPKTi",
+      "goalId": "maJSQymXLhFv3KaWPKTi",
+      "type": "stretch",
+      "dueDate": {
+        "seconds": 1893369600,
+        "nanoseconds": 0
+      },
+      "title": "MasterPuppeteering my Body. Learn to move like an optical illusion",
+      "axisId": "physical"
+    },
+    {
+      "id": "oOl4aWkkT3PdSmONqROw",
+      "type": "stretch",
+      "axisId": "financial",
+      "dueDate": {
+        "seconds": 1893369600,
+        "nanoseconds": 0
+      },
+      "title": "Create abundance so Great it funds all other axes of my life/beyond",
+      "goalId": "oOl4aWkkT3PdSmONqROw"
+    },
+    {
+      "id": "oSJXxexbQ7XXmqjiWgoq",
+      "title": "Gym and Dance",
+      "goalId": "oSJXxexbQ7XXmqjiWgoq",
+      "createdAt": {
+        "seconds": 1751666071,
+        "nanoseconds": 900000000
+      },
+      "completionDate": {
+        "seconds": 1735603200,
+        "nanoseconds": 0
+      },
+      "type": "yearly",
+      "axisId": "physical",
+      "status": "completed",
+      "year": 2024
+    },
+    {
+      "id": "od32T7wugrLrPw9PgCbR",
+      "title": "Master space inside and outside",
+      "axisId": "environment",
+      "goalId": "od32T7wugrLrPw9PgCbR",
+      "type": "pareto"
+    },
+    {
+      "id": "p10D2iZUYoTB98CkBXq6",
+      "status": "completed",
+      "title": "Habits",
+      "dueDate": {
+        "seconds": 1735603200,
+        "nanoseconds": 0
+      },
+      "year": 2024,
+      "goalId": "p10D2iZUYoTB98CkBXq6",
+      "type": "yearly",
+      "completionDate": {
+        "seconds": 1735430400,
+        "nanoseconds": 0
+      },
+      "axisId": "On Track N+1",
+      "createdAt": {
+        "seconds": 1753016626,
+        "nanoseconds": 645000000
+      }
+    },
+    {
+      "id": "pnpoxak0tZBeZzKR85i5",
+      "createdAt": {
+        "seconds": 1751855767,
+        "nanoseconds": 346000000
+      },
+      "dueDate": {
+        "seconds": 1830211200,
+        "nanoseconds": 0
+      },
+      "year": 2027,
+      "completionDate": null,
+      "status": "todo",
+      "type": "yearly",
+      "title": "Protocols for different states. ie depression or spiritual modes",
+      "axisId": "On Track N+1",
+      "goalId": "pnpoxak0tZBeZzKR85i5"
+    },
+    {
+      "id": "q7Y6xF8F8XtIpP0wTSX0",
+      "goalId": "q7Y6xF8F8XtIpP0wTSX0",
+      "type": "stretch",
+      "axisId": "environment",
+      "dueDate": {
+        "seconds": 1893369600,
+        "nanoseconds": 0
+      },
+      "title": "Master space inside and outside"
+    },
+    {
+      "id": "qkhhoSfiDUdluYsVfYNK",
+      "axisId": "financial",
+      "type": "pareto",
+      "goalId": "qkhhoSfiDUdluYsVfYNK",
+      "title": "Create abundance so Great it funds all other axes of my life/beyond"
+    },
+    {
+      "id": "roOAvextlSI73TqslcbA",
+      "completionDate": null,
+      "status": "todo",
+      "year": 2026,
+      "dueDate": {
+        "seconds": 1798675200,
+        "nanoseconds": 0
+      },
+      "type": "yearly",
+      "axisId": "gear",
+      "goalId": "roOAvextlSI73TqslcbA",
+      "createdAt": {
+        "seconds": 1751847374,
+        "nanoseconds": 755000000
+      },
+      "title": "Launch Edition 1 of a Collaborative Project"
+    },
+    {
+      "id": "u6CsMUfxuk2YN5CdMCoC",
+      "goalId": "u6CsMUfxuk2YN5CdMCoC",
+      "type": "stretch",
+      "title": "Figure out how to use misdirects to recharge, to shift, to surf the Ebbs and Flows of Reality",
+      "axisId": "misdirect",
+      "dueDate": {
+        "seconds": 1893369600,
+        "nanoseconds": 0
+      }
+    },
+    {
+      "id": "vsXaeMUXPHlvLi4AXPVH",
+      "title": "Tiny Dinosaur Farm Created",
+      "year": 2026,
+      "goalId": "vsXaeMUXPHlvLi4AXPVH",
+      "axisId": "misdirect",
+      "createdAt": {
+        "seconds": 1751847256,
+        "nanoseconds": 536000000
+      },
+      "completionDate": null,
+      "status": "todo",
+      "type": "yearly",
+      "dueDate": {
+        "seconds": 1798675200,
+        "nanoseconds": 0
+      }
+    },
+    {
+      "id": "wURyXcMvm1gB9eSACmqq",
+      "axisId": "rest-and-preparation",
+      "completionDate": null,
+      "title": "Preparation Protocols in Place",
+      "dueDate": {
+        "seconds": 1767139200,
+        "nanoseconds": 0
+      },
+      "year": 2025,
+      "type": "yearly",
+      "goalId": "wURyXcMvm1gB9eSACmqq",
+      "status": "todo"
+    },
+    {
+      "id": "zAMgTaKdi2cLA9rPlt80",
+      "dueDate": {
+        "seconds": 1893369600,
+        "nanoseconds": 0
+      },
+      "goalId": "zAMgTaKdi2cLA9rPlt80",
+      "title": "Have habits in place that make me feel prepared for anything",
+      "axisId": "rest-and-preparation",
+      "type": "stretch"
+    },
+    {
+      "id": "zHw1ssYSfBceDujtrJFb",
+      "title": "Develop a System for Proactive Future-Planning",
+      "dueDate": {
+        "seconds": 1893369600,
+        "nanoseconds": 0
+      },
+      "type": "stretch",
+      "goalId": "zHw1ssYSfBceDujtrJFb",
+      "axisId": "On Track N+1"
+    },
+    {
+      "id": "zlLP8UwF8aj5s1g87cKF",
+      "type": "yearly",
+      "completionDate": null,
+      "title": "Complete an Intensive Study on Trend Analysis & Forecasting",
+      "year": 2028,
+      "goalId": "zlLP8UwF8aj5s1g87cKF",
+      "dueDate": {
+        "seconds": 1861833600,
+        "nanoseconds": 0
+      },
+      "status": "todo",
+      "createdAt": {
+        "seconds": 1752012758,
+        "nanoseconds": 384000000
+      },
+      "axisId": "On Track N+1"
+    }
+  ]
+}

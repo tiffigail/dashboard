@@ -1,0 +1,44 @@
+{
+  "dailyMetrics": [
+    {
+      "id": "2025-09-06",
+      "productivityScore": 49,
+      "lastUpdated": {
+        "seconds": 1757199747,
+        "nanoseconds": 26000000
+      },
+      "axisTaskCounts": {
+        "Rest and preparation": 4,
+        "Physical": 5,
+        "Environment": 6,
+        "Misdirect": 5,
+        "Financial": 2,
+        "Gear": 23,
+        "On Track N+1": 4
+      },
+      "tasksStatus": {
+        "routine_pm": {
+          "completedAt": {
+            "seconds": 1757195072,
+            "nanoseconds": 747000000
+          },
+          "completed": true
+        },
+        "routine_study": {
+          "completedAt": {
+            "seconds": 1757199721,
+            "nanoseconds": 294000000
+          },
+          "completed": true
+        },
+        "routine_am": {
+          "completed": true,
+          "completedAt": {
+            "seconds": 1757157543,
+            "nanoseconds": 192000000
+          }
+        }
+      }
+    }
+  ]
+}

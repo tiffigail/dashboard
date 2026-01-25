@@ -4,6 +4,7 @@ import { initializeApp } from "firebase/app";
 // VVVV 1. IMPORT THE NEW, MODERN FUNCTIONS VVVV
 import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
+import { getAuth } from "firebase/auth";
 
 // Your web app's Firebase configuration (no changes here)
 const firebaseConfig = {
@@ -26,6 +27,8 @@ const db = initializeFirestore(app, {
 });
 console.log("Firestore initialized with offline persistence enabled.");
 
+const auth = getAuth(app); // This line creates the auth service
+
 
 // Initialize Cloud Storage (no changes here)
 const storage = getStorage(app);
@@ -41,4 +44,4 @@ const storage = getStorage(app);
 
 
 // Export the instances for use elsewhere in the app
-export { db, storage };
+export { db, storage, auth };

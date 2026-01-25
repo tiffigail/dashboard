@@ -1,0 +1,239 @@
+/* --- Main Container & Theme --- */
+
+.dashboardContainer {
+    width: 100%;
+    padding: 20px;
+    background-color: #ffffff; /* White background */
+    color: #333; /* Dark text */
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.modalVersion {
+    width: 100%;
+    padding: 20px;
+    background: #ffffff; /* Modal background is also white */
+    color: #333;
+}
+
+.dashboardTitle {
+    color: #d90429; /* Red accent color */
+    text-align: center;
+    margin-bottom: 24px;
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+/* --- KPI Indicator Cards --- */
+
+.kpiGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.kpiCard {
+    padding: 20px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    text-align: center;
+    background: #fafafa;
+    transition: all 0.2s ease-in-out;
+}
+
+.kpiTitle {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #777;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+}
+
+.kpiValue {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #333;
+}
+
+.kpiUnit {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #777;
+    margin-left: 4px;
+}
+
+/* Red / Yellow / Green Indicator Styles */
+.red {
+    background-color: #ffebee;
+    border-color: #f44336;
+}
+.red .kpiTitle { color: #c62828; }
+.red .kpiValue { color: #d90429; }
+
+.green {
+    background-color: #e8f5e9;
+    border-color: #4caf50;
+}
+.green .kpiTitle { color: #2e7d32; }
+.green .kpiValue { color: #388e3c; }
+
+.yellow {
+    background-color: #fffde7;
+    border-color: #fdd835;
+}
+.yellow .kpiTitle { color: #f9a825; }
+.yellow .kpiValue { color: #f57f17; }
+
+
+/* --- Chart Grid Layout --- */
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.card {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #eee;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.fullWidth {
+    grid-column: 1 / -1;
+}
+
+.chartBox {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.chartTitle {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+/* --- Recharts Tooltip Customization --- */
+
+.customTooltip {
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.tooltipLabel {
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+}
+/* --- PASTE THIS AT THE END of your .css file --- */
+
+.logContainer {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.logGrid {
+    display: grid;
+    grid-template-columns: 60px 50px 100px 1fr; /* Date, Gym, Water, Meals */
+    gap: 8px 10px;
+    align-items: center;
+    max-height: 300px; /* Make the log scrollable */
+    overflow-y: auto;
+    padding-right: 10px; /* For the scrollbar */
+}
+
+.logHeader {
+    font-weight: 600;
+    font-size: 0.8rem;
+    color: #555;
+    text-transform: uppercase;
+}
+
+.logCell {
+    display: flex;
+    align-items: center;
+    min-height: 24px;
+}
+
+.logCellDate {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #333;
+}
+
+/* --- Gym Indicator --- */
+.gymBlock {
+    width: 25px;
+    height: 25px;
+    background-color: #d90429; /* Red */
+    border-radius: 4px;
+}
+
+/* --- Water Indicator --- */
+.waterDrops {
+    display: flex;
+    gap: 3px;
+    align-items: center;
+    color: #0077b6; /* Blue */
+    font-size: 1.1rem;
+}
+
+.waterDrop {
+    opacity: 0.8;
+}
+
+/* --- Meal Indicator --- */
+.mealBlocks {
+    display: flex;
+    gap: 4px;
+}
+
+.mealBlocks span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 25px;
+    height: 25px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.mealTracked {
+    background-color: #ff8fa3; /* Light Red */
+    color: #d90429;
+}
+
+.mealMissed {
+    background-color: #f0f0f0; /* Grey */
+    color: #aaa;
+    border: 1px solid #ddd;
+}
+
+/* --- NEW STYLE FOR KPI HEADERS --- */
+.kpiHeader {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+    margin-top: 25px;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 5px;
+}
+
+/* This resets the margin for the very first header */
+.kpiHeader:first-of-type {
+    margin-top: 0;
+}

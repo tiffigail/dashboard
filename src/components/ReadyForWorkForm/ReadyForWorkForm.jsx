@@ -5,7 +5,8 @@ import StarRating from '../StarRating/StarRating'; // Import the reusable StarRa
 import { db } from '../../firebaseConfig';
 import {
     collection,
-    addDoc,
+    writeBatch, // Add this
+    doc, // Add this
     serverTimestamp,
     query,
     where,
@@ -19,7 +20,12 @@ const checklistItems = [
     "Hair", "Makeup", "Scent", "Recitation", 
     "PKW", "Water", "Lunch", "Supps", "Snacks", "Leave your worth", "remember your point"
 ];
-
+const getTodayString = () => {
+    const now = new Date();
+    const timezoneOffset = now.getTimezoneOffset() * 60000;
+    const localDate = new Date(now - timezoneOffset);
+    return localDate.toISOString().split('T')[0];
+};
 // Props: onSubmit, onClose
 function ReadyForWorkForm({ onSubmit, onClose }) {
     // == State ==
@@ -85,51 +91,76 @@ function ReadyForWorkForm({ onSubmit, onClose }) {
     };
 
     const handleSubmit = async (event) => {
-        event.preventDefault();
-        if (readinessRating === 0) {
-            setSubmitError("Please rate how ready you feel.");
-            return;
-        }
-        setIsSubmitting(true);
-        setSubmitError(null);
+    event.preventDefault();
+    if (readinessRating === 0) {
+        setSubmitError("Please rate how ready you feel.");
+        return;
+    }
+    setIsSubmitting(true);
+    setSubmitError(null);
 
-        const completedChecklist = Object.entries(checkedItems)
-            .filter(([key, value]) => value === true)
-            .map(([key]) => key);
+    // --- NEW: Use the helper to get the YYYY-MM-DD Document ID ---
+    const docId = getTodayString(); // e.g., "2025-10-24"
 
-        const endTime = Date.now();
-        const durationMinutes = Math.round((endTime - startTimeRef.current) / (1000 * 60));
+    console.log(`--- USING NEW HANDLE SUBMIT (V4) ---`);
+    console.log(`Attempting to create/set documents with ID: ${docId}`);
 
-        const formData = {
-            type: 'readyForWorkLog',
-            checklistCompleted: completedChecklist,
-            weight: weight.trim() ? parseFloat(weight) : null,
-            bodyfatPercentage: bodyfat.trim() ? parseFloat(bodyfat) : null,
-            readinessRating: readinessRating,
-            durationMinutes: durationMinutes,
-            completedAt: serverTimestamp()
-            // Optionally add workRecitation here if needed in the log:
-            // recitationText: (workRecitation && workRecitation !== "Loading recitation..." && workRecitation !== "No active 'work' recitation set." && workRecitation !== "Error loading recitation.") ? workRecitation : null,
-        };
+    // --- Data Preparation ---
+    const endTime = Date.now();
+    const durationMinutes = Math.round((endTime - startTimeRef.current) / (1000 * 60));
+    const timestamp = serverTimestamp(); 
 
-        console.log("Attempting to save Ready For Work Data:", formData);
+    // 1. Prepare data for 'readyForWorkLogs'
+    const completedChecklist = Object.entries(checkedItems)
+        .filter(([key, value]) => value === true)
+        .map(([key]) => key);
 
-        try {
-            const logDocRef = await addDoc(collection(db, "readyForWorkLogs"), formData);
-            console.log("Ready For Work Log Document written with ID: ", logDocRef.id);
-
-            if (onSubmit) onSubmit(formData);
-            if (onClose) onClose();
-
-        } catch (e) {
-            console.error("Error adding Ready For Work log: ", e);
-            setSubmitError("Failed to save log. Please try again.");
-            setIsSubmitting(false);
-        }
-        // Keep isSubmitting true if successful because onClose should handle component unmount/reset
+    const readyForWorkData = {
+        type: 'readyForWorkLog',
+        checklistCompleted: completedChecklist,
+        readinessRating: readinessRating,
+        durationMinutes: durationMinutes,
+        completedAt: timestamp 
     };
 
-    // --- Render JSX ---
+    // 2. Prepare data for 'physicalGoalsLogs'
+    const hasPhysicalData = weight.trim() || bodyfat.trim();
+    const physicalGoalsData = {
+        weight: weight.trim() ? parseFloat(weight) : null,
+        bodyfatPercentage: bodyfat.trim() ? parseFloat(bodyfat) : null,
+        amMetricsCompletedAt: timestamp // Using a more specific field name
+    };
+
+    // --- Firestore Batch Write ---
+    try {
+        const batch = writeBatch(db);
+
+        // Create a reference to the *specific* YYYY-MM-DD document
+        const workLogRef = doc(db, "readyForWorkLogs", docId);
+        batch.set(workLogRef, readyForWorkData); // Creates or overwrites
+        console.log("Staged 'set' for readyForWorkLogs:", readyForWorkData);
+
+        if (hasPhysicalData) {
+            // Create a reference to the *specific* YYYY-MM-DD document
+            const physicalLogRef = doc(db, "physicalGoalsLogs", docId);
+            // Use set() WITH MERGE: TRUE
+            // This creates the doc *or* merges if it somehow already exists
+            batch.set(physicalLogRef, physicalGoalsData, { merge: true }); 
+            console.log("Staged 'set with merge' for physicalGoalsLogs:", physicalGoalsData);
+        }
+
+        await batch.commit();
+        console.log("Batch commit successful!");
+
+        if (onSubmit) onSubmit(readyForWorkData);
+        if (onClose) onClose();
+
+    } catch (e) {
+        console.error("Error committing batch: ", e);
+        setSubmitError("Failed to save log. Please try again.");
+        setIsSubmitting(false);
+    }
+};
     return (
         <form onSubmit={handleSubmit} className={styles.form}>
             <h3 className={styles.formTitle}>Ready for Work</h3>

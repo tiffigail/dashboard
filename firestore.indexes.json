@@ -1,10 +1,6 @@
 {
   "indexes": [
-    {
-      "collectionGroup": "dailyMetrics",
-      "queryScope": "COLLECTION",
-      "fields": []
-    },
+   
     {
       "collectionGroup": "weeklySteps",
       "queryScope": "COLLECTION",

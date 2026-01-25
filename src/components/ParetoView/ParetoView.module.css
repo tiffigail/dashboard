@@ -158,10 +158,11 @@
     margin-bottom: 0;
 }
 .premiseText {
-    font-size: 1rem;
+    font-size: 1.2rem;
+    font-weight: 525;
     color: #6A4A3C;
     margin-top: 0;
-    line-height: 1.5;
+    line-height: 1;
 }
 
 .eightyTwentyVisual { /* MODIFIED: Sized down for inline display */
@@ -188,7 +189,7 @@
     padding: 1rem;
 }
 .groupTitle {
-    margin-top: 0;
+    margin-top: .5rem;
     margin-bottom: 0.5rem;
     font-size: 1.3rem;
     font-weight: 700;
@@ -284,14 +285,43 @@
     font-weight: 400;
 }
 .carrotToggle {
-    font-size: 1rem;
-    color: var(--text-accent);
-    cursor: pointer;
-    transition: transform 0.3s ease-in-out;
-    padding: 0 0.25rem;
+  position: relative; /* Needed for the tooltip positioning */
+  cursor: pointer;
+  font-size: 1.5rem;
+  transition: transform 0.3s ease;
+  color: var(--text-accent, #6C757D);
+  -webkit-text-stroke: 0.5px black;
+  text-stroke: 0.5px black;
 }
+
 .carrotToggle.expanded {
-    transform: rotate(180deg);
+  transform: rotate(180deg);
+}
+
+/* --- NEW: CSS-only Tooltip --- */
+.carrotToggle::after {
+  content: 'Expand for details';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+
+  background-color: #f0f9f9;
+  color: #021321;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 14px;
+  white-space: nowrap;
+
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s, visibility 0.2s;
+  pointer-events: none;
+}
+
+.carrotToggle:hover::after {
+  opacity: 1;
+  visibility: visible;
 }
 
 /* --- Methodology Section --- */

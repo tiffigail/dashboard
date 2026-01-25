@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import styles from './YearlyReviewModal.module.css'; // You can reuse the same CSS
 import { db } from '../../firebaseConfig';
-import { collection, addDoc, serverTimestamp, doc, getDoc, setDoc } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp, doc, getDoc, setDoc, deleteDoc } from "firebase/firestore";
 
 // ✅ 1. Questions are now a constant in this file
 const yearlyReviewQuestions = [
@@ -121,13 +121,55 @@ function YearlyReviewModal({ isOpen, onClose, onOpenTimeline, allAxesData }) {
         }
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        // This function would contain your final submission logic,
-        // which might move the draft to a final "completed" state.
-        // For now, it can function similarly to saving a draft.
-        alert("Final submission logic goes here!");
-    };
+const handleSubmit = async (e) => {
+    e.preventDefault();
+    const selectedAxis = allAxesData.find(axis => axis.id === selectedAxisId);
+    
+    // Validation: Ensure all questions have at least some text
+    const unanswered = yearlyReviewQuestions.filter(q => !responses[q.id] || responses[q.id].trim() === '');
+    if (unanswered.length > 0) {
+        setError(`Please answer all questions before submitting. (${unanswered.length} remaining)`);
+        return;
+    }
+
+    setIsSubmitting(true);
+    setError('');
+    setStatusMessage('Finalizing your yearly review...');
+
+    try {
+        // 1. Create the final record
+        // We use addDoc to create a unique entry, or setDoc with a timestamped ID
+        const finalReviewId = `yearly_final_${selectedAxis.yearlyGoal.id}_${Date.now()}`;
+        
+        await setDoc(doc(db, "goalCheckins", finalReviewId), {
+            goalId: selectedAxis.yearlyGoal.id,
+            axisId: selectedAxis.id,
+            axisName: selectedAxis.displayName,
+            userId: "user_placeholder_id", // Replace with actual auth UID if available
+            responses: responses,
+            checkinType: 'yearly_review', 
+            submittedAt: serverTimestamp(),
+            year: 2025 
+        });
+
+        // 2. Delete the draft now that the final version exists
+        const draftId = `yearly_draft_${selectedAxis.yearlyGoal.id}`;
+        await deleteDoc(doc(db, "goalCheckins", draftId));
+
+        setStatusMessage('Yearly review submitted successfully!');
+        
+        // 3. Close the modal after a short delay
+        setTimeout(() => {
+            onClose();
+        }, 1500);
+
+    } catch (err) {
+        console.error("Error submitting final review:", err);
+        setError('Failed to submit final review. Your draft is still safe.');
+    } finally {
+        setIsSubmitting(false);
+    }
+};
     
     if (!isOpen) return null;
 

@@ -1,0 +1,91 @@
+.logContainer {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.chartTitle {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.logGrid {
+    display: grid;
+    grid-template-columns: 60px 50px 100px 1fr; /* Date, Gym, Water, Meals */
+    gap: 8px 10px;
+    align-items: center;
+    max-height: 400px; /* Make the log scrollable */
+    overflow-y: auto;
+    padding-right: 10px; /* For the scrollbar */
+}
+
+.logHeader {
+    font-weight: 600;
+    font-size: 0.8rem;
+    color: #555;
+    text-transform: uppercase;
+}
+
+.logCell {
+    display: flex;
+    align-items: center;
+    min-height: 24px;
+}
+
+.logCellDate {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #333;
+}
+
+/* --- Gym Indicator --- */
+.gymBlock {
+    width: 25px;
+    height: 25px;
+    background-color: #d90429; /* Red */
+    border-radius: 4px;
+}
+
+/* --- Water Indicator --- */
+.waterDrops {
+    display: flex;
+    gap: 3px;
+    align-items: center;
+    color: #0077b6; /* Blue */
+    font-size: 1.1rem;
+}
+
+.waterDrop {
+    opacity: 0.8;
+}
+
+/* --- Meal Indicator --- */
+.mealBlocks {
+    display: flex;
+    gap: 4px;
+}
+
+.mealBlocks span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 25px;
+    height: 25px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.mealTracked {
+    background-color: #ff8fa3; /* Light Red */
+    color: #d90429;
+}
+
+.mealMissed {
+    background-color: #f0f0f0; /* Grey */
+    color: #aaa;
+    border: 1px solid #ddd;
+}

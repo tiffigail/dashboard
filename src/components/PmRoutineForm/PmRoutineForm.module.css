@@ -148,4 +148,33 @@
   .submitButton:hover:not(:disabled) {
     background-color: #04231c; /* Peacock light*/
   }
-  
+  .chartButtonContainer {
+  width: 100%;
+  margin-bottom: 10px;
+  margin-top: 15px;
+  border-top: 1px solid #444;
+  padding-top: 15px;
+}
+
+.chartButton {
+  width: 100%;
+  padding: 10px 15px;
+  background-color: #3a3a3c;
+  color: #e0e0e0;
+  border: 1px solid #555;
+  border-radius: 5px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.chartButton:hover:not(:disabled) {
+  background-color: #4a4a4c;
+}
+
+.chartButton:disabled {
+  background-color: #2a2a2e;
+  color: #777;
+  cursor: not-allowed;
+}

@@ -1,0 +1,982 @@
+Starting data export...
+Successfully read 7 documents from new_axes
+Successfully read 57 documents from new_goals
+
+--- COPY THE JSON BELOW ---
+{
+  "new_axes": [
+    {
+      "id": "On Track N+1",
+      "question": "How do I avoid burnout when dealing with repetition?",
+      "mentor": "Catherine L. Gibbon",
+      "values": [
+        "Strategic Pursuit: Applying a discerning lens to identify and amplify the most effective actions (the 20%) that yield significant results, as inspired by Pareto.  Intentionality: Deliberately choosing where to apply your energy and focus, even if the grand purpose is \"intentional pointlessness.\"",
+        "Value Creation: Actively working to generate something of worth, whether it's an optical illusion through movement, a functional mental system, or monetary abundance.",
+        "Mastery: The relentless pursuit of skill and precision within each axis, whether it's mime, mind control, or managing money. Output: The creation of tangible results and physical manifestations—a performance, a guide, a space, funding—as proof of your focused efforts.  Empowerment: Taking control over aspects of your life (body, mind, environment, finances) to diminish feelings of helplessness and shame.",
+        "Observation: Actively collecting and analyzing data from your efforts within each axis, turning your life into an \"experiment.\"",
+        "Adaptability: Allowing your \"plans and dreams\" to evolve, recognizing that the journey itself is a dynamic process of discovery."
+      ],
+      "overview": "the \"On Track\" axis is the arena of focused effort and intentional creation, where your active engagement with the world brings your specific axis goals to fruition. It's about the conscious application of energy towards mastery, output, and strategic growth within your chosen \"5 Axes\" (Physical, Financial, Mental, Environmental, and the overarching Misdirect). This axis is about directing your will and observing the tangible results, even if the ultimate \"point\" is found in the journey and the unexpected outcomes. It's where you actively \"prune nations and cast off dross\" by identifying and concentrating on the most impactful 20% of your actions.",
+      "axisName": "On Track N+1"
+    },
+    {
+      "id": "environment",
+      "values": [
+        "To demonstrate and experience personal power by controlling one's environment.",
+        "To recognize that cleaning the external sorts the internal.",
+        "To change myself to be at peace in any environment.",
+        "To create a space that is a reflection of my inner mind."
+      ],
+      "axisName": "Environment",
+      "overview": "We define ourselves both internally and in relation to our surroundings. Because our minds are mirrors, our perspective of our environment reflects our inner mind. Taking control of our environment is then reflected in the mind. The goal is to create a space that is a reflection of the inner self, a place of safety and ease. This involves not just shaping the environment, but also exploring it and sometimes adjusting oneself to it. The ultimate goal is a space that can gently incorporate others, changing them through the experience of the space itself, much like the progression through a Mormon temple.",
+      "question": "What is the ideal state of the house to make me feel I am safe and own a treasure",
+      "mentor": "The Whole in the Ozone Layer"
+    },
+    {
+      "id": "financial",
+      "mentor": "The Tailor that made the Emperor’s new clothes",
+      "overview": "This Axis aims to shift the perspective on money from a mysterious, uncontrollable force to something where hard work has monetary value that can be strategically pursued. It addresses the fear and shame associated with past poverty and the feeling of powerlessness over finances. The initial 'lottery' metaphor represents a desperate hope, but evolves into a desire to 'win the lottery on purpose' by aligning one's own values with what others value, leading to a fulfilling exchange. Recognizing that treating money as impossible to earn can be a defense mechanism, the goal is to reclaim control and understand that earning is based on value. The 'Boxcar Children' metaphor signifies a richness based on treasuring what one has, resourcefulness, and gratitude",
+      "question": "How can I make myself a Magnet?  How can I create passive income so I am free to pursue enlightenment and raise others",
+      "values": [
+        "To survive in this reality and fund all other endeavors\n",
+        "To shift perspective from chance to strategic pursuit of value",
+        "To find richness in gratitude and resourcefulness",
+        "To reclaim control and see earning as a function of value provided"
+      ],
+      "axisName": "Financial"
+    },
+    {
+      "id": "gear",
+      "axisName": "Gear",
+      "mentor": "The old lady in the Mitsubishi commercial",
+      "question": "How do I say things that cant be fully said in the most simple way?",
+      "values": [
+        "To achieve mind control by understanding, not forcing",
+        "To align actions with a higher, 'zoomed-out' value system",
+        "To use a systematic method of thinking to solve problems",
+        "To navigate ambiguity with a structured framework"
+      ],
+      "overview": "The 'Liahona' (a navigational device in the Book of Mormon) serves as a central metaphor for a core component of the mind. The Liahona works when its users’ actions and beliefs align with the values of its creator (God). When your actions and beliefs align with what you truly value, the mind (Liahona) calibrates to show the steps needed to achieve desires, balancing reward and punishment to create intrinsic motivation. The 'GearShift' effort is an attempt to understand these mental processes, fine-tune map creating and map-following skills, rather than trying to control fate from a limited perspective. It acknowledges that gut feelings can be 'scrambled by shame and fear,' and the higher mind is needed for clear navigation"
+    },
+    {
+      "id": "misdirect",
+      "values": [
+        "To use distraction strategically to prolong total periods of productivity",
+        "To trust the brain's innate ability to sort information in the background.",
+        "To balance misdirection with intentional re-orientation",
+        "To reframe 'breaks' as productive regrouping"
+      ],
+      "question": "how can I produce the most with no pressure",
+      "axisName": "Misdirect",
+      "mentor": "ABI HARRISON",
+      "overview": "Misdirection is a tool to prevent fatigue and allow for prolonged, effective focus by providing necessary breaks and shifts in perspective. Each Axis can seem like a misdirect from the perspective of another, yet all contribute to a whole. This approach involves trusting the brain's innate ability to sort and process information even when not actively focused on it. From the perspective of any single Axis, the other 80% of activities can be reframed as rest and regrouping, rather than an endless grind. Crucially, a misdirect must be balanced by an eventual intentional redirect. It's about 'leaving so we can come back again,' using the disorienting nature of misdirection to then re-orient with fresh perspective"
+    },
+    {
+      "id": "physical",
+      "axisName": "Physical",
+      "values": [
+        "To be powerful and on purpose",
+        "To be valued by use and capability, not solely by appearance.",
+        "To be fully present and overcome the instinct to dissociate from pain",
+        "To find joy in movement for intrinsic expression"
+      ],
+      "mentor": "Mimechal Jackson",
+      "question": "How do I savor my ability to act on the physical world and have a good life?",
+      "overview": "This Axis evolved from a desire to move without shame to a deeper goal of self-mastery and being fully present in the body. The body is seen as a vessel for sentience, and the ultimate achievement is for sentience to control it seamlessly, to become the body. It aims to overcome feelings of pain or dissociation, allowing the user to 'feel what it's like to know what YOU as a body want, and to be able to move just exactly so with precision and timing.' This is an act of respect and gratitude for life, addressing past negative experiences and reclaiming the joy of movement for intrinsic expression"
+    },
+    {
+      "id": "rest-and-preparation",
+      "axisName": "Rest and preparation",
+      "values": [
+        "Proactive Confidence: Engaging in actions that build a deep-seated belief in your ability to handle future challenges, knowing you've invested in your own well-being and readiness. This creates an intrinsic sense of power that comes from self-reliance.",
+        "Peace of Mind: Through conscious rest, reflection, and strategic planning (even through misdirection), you reduce anxiety and uncertainty, cultivating a calm and centered state ready for action.",
+        "Sustainability: Ensuring your long-term capacity for effort and engagement by prioritizing physical, mental, and emotional replenishment. This isn't just recovery; it's building a deeper reserve.",
+        "Strategic Foresight: Stepping back from the immediate grind to plan, learn, and organize your thoughts and environment, anticipating needs and creating favorable conditions for future success.",
+        "Resource Cultivation: Actively nurturing your internal and external resources—energy, knowledge, mental clarity, a supportive environment—so they are abundant when needed.",
+        "Personal Sovereignty: The deep satisfaction and control you feel when you intentionally shape your internal state and external environment, demonstrating to yourself that you have the agency to influence your reality.",
+        "Inner Alignment: Using moments of \"misdirection\" and reorientation to reconnect with your core values and \"higher mind,\" ensuring your actions are in sync with your authentic self, which naturally breeds confidence.",
+        "Embracing Discomfort (as Preparation): Willingly engaging with challenging experiences (like cold showers or uncomfortable temperatures) not as punishment, but as a deliberate practice to expand your tolerance for discomfort, thus preparing you for life's inevitable pains and making you more adaptable."
+      ],
+      "overview": "Your \"Rest & Prepare\" axis is uniquely defined by the concept of the \"Misdirect\": strategic distraction, essential reorientation, and the profound act of stepping back to gain perspective and restore your capacity. It's the vital counterpoint that prevents fatigue and enables sustained \"On Track\" productivity. This axis is about rejuvenation through unexpected pathways, cultivating deeper understanding, and allowing for the incubation of ideas. It's the space where you \"shake up the etch a sketch,\" embrace being \"good and dizzy and lost\" before intentionally re-orienting, ensuring you don't get trapped in a loop. It's where you \"savor\" moments, allowing for a deeper, multi-sensory experience of reality that is itself a form of grounding and preparation.",
+      "question": "How can I minimize daily tasks by preparing in advance?",
+      "mentor": "Bear Grylls"
+    }
+  ],
+  "new_goals": [
+    {
+      "id": "0iSDHlKDDMnIVqmxbNA4",
+      "axisId": "financial",
+      "year": 2028,
+      "dueDate": {
+        "seconds": 1861833600,
+        "nanoseconds": 0
+      },
+      "goalId": "0iSDHlKDDMnIVqmxbNA4",
+      "type": "yearly",
+      "title": "100,000 salary",
+      "createdAt": {
+        "seconds": 1752011151,
+        "nanoseconds": 748000000
+      },
+      "completionDate": null,
+      "status": "todo"
+    },
+    {
+      "id": "1Jh7dt77QGNkabywBhjD",
+      "completionDate": null,
+      "dueDate": {
+        "seconds": 1861833600,
+        "nanoseconds": 0
+      },
+      "status": "todo",
+      "title": "Sing publicly",
+      "createdAt": {
+        "seconds": 1752011517,
+        "nanoseconds": 885000000
+      },
+      "year": 2028,
+      "goalId": "1Jh7dt77QGNkabywBhjD",
+      "type": "yearly",
+      "axisId": "misdirect"
+    },
+    {
+      "id": "2bO4EwVWMH4gRGZs8VJ0",
+      "dueDate": {
+        "seconds": 1830211200,
+        "nanoseconds": 0
+      },
+      "axisId": "environment",
+      "completionDate": null,
+      "type": "yearly",
+      "status": "todo",
+      "goalId": "2bO4EwVWMH4gRGZs8VJ0",
+      "createdAt": {
+        "seconds": 1751905916,
+        "nanoseconds": 271000000
+      },
+      "year": 2027,
+      "title": "Only own things I love and be particular in arrangement"
+    },
+    {
+      "id": "43BuxY7uXr7bppWWQUj7",
+      "status": "todo",
+      "axisId": "rest-and-preparation",
+      "dueDate": {
+        "seconds": 1887494400,
+        "nanoseconds": 0
+      },
+      "goalId": "43BuxY7uXr7bppWWQUj7",
+      "title": "Follow the track",
+      "createdAt": {
+        "seconds": 1752013128,
+        "nanoseconds": 398000000
+      },
+      "type": "yearly",
+      "completionDate": null,
+      "year": 2029
+    },
+    {
+      "id": "4Du5uXdBmzihk3oj1wVW",
+      "axisId": "physical",
+      "title": "MasterPuppeteering my Body. Learn to move like an optical illusion",
+      "type": "pareto",
+      "goalId": "4Du5uXdBmzihk3oj1wVW"
+    },
+    {
+      "id": "6oSwF0f6QOqV6Ec8CCXb",
+      "completionDate": {
+        "seconds": 1735603200,
+        "nanoseconds": 0
+      },
+      "createdAt": {
+        "seconds": 1751666020,
+        "nanoseconds": 534000000
+      },
+      "goalId": "6oSwF0f6QOqV6Ec8CCXb",
+      "status": "completed",
+      "type": "yearly",
+      "dueDate": {
+        "seconds": 1735603200,
+        "nanoseconds": 0
+      },
+      "title": "List of Projects",
+      "axisId": "misdirect",
+      "year": 2024
+    },
+    {
+      "id": "84uLSh4O4w9OgTmQ2Wpg",
+      "completionDate": null,
+      "type": "yearly",
+      "dueDate": {
+        "seconds": 1861833600,
+        "nanoseconds": 0
+      },
+      "createdAt": {
+        "seconds": 1752011482,
+        "nanoseconds": 808000000
+      },
+      "year": 2028,
+      "title": "Enter a contest",
+      "status": "todo",
+      "goalId": "84uLSh4O4w9OgTmQ2Wpg",
+      "axisId": "physical"
+    },
+    {
+      "id": "9W59UpRspBO0eunxlhUZ",
+      "createdAt": {
+        "seconds": 1752011969,
+        "nanoseconds": 354000000
+      },
+      "axisId": "gear",
+      "goalId": "9W59UpRspBO0eunxlhUZ",
+      "completionDate": null,
+      "status": "todo",
+      "year": 2028,
+      "type": "yearly",
+      "title": "Write book",
+      "dueDate": {
+        "seconds": 1861833600,
+        "nanoseconds": 0
+      }
+    },
+    {
+      "id": "9iCGcNxJjbfxf7bjXzw5",
+      "title": "Create a system of mindcontrol that allows me to maximize the brain I have",
+      "goalId": "9iCGcNxJjbfxf7bjXzw5",
+      "dueDate": {
+        "seconds": 1893369600,
+        "nanoseconds": 0
+      },
+      "type": "stretch",
+      "axisId": "gear"
+    },
+    {
+      "id": "9iTH3LhmjWTtLeuKa4FK",
+      "title": "Pay off Debt",
+      "goalId": "9iTH3LhmjWTtLeuKa4FK",
+      "axisId": "financial",
+      "type": "yearly",
+      "completionDate": {
+        "seconds": 1735668921,
+        "nanoseconds": 455000000
+      },
+      "createdAt": {
+        "seconds": 1751665928,
+        "nanoseconds": 448000000
+      },
+      "year": 2024,
+      "status": "completed"
+    },
+    {
+      "id": "CzVBT3f8VnpJzVEENxK5",
+      "status": "todo",
+      "type": "yearly",
+      "year": 2027,
+      "title": "Establish a source of passive income",
+      "axisId": "financial",
+      "dueDate": {
+        "seconds": 1830211200,
+        "nanoseconds": 0
+      },
+      "completionDate": null,
+      "createdAt": {
+        "seconds": 1751905751,
+        "nanoseconds": 355000000
+      },
+      "goalId": "CzVBT3f8VnpJzVEENxK5"
+    },
+    {
+      "id": "FhatwpWvyj0AMAL0hMvW",
+      "goalId": "FhatwpWvyj0AMAL0hMvW",
+      "type": "pareto",
+      "title": "Create a system of mindcontrol that allows me to maximize the brain I have",
+      "axisId": "gear"
+    },
+    {
+      "id": "FpaLbiirZnAiW1TNVxZV",
+      "title": "Structured plan to save 10000",
+      "goalId": "FpaLbiirZnAiW1TNVxZV",
+      "status": "todo",
+      "year": 2026,
+      "axisId": "financial",
+      "type": "yearly",
+      "createdAt": {
+        "seconds": 1751847112,
+        "nanoseconds": 574000000
+      },
+      "dueDate": {
+        "seconds": 1798675200,
+        "nanoseconds": 0
+      },
+      "completionDate": null
+    },
+    {
+      "id": "FrfD12qU8QYeh1JIMR3q",
+      "year": 2028,
+      "type": "yearly",
+      "completionDate": null,
+      "status": "todo",
+      "goalId": "FrfD12qU8QYeh1JIMR3q",
+      "createdAt": {
+        "seconds": 1751855876,
+        "nanoseconds": 861000000
+      },
+      "dueDate": {
+        "seconds": 1861833600,
+        "nanoseconds": 0
+      },
+      "axisId": "rest-and-preparation",
+      "title": "Full year designed and prepared for"
+    },
+    {
+      "id": "FzPqmLUgp0RuoeedXNTi",
+      "title": "Creation of Preparedness concept",
+      "status": "completed",
+      "goalId": "FzPqmLUgp0RuoeedXNTi",
+      "year": 2024,
+      "axisId": "rest-and-preparation",
+      "type": "yearly",
+      "completionDate": {
+        "seconds": 1735430400,
+        "nanoseconds": 0
+      },
+      "dueDate": {
+        "seconds": 1735603200,
+        "nanoseconds": 0
+      },
+      "createdAt": {
+        "seconds": 1753016542,
+        "nanoseconds": 569000000
+      }
+    },
+    {
+      "id": "GZHtiY89jo3TvHmBZSxT",
+      "status": "todo",
+      "axisId": "physical",
+      "completionDate": null,
+      "createdAt": {
+        "seconds": 1751905824,
+        "nanoseconds": 110000000
+      },
+      "type": "yearly",
+      "goalId": "GZHtiY89jo3TvHmBZSxT",
+      "title": "Perform a Physical Feat",
+      "year": 2027,
+      "dueDate": {
+        "seconds": 1830211200,
+        "nanoseconds": 0
+      }
+    },
+    {
+      "id": "GiegImr5LmZaooP0vXwX",
+      "title": "Working farm",
+      "type": "yearly",
+      "dueDate": {
+        "seconds": 1878163200,
+        "nanoseconds": 0
+      },
+      "status": "todo",
+      "goalId": "GiegImr5LmZaooP0vXwX",
+      "axisId": "financial",
+      "completionDate": null,
+      "createdAt": {
+        "seconds": 1752011203,
+        "nanoseconds": 278000000
+      },
+      "year": 2029
+    },
+    {
+      "id": "J02GT6tIQWWySWDTafV8",
+      "completionDate": null,
+      "year": 2027,
+      "axisId": "gear",
+      "status": "todo",
+      "title": "Map out mental modes and protocols and approaches",
+      "goalId": "J02GT6tIQWWySWDTafV8",
+      "createdAt": {
+        "seconds": 1751855693,
+        "nanoseconds": 911000000
+      },
+      "type": "yearly",
+      "dueDate": {
+        "seconds": 1830211200,
+        "nanoseconds": 0
+      }
+    },
+    {
+      "id": "JHC3KOsiqSpIJ127KjEx",
+      "title": "Have habits in place that make me feel prepared for anything",
+      "axisId": "rest-and-preparation",
+      "goalId": "JHC3KOsiqSpIJ127KjEx",
+      "type": "pareto"
+    },
+    {
+      "id": "JKHnwsRp4A6o3mYmetMZ",
+      "completionDate": null,
+      "axisId": "misdirect",
+      "status": "todo",
+      "dueDate": {
+        "seconds": 1830211200,
+        "nanoseconds": 0
+      },
+      "createdAt": {
+        "seconds": 1751906199,
+        "nanoseconds": 629000000
+      },
+      "goalId": "JKHnwsRp4A6o3mYmetMZ",
+      "year": 2027,
+      "title": "Make something that will connect me to people",
+      "type": "yearly"
+    },
+    {
+      "id": "Js10wq3m7EpCRVfWSInk",
+      "title": "Save 18000 in an emergency fund",
+      "year": 2025,
+      "status": "completed",
+      "goalId": "Js10wq3m7EpCRVfWSInk",
+      "completionDate": {
+        "seconds": 1751760000,
+        "nanoseconds": 0
+      },
+      "type": "yearly",
+      "axisId": "financial",
+      "dueDate": {
+        "seconds": 1767139200,
+        "nanoseconds": 0
+      }
+    },
+    {
+      "id": "MdwQVVDts0VRUXSJow0O",
+      "axisId": "misdirect",
+      "type": "yearly",
+      "year": 2025,
+      "dueDate": {
+        "seconds": 1767139200,
+        "nanoseconds": 0
+      },
+      "title": "Spending intentional time with Izi",
+      "goalId": "MdwQVVDts0VRUXSJow0O"
+    },
+    {
+      "id": "ORUJH8GSPgrIPi8lp7Xf",
+      "goalId": "ORUJH8GSPgrIPi8lp7Xf",
+      "axisId": "On Track N+1",
+      "createdAt": {
+        "seconds": 1751847499,
+        "nanoseconds": 458000000
+      },
+      "year": 2026,
+      "title": "\"Published\" year 3 summary of Dashboard and the shape of my brain",
+      "status": "todo",
+      "type": "yearly",
+      "dueDate": {
+        "seconds": 1798675200,
+        "nanoseconds": 0
+      },
+      "completionDate": null
+    },
+    {
+      "id": "QMsaeEd2AQdKdpW0hS3F",
+      "status": "todo",
+      "type": "yearly",
+      "goalId": "QMsaeEd2AQdKdpW0hS3F",
+      "axisId": "rest-and-preparation",
+      "year": 2026,
+      "dueDate": {
+        "seconds": 1798675200,
+        "nanoseconds": 0
+      },
+      "title": "Emergency Ready",
+      "completionDate": null,
+      "createdAt": {
+        "seconds": 1751847415,
+        "nanoseconds": 627000000
+      }
+    },
+    {
+      "id": "QaQjUP8HmFkIkVxgM4fb",
+      "axisId": "physical",
+      "completionDate": null,
+      "dueDate": {
+        "seconds": 1884384000,
+        "nanoseconds": 0
+      },
+      "status": "todo",
+      "title": "Performance Art",
+      "goalId": "QaQjUP8HmFkIkVxgM4fb",
+      "createdAt": {
+        "seconds": 1752013042,
+        "nanoseconds": 0
+      },
+      "type": "yearly",
+      "year": 2029
+    },
+    {
+      "id": "RbMKiVQb30rXlZzq51uo",
+      "title": "Family Clean Habit and Stats Chart",
+      "dueDate": {
+        "seconds": 1767139200,
+        "nanoseconds": 0
+      },
+      "type": "yearly",
+      "year": 2025,
+      "axisId": "environment",
+      "goalId": "RbMKiVQb30rXlZzq51uo"
+    },
+    {
+      "id": "SWgWDyJci3C3tmiiRqOx",
+      "type": "yearly",
+      "year": 2026,
+      "completionDate": null,
+      "createdAt": {
+        "seconds": 1751804210,
+        "nanoseconds": 214000000
+      },
+      "status": "todo",
+      "title": "Learn a choreographed dance",
+      "axisId": "physical",
+      "dueDate": {
+        "seconds": 1798675200,
+        "nanoseconds": 0
+      },
+      "goalId": "SWgWDyJci3C3tmiiRqOx"
+    },
+    {
+      "id": "T1rHxlyNW5BKzvZM8Arx",
+      "title": "Figure out how to use misdirects to recharge, to shift, to surf the Ebbs and Flows of Reality",
+      "type": "pareto",
+      "axisId": "misdirect",
+      "goalId": "T1rHxlyNW5BKzvZM8Arx"
+    },
+    {
+      "id": "TznfQZgozB5CMAo5H1gF",
+      "goalId": "TznfQZgozB5CMAo5H1gF",
+      "completionDate": null,
+      "title": "On track habits and reviews",
+      "type": "yearly",
+      "axisId": "On Track N+1",
+      "year": 2025,
+      "dueDate": {
+        "seconds": 1767139200,
+        "nanoseconds": 0
+      },
+      "status": "todo"
+    },
+    {
+      "id": "ZOij9Irbq2Ntf5ktFlzP",
+      "type": "yearly",
+      "status": "todo",
+      "title": "Care kits for the modes outlined in gear",
+      "dueDate": {
+        "seconds": 1830211200,
+        "nanoseconds": 0
+      },
+      "axisId": "rest-and-preparation",
+      "createdAt": {
+        "seconds": 1751855822,
+        "nanoseconds": 523000000
+      },
+      "completionDate": null,
+      "year": 2027,
+      "goalId": "ZOij9Irbq2Ntf5ktFlzP"
+    },
+    {
+      "id": "ZQDd38L63XtWVDggARH6",
+      "title": "Mind map",
+      "dueDate": {
+        "seconds": 1879632000,
+        "nanoseconds": 0
+      },
+      "createdAt": {
+        "seconds": 1752013076,
+        "nanoseconds": 362000000
+      },
+      "axisId": "environment",
+      "type": "yearly",
+      "goalId": "ZQDd38L63XtWVDggARH6",
+      "status": "todo",
+      "completionDate": null,
+      "year": 2029
+    },
+    {
+      "id": "Za8AkNnno2fOQIuRiplJ",
+      "year": 2029,
+      "title": "illustrate that book",
+      "createdAt": {
+        "seconds": 1752011569,
+        "nanoseconds": 218000000
+      },
+      "completionDate": null,
+      "dueDate": {
+        "seconds": 1882137600,
+        "nanoseconds": 0
+      },
+      "status": "todo",
+      "type": "yearly",
+      "goalId": "Za8AkNnno2fOQIuRiplJ",
+      "axisId": "misdirect"
+    },
+    {
+      "id": "a3s5LldU4JIrIosj4L9y",
+      "dueDate": {
+        "seconds": 1884816000,
+        "nanoseconds": 0
+      },
+      "completionDate": null,
+      "createdAt": {
+        "seconds": 1752011267,
+        "nanoseconds": 768000000
+      },
+      "goalId": "a3s5LldU4JIrIosj4L9y",
+      "status": "todo",
+      "year": 2029,
+      "title": "Publish a book",
+      "axisId": "gear",
+      "type": "yearly"
+    },
+    {
+      "id": "bJO1zPgSWveziYeTayrA",
+      "status": "todo",
+      "goalId": "bJO1zPgSWveziYeTayrA",
+      "title": "Yard Planned and in motion FoodForest",
+      "year": 2026,
+      "dueDate": {
+        "seconds": 1798675200,
+        "nanoseconds": 0
+      },
+      "type": "yearly",
+      "createdAt": {
+        "seconds": 1751847311,
+        "nanoseconds": 678000000
+      },
+      "axisId": "environment",
+      "completionDate": null
+    },
+    {
+      "id": "c26VpLAGQC0EIRsPyAPB",
+      "createdAt": {
+        "seconds": 1751665995,
+        "nanoseconds": 661000000
+      },
+      "year": 2024,
+      "status": "completed",
+      "title": "Habits",
+      "goalId": "c26VpLAGQC0EIRsPyAPB",
+      "completionDate": {
+        "seconds": 1735603200,
+        "nanoseconds": 0
+      },
+      "axisId": "gear",
+      "type": "yearly"
+    },
+    {
+      "id": "dGzsZyC4qyZkbhnO8PM3",
+      "axisId": "gear",
+      "type": "yearly",
+      "title": "Dashboard (gearshift Model)",
+      "dueDate": {
+        "seconds": 1767160800,
+        "nanoseconds": 891000000
+      },
+      "year": 2025,
+      "goalId": "dGzsZyC4qyZkbhnO8PM3"
+    },
+    {
+      "id": "eHqfkFI4WdArOIjXsimD",
+      "title": "Stay on track",
+      "year": 2029,
+      "axisId": "On Track N+1",
+      "completionDate": null,
+      "createdAt": {
+        "seconds": 1752013187,
+        "nanoseconds": 288000000
+      },
+      "goalId": "eHqfkFI4WdArOIjXsimD",
+      "type": "yearly",
+      "dueDate": {
+        "seconds": 1887667200,
+        "nanoseconds": 0
+      },
+      "status": "todo"
+    },
+    {
+      "id": "fG2ihhGqdqWD9LAbvoeR",
+      "year": 2025,
+      "completionDate": null,
+      "createdAt": {
+        "seconds": 1752014031,
+        "nanoseconds": 44000000
+      },
+      "title": "Scrum Certification",
+      "axisId": "financial",
+      "type": "yearly",
+      "dueDate": {
+        "seconds": 1767139200,
+        "nanoseconds": 0
+      },
+      "status": "todo",
+      "goalId": "fG2ihhGqdqWD9LAbvoeR"
+    },
+    {
+      "id": "fRTLQMWDQd5ZusXKO7Yi",
+      "status": "todo",
+      "axisId": "environment",
+      "createdAt": {
+        "seconds": 1752012699,
+        "nanoseconds": 347000000
+      },
+      "year": 2028,
+      "title": "Sculpt a monument",
+      "goalId": "fRTLQMWDQd5ZusXKO7Yi",
+      "completionDate": null,
+      "type": "yearly",
+      "dueDate": {
+        "seconds": 1861833600,
+        "nanoseconds": 0
+      }
+    },
+    {
+      "id": "fzNAzJHewR5MoHpIZowC",
+      "goalId": "fzNAzJHewR5MoHpIZowC",
+      "type": "pareto",
+      "title": "",
+      "axisId": "On Track N + 1"
+    },
+    {
+      "id": "hb1dU0Gm3UoFhi5qJvVt",
+      "axisId": "physical",
+      "year": 2025,
+      "goalId": "hb1dU0Gm3UoFhi5qJvVt",
+      "type": "yearly",
+      "dueDate": {
+        "seconds": 1767139200,
+        "nanoseconds": 0
+      },
+      "title": "Weigh 144.  Prove to yourself you CAN"
+    },
+    {
+      "id": "hqi9uPGlNshDLzzAZDcM",
+      "year": 2024,
+      "status": "completed",
+      "type": "yearly",
+      "axisId": "environment",
+      "title": "MindMap",
+      "goalId": "hqi9uPGlNshDLzzAZDcM",
+      "completionDate": {
+        "seconds": 1735668861,
+        "nanoseconds": 908000000
+      },
+      "createdAt": {
+        "seconds": 1751665858,
+        "nanoseconds": 941000000
+      }
+    },
+    {
+      "id": "maJSQymXLhFv3KaWPKTi",
+      "axisId": "physical",
+      "type": "stretch",
+      "title": "MasterPuppeteering my Body. Learn to move like an optical illusion",
+      "goalId": "maJSQymXLhFv3KaWPKTi",
+      "dueDate": {
+        "seconds": 1893369600,
+        "nanoseconds": 0
+      }
+    },
+    {
+      "id": "oOl4aWkkT3PdSmONqROw",
+      "type": "stretch",
+      "dueDate": {
+        "seconds": 1893369600,
+        "nanoseconds": 0
+      },
+      "title": "Create abundance so Great it funds all other axes of my life/beyond",
+      "goalId": "oOl4aWkkT3PdSmONqROw",
+      "axisId": "financial"
+    },
+    {
+      "id": "oSJXxexbQ7XXmqjiWgoq",
+      "axisId": "physical",
+      "createdAt": {
+        "seconds": 1751666071,
+        "nanoseconds": 900000000
+      },
+      "year": 2024,
+      "goalId": "oSJXxexbQ7XXmqjiWgoq",
+      "completionDate": {
+        "seconds": 1735603200,
+        "nanoseconds": 0
+      },
+      "status": "completed",
+      "type": "yearly",
+      "title": "Gym and Dance"
+    },
+    {
+      "id": "od32T7wugrLrPw9PgCbR",
+      "title": "Master space inside and outside",
+      "goalId": "od32T7wugrLrPw9PgCbR",
+      "axisId": "environment",
+      "type": "pareto"
+    },
+    {
+      "id": "p10D2iZUYoTB98CkBXq6",
+      "title": "Habits",
+      "dueDate": {
+        "seconds": 1735603200,
+        "nanoseconds": 0
+      },
+      "goalId": "p10D2iZUYoTB98CkBXq6",
+      "completionDate": {
+        "seconds": 1735430400,
+        "nanoseconds": 0
+      },
+      "createdAt": {
+        "seconds": 1753016626,
+        "nanoseconds": 645000000
+      },
+      "year": 2024,
+      "type": "yearly",
+      "status": "completed",
+      "axisId": "On Track N+1"
+    },
+    {
+      "id": "pnpoxak0tZBeZzKR85i5",
+      "year": 2027,
+      "title": "Protocols for different states. ie depression or spiritual modes",
+      "axisId": "On Track N+1",
+      "type": "yearly",
+      "completionDate": null,
+      "dueDate": {
+        "seconds": 1830211200,
+        "nanoseconds": 0
+      },
+      "status": "todo",
+      "goalId": "pnpoxak0tZBeZzKR85i5",
+      "createdAt": {
+        "seconds": 1751855767,
+        "nanoseconds": 346000000
+      }
+    },
+    {
+      "id": "q7Y6xF8F8XtIpP0wTSX0",
+      "goalId": "q7Y6xF8F8XtIpP0wTSX0",
+      "title": "Master space inside and outside",
+      "type": "stretch",
+      "axisId": "environment",
+      "dueDate": {
+        "seconds": 1893369600,
+        "nanoseconds": 0
+      }
+    },
+    {
+      "id": "qkhhoSfiDUdluYsVfYNK",
+      "goalId": "qkhhoSfiDUdluYsVfYNK",
+      "axisId": "financial",
+      "type": "pareto",
+      "title": "Create abundance so Great it funds all other axes of my life/beyond"
+    },
+    {
+      "id": "roOAvextlSI73TqslcbA",
+      "year": 2026,
+      "type": "yearly",
+      "title": "Jim and I Edition 1",
+      "createdAt": {
+        "seconds": 1751847374,
+        "nanoseconds": 755000000
+      },
+      "axisId": "gear",
+      "status": "todo",
+      "goalId": "roOAvextlSI73TqslcbA",
+      "dueDate": {
+        "seconds": 1798675200,
+        "nanoseconds": 0
+      },
+      "completionDate": null
+    },
+    {
+      "id": "u6CsMUfxuk2YN5CdMCoC",
+      "dueDate": {
+        "seconds": 1893369600,
+        "nanoseconds": 0
+      },
+      "axisId": "misdirect",
+      "goalId": "u6CsMUfxuk2YN5CdMCoC",
+      "title": "Figure out how to use misdirects to recharge, to shift, to surf the Ebbs and Flows of Reality",
+      "type": "stretch"
+    },
+    {
+      "id": "vsXaeMUXPHlvLi4AXPVH",
+      "createdAt": {
+        "seconds": 1751847256,
+        "nanoseconds": 536000000
+      },
+      "axisId": "misdirect",
+      "title": "Tiny Dinosaur Farm Created",
+      "goalId": "vsXaeMUXPHlvLi4AXPVH",
+      "year": 2026,
+      "status": "todo",
+      "type": "yearly",
+      "completionDate": null,
+      "dueDate": {
+        "seconds": 1798675200,
+        "nanoseconds": 0
+      }
+    },
+    {
+      "id": "wURyXcMvm1gB9eSACmqq",
+      "dueDate": {
+        "seconds": 1767139200,
+        "nanoseconds": 0
+      },
+      "goalId": "wURyXcMvm1gB9eSACmqq",
+      "completionDate": null,
+      "title": "Preparation Protocols in Place",
+      "year": 2025,
+      "axisId": "rest-and-preparation",
+      "type": "yearly",
+      "status": "todo"
+    },
+    {
+      "id": "zAMgTaKdi2cLA9rPlt80",
+      "type": "stretch",
+      "axisId": "rest-and-preparation",
+      "dueDate": {
+        "seconds": 1893369600,
+        "nanoseconds": 0
+      },
+      "title": "Have habits in place that make me feel prepared for anything",
+      "goalId": "zAMgTaKdi2cLA9rPlt80"
+    },
+    {
+      "id": "zHw1ssYSfBceDujtrJFb",
+      "axisId": "On Track N+1",
+      "type": "stretch",
+      "goalId": "zHw1ssYSfBceDujtrJFb",
+      "title": "Be a prophet",
+      "dueDate": {
+        "seconds": 1893369600,
+        "nanoseconds": 0
+      }
+    },
+    {
+      "id": "zlLP8UwF8aj5s1g87cKF",
+      "type": "yearly",
+      "dueDate": {
+        "seconds": 1861833600,
+        "nanoseconds": 0
+      },
+      "goalId": "zlLP8UwF8aj5s1g87cKF",
+      "completionDate": null,
+      "axisId": "On Track N+1",
+      "title": "Study prophecy Intensive",
+      "createdAt": {
+        "seconds": 1752012758,
+        "nanoseconds": 384000000
+      },
+      "status": "todo",
+      "year": 2028
+    }
+  ]
+}
+--- END OF JSON ---
+
+Export complete! Now, create your .json files.

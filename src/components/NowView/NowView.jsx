@@ -11,7 +11,28 @@ import {
     collection, doc, addDoc, setDoc, getDocs, getDoc, query, where,
     updateDoc, serverTimestamp, Timestamp
 } from "firebase/firestore";
+import { useTimer } from '../../context/TimerContext.jsx';
 
+
+const LS_KEYS = {
+    CURRENT_TASK_ID: 'productivityApp_currentTaskId',
+};
+
+const loadState = (key, defaultValue) => {
+    try {
+        const saved = localStorage.getItem(key);
+        if (saved === null) return defaultValue;
+        if (typeof defaultValue === 'number') {
+            const parsed = parseFloat(saved);
+            return isNaN(parsed) ? defaultValue : parsed;
+        }
+        if (typeof defaultValue === 'boolean') return saved === 'true';
+        return saved;
+    } catch (error) {
+        console.error(`Error reading localStorage key “${key}”:`, error);
+        return defaultValue;
+    }
+};
 // --- Definitions ---
 const recurringRoutineDefinitions = {
     'routine_am': { text: "Am Routine", axisTheme: "On Track N+1", assignedDays: [0, 1, 2, 3, 4, 5, 6] },
@@ -48,11 +69,25 @@ const axisNameToCssVarSuffix = (axisName) => {
 };
 
 // --- NowView Component ---
-function NowView({
-    currentTaskId, onSetCurrentTask, pomodoroDurationMinutes, timerSeconds,
-    isTimerRunning, isTimerFinished,
-    onSetPomodoroDurationMinutes, onSetTimerSeconds, onSetIsTimerRunning, onSetIsTimerFinished, activeMilestone
-}) {
+function NowView() {
+    const { 
+        pomodoroDurationMinutes, timerSeconds,
+        isTimerRunning, isTimerFinished,
+        onSetPomodoroDurationMinutes, onSetTimerSeconds, onSetIsTimerRunning, onSetIsTimerFinished 
+    } = useTimer();
+
+    // --- ADD THIS STATE AND EFFECT BACK ---
+    const [currentTaskId, setCurrentTaskId] = useState(() => loadState(LS_KEYS.CURRENT_TASK_ID, null));
+
+    useEffect(() => {
+        if (currentTaskId !== null) {
+            localStorage.setItem(LS_KEYS.CURRENT_TASK_ID, currentTaskId);
+        } else {
+            localStorage.removeItem(LS_KEYS.CURRENT_TASK_ID);
+        }
+    }, [currentTaskId]);
+
+    
     // == State ==
     const [tasks, setTasks] = useState([]);
     const [epiphanyCount, setEpiphanyCount] = useState(0);
@@ -263,6 +298,21 @@ function NowView({
     }, []); // Dependency array: Run once on mount
 
     // == Handlers ==
+const handleSetCurrentTask = (taskId) => {
+    if (dragItem.current) return;
+    setCurrentTaskId(taskId);
+    setTasks(prevTasks => {
+        const clickedIndex = prevTasks.findIndex(task => task.id === taskId);
+        if (clickedIndex === -1 || clickedIndex === 0) return prevTasks;
+        const newTasks = [...prevTasks];
+        const [clickedItem] = newTasks.splice(clickedIndex, 1);
+        newTasks.unshift(clickedItem);
+        localStorage.setItem(TASK_ORDER_LS_KEY, JSON.stringify(newTasks.map(t => t.id)));
+        return newTasks;
+    });
+};
+
+// ... your other handler functions
     const handleTaskToggle = async (taskId, event) => {
         console.log("--- Task Toggle Start ---");
         console.log("State of 'tasks' array at this moment:", tasks);
@@ -438,20 +488,6 @@ function NowView({
                 incrementDespair();
             }
         }
-    };
-
-    const handleSetCurrentTask = (taskId) => {
-        if (dragItem.current) return;
-        onSetCurrentTask(taskId);
-        setTasks(prevTasks => {
-            const clickedIndex = prevTasks.findIndex(task => task.id === taskId);
-            if (clickedIndex === -1 || clickedIndex === 0) return prevTasks;
-            const newTasks = [...prevTasks];
-            const [clickedItem] = newTasks.splice(clickedIndex, 1);
-            newTasks.unshift(clickedItem);
-            localStorage.setItem(TASK_ORDER_LS_KEY, JSON.stringify(newTasks.map(t => t.id)));
-            return newTasks;
-        });
     };
 
     const handleDragStart = (e, id) => {

@@ -659,11 +659,18 @@
   }
 
   .leftPanel,
-  .rightPanel {
-    margin-top: var(--space-lg, 1.5rem);
-    padding: var(--space-sm, 0.5rem);
-    max-width: none;
-    width: 100%;
+.rightPanel {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* This centers the content horizontally */
+  gap: 1.5rem;
+}
+
+/* This ensures all items inside the columns have a consistent width */
+.leftPanel > *,
+.rightPanel > * {
+  width: 100%;
+  max-width: 300px;   
 }
   /* .breakPlaceholder removed as it was noted as old */
   .momentsTracker, .productivityDisplay, .timerSection, .contextMapPlaceholder, .journalPlaceholder, .taskListContainer, .adHocForm {
@@ -697,3 +704,36 @@
     padding-bottom: 0.25rem; /* Example: smaller value */
   }
 }
+
+
+
+.tourNavigation {
+  /* This tells the grid to span all available columns */
+  grid-column: 1 / -1;
+
+  /* This centers the button within that new full-width row */
+  text-align: center;
+
+  padding: -3rem 0 1rem 0;
+}
+
+.finishTourButton {
+  display: inline-block;
+  padding: 0.8rem 2rem;
+  border-radius: 5px;
+  text-decoration: none;
+  font-size: 1.2rem;
+  font-weight: 600;
+  background-color: #27ae60; /* A conclusive green */
+  color: white;
+  transition: all 0.2s ease-in-out;
+  border: none;
+  cursor: pointer;
+}
+
+.finishTourButton:hover {
+  background-color: #229954;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+

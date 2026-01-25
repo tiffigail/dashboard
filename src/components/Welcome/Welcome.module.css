@@ -1,0 +1,115 @@
+.welcomeContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 2rem;
+    background-color: #f4f7f9; /* A slightly cooler, more modern background */
+}
+
+.contentCard {
+    background-color: #ffffff;
+    padding: 3rem 4rem;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.07);
+    border: 1px solid #e2e8f0;
+    max-width: 900px;
+    text-align: center;
+}
+
+.headline {
+    font-size: 2.8rem; /* Reduced for compactness */
+    font-weight: 700;
+    color: #1a202c;
+    line-height: 1.2;
+    margin-top: 0;
+    margin-bottom: 0.75rem;
+    letter-spacing: -1.5px;
+}
+
+.subheadline {
+    font-size: 1.15rem;
+    color: #4a5568;
+    margin-bottom: 2rem; /* Reduced spacing */
+    max-width: 650px;
+    margin-left: auto;
+    margin-right: auto;
+    font-weight: 400;
+}
+
+.textBlock {
+    font-size: 1.05rem;
+    line-height: 1.8;
+    color: #2d3748;
+    max-width: 750px;
+    text-align: left;
+    margin: 0 auto; /* Center the text block */
+}
+
+.textBlock p:first-of-type {
+    margin-bottom: 1rem;
+}
+
+.buttonContainer {
+    margin-top: 2.5rem; /* Reduced spacing */
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.primaryButton,
+.secondaryButton {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: all 0.2s ease-in-out;
+    border: 2px solid transparent;
+}
+
+.primaryButton {
+    background: linear-gradient(90deg, #4a54e2, #8f94fb);
+    color: white;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.primaryButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 7px 20px rgba(0, 0, 0, 0.15);
+}
+
+.secondaryButton {
+    background-color: #ffffff;
+    color: #4a54e2;
+    border-color: #e2e8f0;
+}
+
+.secondaryButton:hover {
+    background-color: #f7f7f9;
+    border-color: #4a54e2;
+}
+
+/* --- Responsive Styles for Mobile --- */
+@media (max-width: 768px) {
+  .welcomeContainer {
+    padding: 1rem;
+  }
+
+  .contentCard {
+    padding: 2rem 1.5rem;
+  }
+
+  .headline {
+    font-size: 2.25rem;
+  }
+
+  .subheadline {
+    font-size: 1.1rem;
+  }
+
+  .textBlock {
+    font-size: 1rem;
+  }
+}
+

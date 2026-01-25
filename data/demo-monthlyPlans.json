@@ -1,0 +1,193 @@
+{"monthlyPlans": [
+    {
+      "id": "2025-01",
+      "monthFocus": "Letting go of Self\r\nNo Longer in the Shape of Hurt",
+      "monthName": "January 2025",
+      "createdAt": {
+        "seconds": 1745206045,
+        "nanoseconds": 532000000
+      },
+      "monthObjective": "MicroD: Letting go of self",
+      "monthId": "2025-01",
+      "weeklyData": {
+        "1": {
+          "objective": "Open the door",
+          "focus": "Induction"
+        },
+        "2": {
+          "focus": "Prune away the habit of being yourself",
+          "objective": "Admit, Declare, Surrender"
+        },
+        "3": {
+          "focus": "Dismantle Old Self",
+          "objective": "Observe, Remind, Redirect"
+        },
+        "4": {
+          "objective": "Envision and Rehearse",
+          "focus": "Create New Personal Reality"
+        }
+      },
+      "reward": "Sense AI"
+    },
+    {
+      "id": "2025-02",
+      "weeklyData": {
+        "1": {
+          "objective": "Establish Budget:1. All Accounts 2. All income 3. Anticipated Spending 4. Habit\r\nI am enough",
+          "focus": "Financial"
+        },
+        "2": {
+          "focus": "Financial",
+          "objective": "I am Enough Go Deeper"
+        },
+        "3": {
+          "focus": "Financial",
+          "objective": "Abundance walk"
+        },
+        "4": {
+          "focus": "Financial",
+          "objective": "Tap Out to more money"
+        }
+      },
+      "monthName": "February 2025",
+      "monthObjective": "To have Budget planned and detailed",
+      "createdAt": {
+        "seconds": 1745206045,
+        "nanoseconds": 742000000
+      },
+      "monthFocus": "1.1-Be a Magnet\r\nI Dont need a Crisis",
+      "monthId": "2025-02",
+      "reward": "Tiger Pajamas"
+    },
+    {
+      "id": "2025-03",
+      "monthId": "2025-03",
+      "monthObjective": "To Improve physical health by performing a Miracle",
+      "weeklyData": {
+        "1": {
+          "focus": "Searching for a path",
+          "objective": "Read Miracle equation."
+        },
+        "2": {
+          "focus": "Orientation",
+          "objective": "Physical: Fast, heal shoulder, heal foot\r\nGear: Outline of 30 day Miracle equation\r\nSpiritual: see my strength and gratitude\r\nWeigh 169\r\nEstablish daily patterns"
+        },
+        "3": {
+          "objective": "Main Focus: PHYSICAL!! Intermitent fast, don't eat in bed, drink water, arm exercises. Heal in AM and PM.\r\nGear: Read Atomic Habit and hone these.  Brain Train as a part of AM\r\nTaps: Eating and Health\r\nStudy: Habit, Diet, Healing",
+          "focus": "Practice Habits and Lose weight"
+        },
+        "4": {
+          "focus": "Practice habits, Intermittent Fast, Heal Foot",
+          "objective": "PMP Intermittent Fasting"
+        }
+      },
+      "createdAt": {
+        "seconds": 1745206045,
+        "nanoseconds": 940000000
+      },
+      "reward": "Pictures of the insides of my left foot.",
+      "monthName": "March 2025",
+      "monthFocus": "RAMADAN Grateful and Strong; FAST\r\nEmbrace Acceptance"
+    },
+    {
+      "id": "2025-04",
+      "monthFocus": "Heal Sandwich",
+      "monthObjective": "Make Left Right",
+      "monthName": "April 2025",
+      "createdAt": {
+        "seconds": 1745206046,
+        "nanoseconds": 131000000
+      },
+      "weeklyData": {
+        "1": {
+          "focus": "Evaluate Habits and how they can hel me heal my foot",
+          "objective": "Break down habits into parts and evaluate.  Who Am I becoming?"
+        },
+        "2": {
+          "focus": "Heal sandwich",
+          "objective": "Write with my left hand, arm and shoulder exercises"
+        },
+        "3": {
+          "focus": "Make Left Write Right",
+          "objective": "Write with my left hand, arm and shoulder exercises, practice walking"
+        },
+        "4": {
+          "objective": "Walk- work up to 4400\r\nMonth plans\r\nHone Habits: Plannerbeginning to transition to Dashboard",
+          "focus": "Heal Sandwich with Habit Honing Meat"
+        }
+      },
+      "monthId": "2025-04",
+      "reward": "New SHOES",
+      "events": [
+        {
+          "text": "TEAM BUILD",
+          "axis": "Financial",
+          "date": "2025-04-29"
+        },
+        {
+          "axis": "Financial",
+          "text": "TEAM BUILD",
+          "date": "2025-04-30"
+        },
+        {
+          "axis": "ON TRACK N+1",
+          "text": "Birthday Eve",
+          "date": "2025-05-01"
+        },
+        {
+          "text": "Birthday",
+          "axis": "Misdirect",
+          "date": "2025-05-02"
+        },
+        {
+          "date": "2025-05-03",
+          "text": "The day?",
+          "axis": "Financial"
+        },
+        {
+          "date": "2025-05-01",
+          "axis": "ON TRACK N+1",
+          "text": "Quarterly Review"
+        },
+        {
+          "date": "2025-07-05",
+          "axis": "ON TRACK N+1",
+          "text": "Q2 Review"
+        },
+        {
+          "date": "2025-12-31",
+          "text": "Q4 Review",
+          "axis": "ON TRACK N+1"
+        }
+      ]
+    },
+    {
+      "id": "2025-05",
+      "monthId": "2025-05",
+      "reward": "A KITE",
+      "monthObjective": "MicroD: Letting go of Being in the shape of Hurt, \r\nNEEDing a Crisis, \r\nWanting things to be different,\r\nChaos and confusion\r\nFIXED MINDSET",
+      "createdAt": {
+        "seconds": 1745206046,
+        "nanoseconds": 231000000
+      },
+      "weeklyData": {
+        "1": {
+          "objective": "38 Let go of Self:\r\nLet Go of Fixed Mindset\r\nEcho: No longer the shape of Hurt\r\nWrite: Constellations\r\nStudy: Mindset",
+          "focus": "Induction: Open the Door"
+        },
+        "2": {
+          "focus": "Prune away the habit of being yourself:\r\nAdmit, Declare, Surrender",
+          "objective": "38 Let go of Self:\r\nLet Go of Fixed Mindset\r\nEcho: I don't need a Crisis\r\nWrite: Managing Ambiguity\r\nStudy: Mindset"
+        },
+        "3": {
+          "objective": "38 Let go of Self:\r\nLet Go of Fixed Mindset\r\nEcho: I do not struggle against\r\nWrite: Managing Ambiguity\r\nStudy: Mindset",
+          "focus": "Dismantle Old Self:\r\nObserve, Remind, Redirect"
+        },
+        "4": {
+          "focus": "Create New Personal Reality: \r\nEnvision and Rehearse",
+          "objective": "38 Let go of Self:\r\nLet Go of Fixed Mindset\r\nEcho: I do not struggle against\r\nWrite: Managing Ambiguity\r\nStudy: Mindset"
+        }
+      },
+      "monthName": "May 2025",
+      "monthFocus": "Letting go of Self:\nLet Go of Fixed Mindset\nEcho: No longer the shape of Hurt"
+    }]}

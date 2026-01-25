@@ -84,15 +84,42 @@ function DailyView({ onNavigate }) {
     const [axisName, setAxisName] = useState("Loading..."); // This is the "Axis Theme of the Day"
     const [axisData, setAxisData] = useState(null); // Roadmap data for the current axis
     const [chartData, setChartData] = useState([]); // Data for the recharts chart
-    const [isAmModalOpen, setIsAmModalOpen] = useState(false);
-    const [isPmModalOpen, setIsPmModalOpen] = useState(false);
-    const [isFamilyCleanModalOpen, setIsFamilyCleanModalOpen] = useState(false);
-    const [isStudyModalOpen, setIsStudyModalOpen] = useState(false);
-    const [isBudgetModalOpen, setIsBudgetModalOpen] = useState(false);
-    const [isReadyModalOpen, setIsReadyModalOpen] = useState(false);
-    const [isLeaveWorkModalOpen, setIsLeaveWorkModalOpen] = useState(false);
+    const [isAmModalOpen, setIsAmModalOpen] = useState(() => localStorage.getItem('isAmModalOpen') === 'true');
+    const [isPmModalOpen, setIsPmModalOpen] = useState(() => localStorage.getItem('isPmModalOpen') === 'true');
+    const [isFamilyCleanModalOpen, setIsFamilyCleanModalOpen] = useState(() => localStorage.getItem('isFamilyCleanModalOpen') === 'true');
+    const [isStudyModalOpen, setIsStudyModalOpen] = useState(() => localStorage.getItem('isStudyModalOpen') === 'true');
+    const [isBudgetModalOpen, setIsBudgetModalOpen] = useState(() => localStorage.getItem('isBudgetModalOpen') === 'true');
+    const [isReadyModalOpen, setIsReadyModalOpen] = useState(() => localStorage.getItem('isReadyModalOpen') === 'true');
+    const [isLeaveWorkModalOpen, setIsLeaveWorkModalOpen] = useState(() => localStorage.getItem('isLeaveWorkModalOpen') === 'true');
     const [axisCssSuffix, setAxisCssSuffix] = useState('default');
     const [currentDayAxisThemeTaskLineColor, setCurrentDayAxisThemeTaskLineColor] = useState(getAxisThemeColorForDailyChart('default'));
+
+// This single useEffect persists all modal states and handles the body scroll lock
+    useEffect(() => {
+        // Persist each modal's state to localStorage
+        localStorage.setItem('isAmModalOpen', isAmModalOpen);
+        localStorage.setItem('isPmModalOpen', isPmModalOpen);
+        localStorage.setItem('isFamilyCleanModalOpen', isFamilyCleanModalOpen);
+        localStorage.setItem('isStudyModalOpen', isStudyModalOpen);
+        localStorage.setItem('isBudgetModalOpen', isBudgetModalOpen);
+        localStorage.setItem('isReadyModalOpen', isReadyModalOpen);
+        localStorage.setItem('isLeaveWorkModalOpen', isLeaveWorkModalOpen);
+        
+        // Check if any modal is open to lock the body scroll
+        const anyModalIsOpen = isAmModalOpen || isPmModalOpen || isFamilyCleanModalOpen || 
+                             isStudyModalOpen || isBudgetModalOpen || isReadyModalOpen || 
+                             isLeaveWorkModalOpen;
+
+        document.body.style.overflow = anyModalIsOpen ? 'hidden' : 'unset';
+
+        // Cleanup function to ensure scroll is unlocked if the component unmounts
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [
+        isAmModalOpen, isPmModalOpen, isFamilyCleanModalOpen, isStudyModalOpen, 
+        isBudgetModalOpen, isReadyModalOpen, isLeaveWorkModalOpen
+    ]);
 
  useEffect(() => {
     const fetchData = async () => {
@@ -348,7 +375,9 @@ function DailyView({ onNavigate }) {
             {/* --- Modals (Copied from your original) --- */}
             {isAmModalOpen && (<Modal isOpen={isAmModalOpen} onClose={closeAmModal}><AmRoutineForm onSubmit={handleAmRoutineSubmit} onClose={closeAmModal} /></Modal>)}
             {isPmModalOpen && (<Modal isOpen={isPmModalOpen} onClose={closePmModal}><PmRoutineForm onSubmit={handlePmRoutineSubmit} onClose={closePmModal} /></Modal>)}
-            {isFamilyCleanModalOpen && (<Modal isOpen={isFamilyCleanModalOpen} onClose={closeFamilyCleanModal}><FamilyCleanForm onSubmit={handleFamilyCleanSubmit} onClose={closeFamilyCleanModal} /></Modal>)}
+            {isFamilyCleanModalOpen && (<Modal isOpen={isFamilyCleanModalOpen} onClose={closeFamilyCleanModal}>
+    <FamilyCleanForm onSubmit={handleFamilyCleanSubmit} onClose={closeFamilyCleanModal} />
+</Modal>)}
             {isStudyModalOpen && (<Modal isOpen={isStudyModalOpen} onClose={closeStudyModal}><StudyForm onSubmit={handleStudySubmit} onClose={closeStudyModal} axisQuestion={axisData?.question}/></Modal>)}
             {isBudgetModalOpen && (
                  <Modal isOpen={isBudgetModalOpen} onClose={closeBudgetModal}>

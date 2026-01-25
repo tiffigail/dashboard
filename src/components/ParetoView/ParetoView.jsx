@@ -31,10 +31,10 @@ function ParetoView() {
     
     const axisSubtexts = {
         'misdirect': 'Strategic distractions to maintain productivity and prevent fatigue.',
-        'physical': 'Mastering movement to make the body an "optical illusion."',
-        'financial': 'Ensuring survival and funding other endeavors through value-based earning.',
-        'gear': 'Creating a mental system ("Liahona") for mind control.',
-        'On Track N+1': 'Aligning with personal values and future goals.',
+        'physical': 'Mastering the body to move like an "optical illusion."',
+        'financial': 'Ensuring survival and funding other endeavors.',
+        'gear': 'Creating a system for mental control.',
+        'On Track N+1': 'Aligning with personal values and future goals. Again and Again',
         'environment': 'Shaping surroundings to reflect the inner mind and foster ease.',
         'rest-and-preparation': 'Crucial for rejuvenation and sustained productivity.'
     };

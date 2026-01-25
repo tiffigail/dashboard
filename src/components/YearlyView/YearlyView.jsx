@@ -13,7 +13,7 @@ const axisColorMap = {
     "Physical":           { light: '#FDC1B4', medium: '#f59284', dark: '#e7514c' },
     "Financial":          { light: '#e9def4', medium: '#beaccf', dark: '#927aaa' },
     "Gear":               { light: '#c9ebf4', medium: '#7ebde0', dark: '#3280a7' },
-    "ON TRACK N+1":       { light: '#BCDDDC', medium: '#618882', dark: '#053229' },
+    "On Track N+1":       { light: '#BCDDDC', medium: '#618882', dark: '#053229' },
     "Environment":        { light: '#efe5c3', medium: '#e3d295', dark: '#d8bf67' },
     "Misdirect":          { light: '#b0e8d7', medium: '#78bfa1', dark: '#409c7c' },
     "Rest and preparation": { light: '#eaf1fa', medium: '#cbdbe7', dark: '#aec6de' },
@@ -25,7 +25,7 @@ const axisDisplayOrder = [
     { id: "Physical", displayName: "Physical" },
     { id: "Financial", displayName: "Financial" },
     { id: "Gear", displayName: "Gear" },
-    { id: "on-track-n+1", displayName: "On Track N+1" },
+    { id: "On Track N+1", displayName: "On Track N+1" },
     { id: "Misdirect", displayName: "Misdirect" },
     { id: "Environment", displayName: "Environment" }
 ];
@@ -85,12 +85,16 @@ function YearlyView({ onNavigate }) {
                     const sortedGoals = [...axisGoals].sort((a, b) =>
                         (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0)
                     );
-                    activeGoal = sortedGoals.find(g => g.completionDate == null) || null;
-                    if (activeGoal) {
-                        achievedGoals = sortedGoals.filter(g => g.id !== activeGoal.id);
-                    } else {
-                        achievedGoals = sortedGoals;
-                    }
+                    const currentlyActive = sortedGoals.find(g => g.completionDate == null);
+
+if (currentlyActive) {
+    activeGoal = currentlyActive;
+    achievedGoals = sortedGoals.filter(g => g.id !== activeGoal.id);
+} else {
+    // If all are completed, show the most recent one as the main title
+    activeGoal = sortedGoals[0]; 
+    achievedGoals = sortedGoals.slice(1); // Put the rest in the 'achieved' list
+}
                 }
                 const milestones = activeGoal ? (milestonesByGoal.get(activeGoal.id) || []) : [];
                 combinedData.push({ ...axis, yearlyGoal: activeGoal, achievedGoals: achievedGoals, milestones: milestones });

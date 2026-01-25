@@ -1,0 +1,83 @@
+.contactContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 2rem;
+    background-color: #f4f7f9;
+}
+
+.contentCard {
+    background-color: #ffffff;
+    padding: 3rem 4rem;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.07);
+    border: 1px solid #e2e8f0;
+    max-width: 700px;
+    text-align: center;
+}
+
+.headline {
+    font-size: 2.8rem;
+    font-weight: 700;
+    color: #1a202c;
+    line-height: 1.2;
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+}
+
+.textBlock {
+    font-size: 1.15rem;
+    line-height: 1.9;
+    color: #4a5568;
+    margin-bottom: 2.5rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.buttonContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+    max-width: 320px;
+    margin: 0 auto;
+}
+
+.primaryButton,
+.secondaryButton {
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: all 0.2s ease-in-out;
+    border: 2px solid transparent;
+    width: 100%;
+    text-align: center;
+}
+
+.primaryButton {
+    background: linear-gradient(90deg, #4a54e2, #8f94fb); /* Matches the Welcome page */
+    color: white;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.primaryButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 7px 20px rgba(0, 0, 0, 0.15);
+}
+
+.secondaryButton {
+    background-color: #ffffff;
+    color: #2d3748;
+    border-color: #e2e8f0;
+}
+
+.secondaryButton:hover {
+    background-color: #f7f7f9;
+    border-color: #4a5568;
+    color: #1a202c;
+}
