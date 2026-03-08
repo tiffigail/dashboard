@@ -1,98 +1,130 @@
 /* src/components/MonthlyThemeModal/MonthlyThemeModal.module.css */
+/* Updated to match NowView/DailyView color scheme */
+
+/* Color Palette Reference (matching NowView/DailyView):
+    --text-primary: var(--color-on-track-n-plus-1-4); (#053229 Peacock)
+    --text-secondary: var(--color-on-track-n-plus-1-3); (#355E58 Spruce)
+    --text-muted: var(--color-rest-and-preparation-5); (#6c757d Dark Grey)
+    --border-light: var(--color-on-track-n-plus-1-1); (#BCDDDC Arctic)
+    --border-secondary: var(--color-on-track-n-plus-1-2); (#72B0AB Sapphire)
+    --border-primary: var(--color-on-track-n-plus-1-3); (#355E58 Spruce)
+    --bg-card: var(--color-white); (#FFFFFF White)
+    --bg-panel: var(--color-on-track-n-plus-1-1); (#BCDDDC Arctic)
+    --bg-panel-accent: #e0f2f7; (Lighter Arctic)
+    --bg-input: var(--color-white); (#FFFFFF White)
+    --button-primary-bg: var(--color-on-track-n-plus-1-2); (#72B0AB Sapphire)
+    --button-primary-text: var(--color-white); (#FFFFFF White)
+    --button-primary-border: var(--color-on-track-n-plus-1-3); (#355E58 Spruce)
+    --button-primary-hover-bg: var(--color-on-track-n-plus-1-3); (#355E58 Spruce)
+*/
+
 .modalContent {
-    padding: 15px 25px 25px 25px;
-    max-height: 80vh; /* Increased max height */
+    padding: 20px 30px;
+    max-height: 80vh;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    gap: 18px; /* Increased gap */
+    gap: 20px;
+    background-color: var(--bg-card, #fff);
+}
+
+/* Date Selection Row */
+.dateSelectionRow {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid var(--border-secondary, #72B0AB);
+    margin-bottom: 10px;
 }
 
 .formGroup {
-    margin-bottom: 12px; /* Slightly reduced */
     display: flex;
     flex-direction: column;
+    gap: 8px;
 }
 
 .formGroup label {
-    margin-bottom: 6px;
-    font-weight: bold;
-    color: var(--text-primary, #333);
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--text-secondary, #355E58);
 }
 
 .inputField,
-.textareaField {
+.textareaField,
+.selectField {
     width: 100%;
     padding: 10px 12px;
-    border: 1px solid var(--border-medium, #ccc);
+    border: 1px solid var(--border-secondary, #72B0AB);
     border-radius: 4px;
     font-size: 1rem;
     box-sizing: border-box;
-    background-color: var(--background-input, #fff);
-    color: var(--text-input, #333);
-    transition: border-color 0.2s ease-in-out;
+    background-color: var(--bg-input, #fff);
+    color: var(--text-primary, #053229);
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    font-family: inherit;
 }
 
 .inputField:focus,
-.textareaField:focus {
-    border-color: var(--accent-color, #007bff); /* Highlight on focus */
+.textareaField:focus,
+.selectField:focus {
+    border-color: var(--button-primary-hover-bg, #355E58);
     outline: none;
+    box-shadow: 0 0 0 3px rgba(114, 176, 171, 0.2);
 }
 
+.inputField:disabled,
+.textareaField:disabled,
+.selectField:disabled {
+    background-color: var(--bg-input-disabled, #f8f9fa);
+    opacity: 0.7;
+    cursor: not-allowed;
+}
 
 .textareaField {
     resize: vertical;
-    min-height: 60px;
+    min-height: 80px;
+    line-height: 1.5;
+}
+
+.selectField {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23355E58' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 20px;
+    padding-right: 35px;
 }
 
 .weeklyDataHeader {
     margin-top: 25px;
-    margin-bottom: 12px;
-    border-bottom: 1px solid var(--border-light, #eee);
-    padding-bottom: 8px;
-    color: var(--text-secondary, #555);
-    font-size: 1.1em;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--border-secondary, #72B0AB);
+    color: var(--text-secondary, #355E58);
+    font-size: 1.15em;
+    font-weight: 600;
 }
 
 .weekGroup {
-    padding: 15px;
-    border: 1px solid var(--border-light, #e0e0e0); /* Slightly darker dashed border */
-    border-radius: 6px; /* More rounded */
-    margin-bottom: 18px;
-    background-color: var(--background-secondary-accent, #f8f9fa); /* Lighter accent */
+    padding: 18px;
+    border: 1px solid var(--border-secondary, #72B0AB);
+    border-radius: 8px;
+    margin-bottom: 15px;
+    background-color: var(--bg-panel-accent, #e0f2f7);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 .weekGroup h5 {
     margin-top: 0;
-    margin-bottom: 12px;
-    color: var(--text-primary, #333);
-    font-size: 1.05em;
-}
-
-.weekActions {
-    display: flex;
-    gap: 10px;
-    margin-top: 5px;
     margin-bottom: 15px;
+    color: var(--text-primary, #053229);
+    font-size: 1.05em;
+    font-weight: 600;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border-light, #BCDDDC);
 }
-
-.actionButton {
-    padding: 8px 15px;
-    font-size: 0.9rem;
-    background-color: var(--button-neutral-bg, #e9ecef);
-    color: var(--button-neutral-text, #495057);
-    border: 1px solid var(--border-medium, #ccc);
-    border-radius: 4px;
-    cursor: pointer;
-}
-.actionButton:hover {
-    background-color: var(--button-neutral-hover-bg, #ced4da);
-}
-.actionButton:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
 
 .modalActions {
     display: flex;
@@ -100,50 +132,168 @@
     gap: 12px;
     margin-top: 25px;
     padding-top: 20px;
-    border-top: 1px solid var(--border-light, #eee);
+    border-top: 2px solid var(--border-secondary, #72B0AB);
 }
 
 .saveButton,
 .cancelButton {
-    padding: 10px 20px;
-    border-radius: 4px;
+    padding: 12px 24px;
+    border-radius: 6px;
     border: none;
     cursor: pointer;
     font-size: 1rem;
-    font-weight: bold;
-    transition: background-color 0.2s ease;
+    font-weight: 600;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .saveButton {
-    background-color: var(--button-primary-bg, #007bff);
+    background-color: var(--button-primary-bg, #72B0AB);
     color: var(--button-primary-text, white);
+    border: 1px solid var(--button-primary-border, #355E58);
 }
-.saveButton:hover {
-    background-color: var(--button-primary-hover-bg, #0056b3);
+
+.saveButton:hover:not(:disabled) {
+    background-color: var(--button-primary-hover-bg, #355E58);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
+
 .saveButton:disabled {
-    background-color: var(--button-disabled-bg, #aaa);
+    background-color: var(--text-muted, #6c757d);
+    opacity: 0.6;
     cursor: not-allowed;
+    box-shadow: none;
 }
 
 .cancelButton {
-    background-color: var(--button-secondary-bg, #6c757d);
-    color: var(--button-secondary-text, white);
+    background-color: var(--bg-panel, #BCDDDC);
+    color: var(--text-primary, #053229);
+    border: 1px solid var(--border-primary, #355E58);
 }
-.cancelButton:hover {
-    background-color: var(--button-secondary-hover-bg, #545b62);
+
+.cancelButton:hover:not(:disabled) {
+    background-color: var(--border-secondary, #72B0AB);
+    color: var(--color-white, #fff);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
+
 .cancelButton:disabled {
-    background-color: var(--button-disabled-bg, #aaa);
+    opacity: 0.6;
     cursor: not-allowed;
+    box-shadow: none;
 }
 
 .errorMessage {
-    color: var(--error-text-color, red);
-    background-color: var(--error-bg-color, #f8d7da);
-    border: 1px solid var(--error-border-color, #f5c6cb);
-    padding: 10px;
-    border-radius: 4px;
+    color: var(--color-white, #fff);
+    background-color: #dc3545;
+    border: 1px solid #bd2130;
+    padding: 12px 15px;
+    border-radius: 6px;
     margin-bottom: 15px;
     text-align: center;
+    font-weight: 500;
+    box-shadow: 0 2px 4px rgba(220, 53, 69, 0.2);
+}
+
+.loadingMessage {
+    color: var(--text-secondary, #355E58);
+    background-color: var(--bg-panel-accent, #e0f2f7);
+    border: 1px solid var(--border-secondary, #72B0AB);
+    padding: 12px 15px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    text-align: center;
+    font-weight: 500;
+    font-style: italic;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .modalContent {
+        padding: 15px 20px;
+        gap: 15px;
+    }
+
+    .dateSelectionRow {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .formGroup label {
+        font-size: 0.9rem;
+    }
+
+    .inputField,
+    .textareaField,
+    .selectField {
+        font-size: 0.95rem;
+        padding: 10px;
+    }
+
+    .weekGroup {
+        padding: 15px;
+    }
+
+    .weekGroup h5 {
+        font-size: 1rem;
+    }
+
+    .modalActions {
+        flex-direction: column-reverse;
+        gap: 10px;
+    }
+
+    .saveButton,
+    .cancelButton {
+        width: 100%;
+        padding: 14px 20px;
+    }
+
+    .weeklyDataHeader {
+        font-size: 1.05em;
+    }
+}
+
+@media (max-width: 480px) {
+    .modalContent {
+        padding: 12px 15px;
+        gap: 12px;
+        max-height: 85vh;
+    }
+
+    .formGroup label {
+        font-size: 0.85rem;
+    }
+
+    .inputField,
+    .textareaField,
+    .selectField {
+        font-size: 0.9rem;
+        padding: 8px 10px;
+    }
+
+    .textareaField {
+        min-height: 60px;
+    }
+
+    .weekGroup {
+        padding: 12px;
+        margin-bottom: 12px;
+    }
+
+    .weekGroup h5 {
+        font-size: 0.95rem;
+        margin-bottom: 12px;
+    }
+
+    .weeklyDataHeader {
+        font-size: 1rem;
+        margin-top: 20px;
+    }
+
+    .saveButton,
+    .cancelButton {
+        padding: 12px 18px;
+        font-size: 0.95rem;
+    }
 }

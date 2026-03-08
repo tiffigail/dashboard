@@ -1,0 +1,60 @@
+.timer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 0;
+}
+
+.ringContainer {
+  position: relative;
+  width: 140px;
+  height: 140px;
+}
+
+.ring {
+  width: 100%;
+  height: 100%;
+}
+
+.progressRing {
+  transition: stroke-dashoffset 1s linear;
+}
+
+.timeDisplay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.time {
+  font-size: 28px;
+  font-weight: 700;
+  color: #333;
+  display: block;
+}
+
+.label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.skipButton {
+  margin-top: 12px;
+  padding: 8px 20px;
+  background: #f0f0f0;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  color: #666;
+}
+
+.skipButton:hover {
+  background: #e0e0e0;
+}

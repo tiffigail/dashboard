@@ -1,0 +1,215 @@
+// Endurance Journey Templates
+// Distance formula: miles = steps / 2640 (average step length of 2 feet)
+
+export const ENDURANCE_JOURNEYS = [
+  {
+    id: 'runners-high',
+    title: "Achieve Runner's High",
+    emoji: '🌟',
+    type: 'session',
+    description: 'Gradually build cardio endurance and chase exercise-induced euphoria using heart rate tracking',
+    totalDistance: null,
+    difficultyLevel: 'progressive',
+    // Phases define the progression; milestones map to phase completions
+    phases: [
+      {
+        id: 'baseline',
+        name: 'Baseline',
+        emoji: '📊',
+        sessionsRequired: 3,
+        description: 'Establish your resting HR, peak HR, and recovery baseline. No intensity targets — just ride and record.',
+        durationTarget: null, // any duration
+        hrrTarget: null, // no zone target
+      },
+      {
+        id: 'build',
+        name: 'Build',
+        emoji: '🔨',
+        sessionsRequired: 3,
+        description: 'Sustain 60-70% of your Heart Rate Reserve for 30+ minutes.',
+        durationTarget: 30,
+        hrrTarget: { min: 60, max: 70 },
+      },
+      {
+        id: 'push',
+        name: 'Push',
+        emoji: '🔥',
+        sessionsRequired: 3,
+        description: 'Sustain 70-80% HRR for 45+ minutes. Endocannabinoid release begins here.',
+        durationTarget: 45,
+        hrrTarget: { min: 70, max: 80 },
+      },
+      {
+        id: 'chase',
+        name: 'Chase the High',
+        emoji: '✨',
+        sessionsRequired: null, // ongoing until euphoria achieved
+        description: 'Sustain 70-80% HRR for 50-60 minutes. This is where the high happens.',
+        durationTarget: 50,
+        hrrTarget: { min: 70, max: 80 },
+      },
+    ],
+    milestones: [
+      { level: 1, phase: 'baseline', name: 'Baseline Established', description: 'Completed 3 baseline sessions — your resting HR and zones are set', emoji: '📊' },
+      { level: 2, phase: 'build', name: 'Endurance Building', description: 'Completed 3 sessions at 60-70% HRR for 30+ min', emoji: '🔨' },
+      { level: 3, phase: 'push', name: 'Pushing Limits', description: 'Completed 3 sessions at 70-80% HRR for 45+ min', emoji: '🔥' },
+      { level: 4, phase: 'chase', name: 'Euphoria Unlocked', description: 'Reported feeling euphoria during or after a chase session', emoji: '🏆', badge: "🌟 Runner's High Achieved" },
+    ],
+    // What user enters per session (app calculates the rest)
+    sessionInputs: ['restingHR', 'peakHR', 'postExerciseHR', 'duration', 'rpe', 'feltEuphoria'],
+    // App auto-calculates these from inputs + age
+    autoCalculated: ['maxHR', 'heartRateReserve', 'hrrPercent', 'recoveryDelta', 'inTargetZone', 'phaseQualifying'],
+    tips: [
+      'Vary your routine — don\'t do the exact same workout every time',
+      'The high typically happens at 70-80% HRR sustained for 45-60 min',
+      'Morning sessions may be more effective for some people',
+      'Stay hydrated but don\'t overdrink during workout',
+      'Recovery HR (1 min post) improves as fitness increases',
+      'RPE of 6-7/10 is the sweet spot — hard but sustainable',
+    ],
+  },
+  {
+    id: 'walk-to-abington',
+    title: 'Walk to Abington, Indiana',
+    emoji: '🏡',
+    type: 'distance',
+    description: 'Virtual walking journey from Austin, TX to Abington, Indiana',
+    totalDistance: 1045,
+    difficultyLevel: 'intermediate',
+    recommendedStepsPerDay: 8000,
+    estimatedWeeks: 50,
+    startLocation: { name: 'Austin, Texas', lat: 30.2672, lng: -97.7431 },
+    endLocation: { name: 'Abington, Indiana', lat: 40.7545, lng: -86.6908 },
+    milestones: [
+      { mile: 200, location: 'Dallas, TX', emoji: '🤠', description: 'Howdy partner! You\'ve crossed Texas!' },
+      { mile: 400, location: 'Little Rock, AR', emoji: '🏞️', description: 'Into the Ozarks - beautiful scenery!' },
+      { mile: 650, location: 'St. Louis, MO', emoji: '🎡', description: 'Gateway Arch! Halfway there!' },
+      { mile: 850, location: 'Indianapolis, IN', emoji: '🏁', description: 'Indy 500 territory - home stretch!' },
+      { mile: 1045, location: 'Abington, Indiana', emoji: '🎉', description: 'You made it! Welcome to Abington!' },
+    ],
+    achievementTiers: [
+      { miles: 100, badge: 'bronze', title: 'First Century' },
+      { miles: 500, badge: 'silver', title: 'Halfway Hero' },
+      { miles: 1000, badge: 'gold', title: 'Almost There' },
+      { miles: 1045, badge: 'platinum', title: 'Abington Arrival' },
+    ],
+  },
+  {
+    id: 'walk-to-nyc',
+    title: 'Walk to New York City',
+    emoji: '🗽',
+    type: 'distance',
+    description: 'Cross-country trek from Austin to the Big Apple',
+    totalDistance: 1744,
+    difficultyLevel: 'advanced',
+    recommendedStepsPerDay: 8500,
+    estimatedWeeks: 77,
+    startLocation: { name: 'Austin, Texas', lat: 30.2672, lng: -97.7431 },
+    endLocation: { name: 'New York City, NY', lat: 40.7128, lng: -74.0060 },
+    milestones: [
+      { mile: 200, location: 'Shreveport, LA', emoji: '🎰', description: 'Louisiana bound!' },
+      { mile: 500, location: 'Memphis, TN', emoji: '🎸', description: 'Elvis territory - Graceland nearby!' },
+      { mile: 900, location: 'Nashville, TN', emoji: '🎵', description: 'Music City USA!' },
+      { mile: 1200, location: 'Washington, DC', emoji: '🏛️', description: "Nation's capital - almost there!" },
+      { mile: 1500, location: 'Philadelphia, PA', emoji: '🔔', description: 'Liberty Bell! Final stretch!' },
+      { mile: 1744, location: 'New York City', emoji: '🎉', description: 'Welcome to NYC! The city that never sleeps!' },
+    ],
+    achievementTiers: [
+      { miles: 200, badge: 'bronze', title: 'Out of Texas' },
+      { miles: 900, badge: 'silver', title: 'Heartland Crosser' },
+      { miles: 1500, badge: 'gold', title: 'East Coast Arrival' },
+      { miles: 1744, badge: 'platinum', title: 'Big Apple Achieved' },
+    ],
+  },
+  {
+    id: 'walk-to-la',
+    title: 'Walk to Los Angeles',
+    emoji: '🌴',
+    type: 'distance',
+    description: 'Journey west from Austin to the City of Angels',
+    totalDistance: 1377,
+    difficultyLevel: 'intermediate',
+    recommendedStepsPerDay: 8000,
+    estimatedWeeks: 66,
+    startLocation: { name: 'Austin, Texas', lat: 30.2672, lng: -97.7431 },
+    endLocation: { name: 'Los Angeles, CA', lat: 34.0522, lng: -118.2437 },
+    milestones: [
+      { mile: 250, location: 'El Paso, TX', emoji: '🌮', description: 'Texas-Mexico border!' },
+      { mile: 500, location: 'Tucson, AZ', emoji: '🌵', description: 'Desert beauty!' },
+      { mile: 750, location: 'Phoenix, AZ', emoji: '☀️', description: 'Valley of the Sun!' },
+      { mile: 1000, location: 'Palm Springs, CA', emoji: '🏜️', description: 'Oasis in the desert!' },
+      { mile: 1200, location: 'San Bernardino, CA', emoji: '⛰️', description: 'Mountain crossing - LA close!' },
+      { mile: 1377, location: 'Los Angeles, CA', emoji: '🎬', description: "Hollywood! You're a star!" },
+    ],
+    achievementTiers: [
+      { miles: 250, badge: 'bronze', title: 'Desert Entry' },
+      { miles: 750, badge: 'silver', title: 'Arizona Crossed' },
+      { miles: 1200, badge: 'gold', title: 'California Dreaming' },
+      { miles: 1377, badge: 'platinum', title: 'Hollywood Star' },
+    ],
+  },
+  {
+    id: 'walk-to-great-wall',
+    title: 'Journey to the Great Wall',
+    emoji: '🏯',
+    type: 'distance',
+    description: 'Epic virtual trek from Austin, Texas to the Great Wall of China in Beijing',
+    totalDistance: 7130,
+    difficultyLevel: 'legendary',
+    recommendedStepsPerDay: 10000,
+    estimatedWeeks: 269,
+    startLocation: { name: 'Austin, Texas', lat: 30.2672, lng: -97.7431 },
+    endLocation: { name: 'Great Wall of China (Beijing)', lat: 40.4319, lng: 116.5704 },
+    milestones: [
+      { mile: 500, location: 'Flagstaff, AZ', emoji: '🌵', description: 'Desert crossed! Heading west!' },
+      { mile: 1000, location: 'San Francisco, CA', emoji: '🌉', description: 'Golden Gate Bridge - Pacific Ocean ahead!' },
+      { mile: 2500, location: 'Pacific Ocean Crossing', emoji: '🌊', description: 'Halfway across the Pacific - keep swimming!' },
+      { mile: 4000, location: 'Approaching Hawaii', emoji: '🏝️', description: 'Aloha! Rest stop in paradise!' },
+      { mile: 5500, location: 'Tokyo, Japan', emoji: '🗼', description: 'Konichiwa! Almost to China!' },
+      { mile: 6500, location: 'Shanghai, China', emoji: '🏙️', description: 'Welcome to China! Beijing is close!' },
+      { mile: 7130, location: 'Great Wall of China', emoji: '🎉', description: 'EPIC ACHIEVEMENT! You virtually walked to one of the 7 Wonders!' },
+    ],
+    achievementTiers: [
+      { miles: 1000, badge: 'bronze', title: 'Pacific Coast' },
+      { miles: 2500, badge: 'silver', title: 'Ocean Crosser' },
+      { miles: 5000, badge: 'gold', title: 'Asia Bound' },
+      { miles: 7130, badge: 'platinum', title: 'Great Wall Conqueror' },
+    ],
+  },
+  {
+    id: 'walk-to-mecca',
+    title: 'Pilgrimage to Mecca',
+    emoji: '🕌',
+    type: 'distance',
+    description: 'Sacred virtual journey from Austin, Texas to Mecca, Saudi Arabia',
+    totalDistance: 7899,
+    difficultyLevel: 'legendary',
+    recommendedStepsPerDay: 10000,
+    estimatedWeeks: 298,
+    startLocation: { name: 'Austin, Texas', lat: 30.2672, lng: -97.7431 },
+    endLocation: { name: 'Mecca, Saudi Arabia', lat: 21.4225, lng: 39.8262 },
+    milestones: [
+      { mile: 500, location: 'Memphis, TN', emoji: '🎸', description: 'Home of the blues - keep the rhythm going!' },
+      { mile: 1200, location: 'New York, NY', emoji: '🗽', description: 'Lady Liberty sees you off to cross the Atlantic!' },
+      { mile: 3000, location: 'Atlantic Ocean Crossing', emoji: '🌊', description: 'Across the Atlantic - halfway to Mecca!' },
+      { mile: 4500, location: 'Lisbon, Portugal', emoji: '🏰', description: 'European landfall - Mediterranean ahead!' },
+      { mile: 6000, location: 'Cairo, Egypt', emoji: '🐪', description: 'Land of the Pyramids - Arabian Peninsula close!' },
+      { mile: 7500, location: 'Medina, Saudi Arabia', emoji: '🕌', description: "The Prophet's City - Mecca is near!" },
+      { mile: 7899, location: 'Mecca, Saudi Arabia', emoji: '✨', description: 'HAJJ COMPLETE! Sacred journey achieved!' },
+    ],
+    achievementTiers: [
+      { miles: 1000, badge: 'bronze', title: 'Atlantic Approach' },
+      { miles: 3000, badge: 'silver', title: 'Ocean Crossed' },
+      { miles: 6000, badge: 'gold', title: 'Arabian Approach' },
+      { miles: 7899, badge: 'platinum', title: 'Hajj Completed' },
+    ],
+  },
+];
+
+export function getJourneyById(id) {
+  return ENDURANCE_JOURNEYS.find(j => j.id === id);
+}
+
+export function stepsToMiles(steps) {
+  return steps / 2640;
+}

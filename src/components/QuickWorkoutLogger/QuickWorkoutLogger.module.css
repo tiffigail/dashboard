@@ -1,0 +1,197 @@
+.logger {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 700px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.title {
+  margin: 0 0 24px 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: #333;
+}
+
+.formGroup {
+  margin-bottom: 20px;
+}
+
+.formGroup label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 8px;
+}
+
+.input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.exercises {
+  margin-bottom: 20px;
+}
+
+.exercisesHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.exercisesHeader h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #333;
+}
+
+.addButton {
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.exerciseCard {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 12px;
+  border-left: 4px solid #667eea;
+}
+
+.exerciseHeader {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.removeButton {
+  padding: 8px 12px;
+  background: #f44336;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.sets {
+  margin-bottom: 12px;
+}
+
+.setRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.setNumber {
+  font-size: 14px;
+  font-weight: 600;
+  color: #555;
+  min-width: 50px;
+}
+
+.smallInput {
+  width: 100px;
+  padding: 8px;
+  border: 2px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.smallInput:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.volume {
+  font-size: 14px;
+  color: #666;
+  margin-left: auto;
+}
+
+.addSetButton {
+  padding: 6px 12px;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.exerciseTotal {
+  padding-top: 12px;
+  border-top: 1px solid #e0e0e0;
+  text-align: right;
+  font-size: 14px;
+  color: #555;
+}
+
+.exerciseTotal strong {
+  color: #667eea;
+  font-size: 16px;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  padding-top: 20px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.cancelButton,
+.saveButton {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cancelButton {
+  background: #e0e0e0;
+  color: #555;
+}
+
+.saveButton {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.saveButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

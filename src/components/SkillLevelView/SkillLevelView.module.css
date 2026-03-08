@@ -1,0 +1,216 @@
+.view {
+  padding: 4px 0;
+}
+
+.headerRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.heading {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.subtitle {
+  font-size: 13px;
+  color: #666;
+  margin: 4px 0 0 0;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #999;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+.levelsList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.levelCard {
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.levelCard.completed {
+  border-color: #43a047;
+  background: #f8fdf8;
+}
+
+.levelCard.inProgress {
+  border-color: #e7514c;
+  background: #fffaf9;
+}
+
+.levelCard.locked {
+  opacity: 0.6;
+}
+
+.levelHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 14px;
+  cursor: pointer;
+}
+
+.locked .levelHeader {
+  cursor: default;
+}
+
+.levelInfo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.levelStatus {
+  font-size: 18px;
+}
+
+.levelTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  display: block;
+}
+
+.levelMeta {
+  font-size: 12px;
+  color: #999;
+  display: block;
+  margin-top: 2px;
+}
+
+.expandIcon {
+  font-size: 12px;
+  color: #999;
+}
+
+.levelContent {
+  padding: 0 14px 14px 14px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.subheading {
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+  margin: 14px 0 8px 0;
+}
+
+.skillsRequired {
+  background: #f9f9f9;
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+.skillsList {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 13px;
+  color: #555;
+  line-height: 1.6;
+}
+
+.drillsSection {
+  margin-top: 10px;
+}
+
+.drillCard {
+  background: #fafafa;
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+}
+
+.drillHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.drillName {
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+}
+
+.drillFreq {
+  font-size: 11px;
+  color: #999;
+}
+
+.drillDesc {
+  font-size: 12px;
+  color: #666;
+  margin: 0 0 6px 0;
+  line-height: 1.4;
+}
+
+.drillStats {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  color: #999;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid #eee;
+}
+
+.markCompleteBtn {
+  padding: 4px 10px;
+  background: #43a047;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.tipsSection {
+  background: #fef0ef;
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-top: 10px;
+}
+
+.tipsList {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 12px;
+  color: #666;
+  line-height: 1.6;
+}
+
+.completeLevelBtn {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #e7514c 0%, #FE9179 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 14px;
+}
+
+.completeLevelBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

@@ -1,0 +1,110 @@
+/* src/components/RestPreparationDashboard/RestPreparationDashboard.module.css */
+
+.container {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.title {
+    font-size: 28px;
+    font-weight: 600;
+    color: #aec6de;
+    margin-bottom: 30px;
+}
+
+.sprintSection,
+.habitSection,
+.metricsSection {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.sectionTitle {
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #cbdbe7;
+    padding-bottom: 8px;
+}
+
+.statsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.statCard {
+    background: linear-gradient(135deg, #eaf1fa 0%, #cbdbe7 100%);
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.statLabel {
+    font-size: 14px;
+    color: #3a5a7a;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+.statValue {
+    font-size: 32px;
+    font-weight: 700;
+    color: #1a3a5a;
+    margin-bottom: 4px;
+}
+
+.statSubtext {
+    font-size: 12px;
+    color: #4a6a8a;
+    margin-top: 4px;
+}
+
+.progressBar {
+    width: 100%;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+    margin-top: 12px;
+    overflow: hidden;
+}
+
+.progressFill {
+    height: 100%;
+    background: linear-gradient(90deg, #aec6de 0%, #7a9abe 100%);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.infoBox {
+    background: #f5f8fb;
+    border: 2px solid #cbdbe7;
+    border-radius: 8px;
+    padding: 24px;
+}
+
+.infoText {
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 12px;
+}
+
+.infoText:last-child {
+    margin-bottom: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .statsGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .statValue {
+        font-size: 24px;
+    }
+}

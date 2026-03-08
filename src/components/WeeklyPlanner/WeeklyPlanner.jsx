@@ -289,14 +289,39 @@ function WeeklyPlanner({ onClose, allAxes = [], allMilestones = [], targetDate }
                     }
                     const axisId = axisData.id;
 
-                    const activeMilestonesForAxis = allMilestones.filter(
-                        m => m.axisId === axisId && m.completionDate === null
-                    );
+                    console.log(`[WeeklyPlanner] For axis "${axisName}", using axisId: "${axisId}"`);
+
+                    // Filter to incomplete milestones for this axis from the current year
+                    const currentYear = new Date().getFullYear();
+
+                    // DEBUG: Log all milestones for this axis to understand the data
+                    const allMilestonesForThisAxis = allMilestones.filter(m => m.axisId === axisId);
+                    console.log(`[WeeklyPlanner] All milestones for ${axisName}:`, allMilestonesForThisAxis.map(m => ({
+                        title: m.title,
+                        dueDate: m.dueDate?.toDate?.(),
+                        year: m.dueDate?.toDate?.()?.getFullYear(),
+                        completed: m.completionDate !== null
+                    })));
+
+                    const activeMilestonesForAxis = allMilestones.filter(m => {
+                        if (m.axisId !== axisId || m.completionDate !== null) return false;
+
+                        // Filter by current year using the dueDate
+                        const dueDate = m.dueDate?.toDate ? m.dueDate.toDate() : null;
+                        if (!dueDate) return false;
+
+                        return dueDate.getFullYear() === currentYear;
+                    });
+
+                    console.log(`[WeeklyPlanner] Incomplete ${currentYear} milestones for ${axisName}:`, activeMilestonesForAxis.length);
+
+                    // Sort by dueDate to get the earliest incomplete milestone
                     activeMilestonesForAxis.sort((a, b) => {
                         const dateA = a.dueDate?.toDate ? a.dueDate.toDate() : new Date('9999-12-31');
                         const dateB = b.dueDate?.toDate ? b.dueDate.toDate() : new Date('9999-12-31');
                         return dateA - dateB;
                     });
+
                     const activeMilestone = activeMilestonesForAxis.length > 0 ? activeMilestonesForAxis[0] : null;
                     
                     const goalDueDate = new Date(weekStartDate);

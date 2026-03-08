@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import styles from './StudyFlashcardsModal.module.css';
 import { db } from '../../firebaseConfig';
-import { doc, getDoc, getDocs, collection, addDoc, serverTimestamp, query, where, orderBy, limit } from "firebase/firestore";
+import { doc, getDoc, getDocs, collection, addDoc, serverTimestamp, query, where, limit } from "firebase/firestore";
 import StarRating from '../StarRating/StarRating';
 import { useTimeAggregator } from '../../hooks/useTimeAggregator';
 
@@ -92,12 +92,15 @@ function StudyFlashcardsModal({ isOpen, onClose }) {
             const q = query(
                 ratingsRef,
                 where("cardTitle", "==", card.title),
-                orderBy("reviewedAt", "desc"),
-                limit(3)
+                limit(20)
             );
 
             const querySnapshot = await getDocs(q);
-            const pastRatings = querySnapshot.docs.map(doc => doc.data().rating);
+            const pastRatings = querySnapshot.docs
+                .map(doc => doc.data())
+                .sort((a, b) => (b.reviewedAt?.seconds || 0) - (a.reviewedAt?.seconds || 0))
+                .slice(0, 3)
+                .map(d => d.rating);
 
             if (pastRatings.length > 0) {
                 const sum = pastRatings.reduce((a, b) => a + b, 0);

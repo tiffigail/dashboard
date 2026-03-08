@@ -1,0 +1,72 @@
+/* src/components/DynamicSprintDashboard/DynamicSprintDashboard.module.css */
+
+.container {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.loading,
+.error {
+    text-align: center;
+    padding: 40px 20px;
+    font-size: 16px;
+    color: #666;
+}
+
+.error {
+    color: #d32f2f;
+}
+
+.sprintBanner {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px 30px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.sprintInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.sprintTitle {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.sprintMeta {
+    display: flex;
+    gap: 20px;
+    font-size: 14px;
+    opacity: 0.95;
+}
+
+.axis {
+    font-weight: 500;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 4px 12px;
+    border-radius: 12px;
+}
+
+.dates {
+    font-family: 'Courier New', monospace;
+}
+
+.noSprintBanner {
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.noSprintBanner p {
+    margin: 0;
+    color: #856404;
+    font-size: 14px;
+}

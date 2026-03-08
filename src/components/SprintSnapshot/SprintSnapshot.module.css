@@ -1,0 +1,282 @@
+/* src/components/SprintSnapshot/SprintSnapshot.module.css */
+/* Matching NowView color scheme */
+
+.snapshotContainer {
+    background-color: var(--bg-card, #fff);
+    border: 2px solid var(--axis-medium);
+    border-radius: 8px;
+    padding: var(--space-md, 1rem);
+    box-shadow: 0 1px 3px var(--shadow-color, rgba(0,0,0,0.1));
+    width: 100%;
+    max-width: 250px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.header {
+    border-bottom: 2px solid var(--axis-medium);
+    padding-bottom: 8px;
+    margin-bottom: 4px;
+}
+
+.title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary, #053229);
+    margin: 0;
+    text-align: center;
+}
+
+.loadingText {
+    color: var(--text-muted, #6c757d);
+    font-style: italic;
+    text-align: center;
+    margin: 0;
+}
+
+.noSprint {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: var(--space-md, 1rem) 0;
+}
+
+.noSprint p {
+    color: var(--text-muted, #6c757d);
+    font-style: italic;
+    margin: 0;
+}
+
+.emoji {
+    font-size: 2rem;
+}
+
+/* Sprint Info Section */
+.sprintInfo {
+    background-color: var(--axis-light);
+    padding: 10px;
+    border-radius: 6px;
+    border-left: 4px solid var(--axis-dark);
+}
+
+.sprintName {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--axis-darkest);
+    margin-bottom: 4px;
+}
+
+.sprintAxis {
+    font-size: 0.8rem;
+    color: var(--axis-dark);
+    margin-bottom: 4px;
+    font-weight: 500;
+}
+
+.sprintDates {
+    font-size: 0.75rem;
+    color: var(--text-muted, #6c757d);
+    font-style: italic;
+}
+
+/* Stand-up Section */
+.standupSection {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: linear-gradient(135deg,
+        var(--axis-medium) 0%,
+        var(--axis-dark) 100%);
+    padding: 8px 12px;
+    border-radius: 6px;
+    color: var(--button-primary-text, #fff);
+}
+
+.standupIcon {
+    font-size: 1.2rem;
+}
+
+.standupText {
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+/* Weekly Section */
+.weeklySection {
+    background-color: var(--axis-light);
+    padding: 8px 10px;
+    border-radius: 4px;
+    border: 1px solid var(--axis-medium);
+}
+
+.weeklyLabel {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--axis-dark);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+}
+
+.weeklyContent {
+    font-size: 0.85rem;
+    color: var(--text-primary, #053229);
+    line-height: 1.3;
+}
+
+/* Metrics Section */
+.metricsSection {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px;
+    background-color: var(--axis-light);
+    border-radius: 6px;
+    border: 1px solid var(--axis-medium);
+}
+
+.progressBar {
+    width: 100%;
+    height: 8px;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progressFill {
+    height: 100%;
+    background: linear-gradient(90deg,
+        var(--axis-medium) 0%,
+        var(--axis-dark) 100%);
+    transition: width 0.3s ease;
+}
+
+.progressText {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--axis-dark);
+    text-align: center;
+}
+
+.taskCounts {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.countItem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.countNumber {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--text-primary, #053229);
+}
+
+.countLabel {
+    font-size: 0.7rem;
+    color: var(--text-muted, #6c757d);
+    text-align: center;
+}
+
+/* Cards Section */
+.cardsSection {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.cardsHeader {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--axis-dark);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+}
+
+.card {
+    background-color: var(--bg-card, #fff);
+    border: 1px solid var(--axis-light);
+    border-left: 3px solid var(--axis-dark);
+    padding: 8px;
+    border-radius: 4px;
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.card:hover {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border-left-color: var(--axis-darkest);
+}
+
+.cardTitle {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-primary, #053229);
+    line-height: 1.3;
+    margin-bottom: 4px;
+}
+
+.cardCriteria {
+    font-size: 0.7rem;
+    color: var(--text-muted, #6c757d);
+    font-style: italic;
+}
+
+/* Motivation */
+.motivation {
+    background: linear-gradient(135deg,
+        var(--axis-medium) 0%,
+        var(--axis-dark) 100%);
+    color: var(--button-primary-text, #fff);
+    padding: 10px;
+    border-radius: 6px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.9rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 600px) {
+    .snapshotContainer {
+        max-width: 100%;
+    }
+
+    .title {
+        font-size: 0.95rem;
+    }
+
+    .sprintName {
+        font-size: 0.9rem;
+    }
+
+    .taskCounts {
+        gap: 6px;
+    }
+
+    .countNumber {
+        font-size: 1.1rem;
+    }
+
+    .countLabel {
+        font-size: 0.65rem;
+    }
+
+    .card {
+        padding: 6px;
+    }
+
+    .cardTitle {
+        font-size: 0.8rem;
+    }
+}

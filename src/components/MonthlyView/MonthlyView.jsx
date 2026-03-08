@@ -1,8 +1,9 @@
+// src/components/MonthlyView/MonthlyView.jsx (IMPROVED VERSION)
 import React, { useState, useEffect, useCallback } from 'react';
 import styles from './MonthlyView.module.css';
 import { db } from '../../firebaseConfig';
 import {
-    doc, getDoc, setDoc, collection, getDocs, updateDoc, arrayUnion, serverTimestamp, limit
+    doc, getDoc, setDoc, collection, getDocs, updateDoc, arrayUnion, serverTimestamp, deleteDoc, addDoc
 } from "firebase/firestore";
 
 // --- Imports for Integrated Features ---
@@ -10,6 +11,7 @@ import * as kanbanService from '../../services/kanbanServices';
 import KanbanBoard from '../KanbanBoard/KanbanBoard';
 import MonthlyThemeModal from '../MonthlyThemeModal/MonthlyThemeModal.jsx';
 import SprintEditModal from './SprintEditModal';
+import { getPrimaryActiveSprint, getProjectIdFromSprint } from '../../services/sprintService';
 
 // --- Helper Functions ---
 function getMonthNameAndYear(date = new Date()) {
@@ -79,11 +81,6 @@ function MonthlyView({ onNavigate }) {
     const [currentMonthName, setCurrentMonthName] = useState("");
     const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
     const [currentMonthIndex, setCurrentMonthIndex] = useState(new Date().getMonth());
-    const [newEventText, setNewEventText] = useState("");
-    const [newEventDate, setNewEventDate] = useState(getTodayDateString());
-    const [newEventAxis, setNewEventAxis] = useState("No Affiliation");
-    const [isAddingEvent, setIsAddingEvent] = useState(false);
-    const [addEventError, setAddEventError] = useState(null);
     const [isMonthlyThemeModalOpen, setIsMonthlyThemeModalOpen] = useState(false);
     const [editingMonthId, setEditingMonthId] = useState('');
     const [currentPlanDataForModal, setCurrentPlanDataForModal] = useState(null);
@@ -102,6 +99,8 @@ function MonthlyView({ onNavigate }) {
     const [sprintStartDate, setSprintStartDate] = useState(getTodayDateString());
     const [sprintDuration, setSprintDuration] = useState('14');
     const [editingSprint, setEditingSprint] = useState(null);
+    const [activeSprint, setActiveSprint] = useState(null);
+    const [carryoverSprints, setCarryoverSprints] = useState([]);
     const selectedProject = projects.find(p => p.id === selectedProjectId);
 
     // --- Effects ---
@@ -116,7 +115,13 @@ function MonthlyView({ onNavigate }) {
                 })).filter(axis => axis.name);
                 axesList.sort((a, b) => a.name.localeCompare(b.name));
                 setAvailableAxes(axesList);
-                if (axesList.length > 0) {
+
+                // Check for active sprint and set axis accordingly
+                const sprint = await getPrimaryActiveSprint();
+                if (sprint && sprint.axis) {
+                    setSelectedAxis(sprint.axis);
+                    setActiveSprint(sprint);
+                } else if (axesList.length > 0) {
                     setSelectedAxis(axesList.find(a => a.name === 'Physical')?.name || axesList[0].name);
                 }
             } catch (error) {
@@ -130,7 +135,6 @@ function MonthlyView({ onNavigate }) {
     const fetchMonthlyData = useCallback(async (yearToFetch, monthIndexToFetch) => {
         setIsLoading(true);
         setError(null);
-        setAddEventError(null);
         const targetDate = new Date(yearToFetch, monthIndexToFetch, 1);
         const monthId = `${yearToFetch}-${String(monthIndexToFetch + 1).padStart(2, '0')}`;
         setCurrentYear(yearToFetch);
@@ -146,9 +150,25 @@ function MonthlyView({ onNavigate }) {
                 setMonthData(data);
                 setCurrentPlanDataForModal(data);
             } else {
-                setMonthData(null); 
+                setMonthData(null);
                 setCurrentPlanDataForModal(null);
             }
+
+            // Also fetch up to 2 previous months to find sprints that carry over into this month
+            const firstOfMonth = `${yearToFetch}-${String(monthIndexToFetch + 1).padStart(2, '0')}-01`;
+            const carryover = [];
+            for (let i = 1; i <= 2; i++) {
+                const prevDate = new Date(yearToFetch, monthIndexToFetch - i, 1);
+                const prevMonthId = `${prevDate.getFullYear()}-${String(prevDate.getMonth() + 1).padStart(2, '0')}`;
+                const prevSnap = await getDoc(doc(db, "monthlyPlans", prevMonthId));
+                if (prevSnap.exists()) {
+                    const prevSprints = (prevSnap.data().events || []).filter(
+                        e => e.type === 'sprint' && e.endDate >= firstOfMonth
+                    );
+                    carryover.push(...prevSprints);
+                }
+            }
+            setCarryoverSprints(carryover);
         } catch (err) {
             console.error("Error fetching monthly data:", err);
             setError("Failed to load monthly data.");
@@ -172,6 +192,7 @@ function MonthlyView({ onNavigate }) {
 
             if (selectedAxis === 'Completed Projects') {
                 fetchedProjects = await kanbanService.getAllCompletedProjects();
+                setActiveGoalId('');
             } else {
                 fetchedProjects = await kanbanService.getProjectsForAxis(selectedAxis);
                 
@@ -182,6 +203,17 @@ function MonthlyView({ onNavigate }) {
             
             setProjects(fetchedProjects);
 
+            // Auto-select active sprint project if it matches this axis
+            if (activeSprint && activeSprint.axis === selectedAxis) {
+                const sprintProjectId = await getProjectIdFromSprint(activeSprint);
+                if (sprintProjectId && fetchedProjects.some(p => p.id === sprintProjectId)) {
+                    setSelectedProjectId(sprintProjectId);
+                    setIsLoadingProjects(false);
+                    return;
+                }
+            }
+
+            // Otherwise use last selected or first project
             const lastProjectId = localStorage.getItem(`lastProject_${selectedAxis}`);
             if (lastProjectId && fetchedProjects.some(p => p.id === lastProjectId)) {
                 setSelectedProjectId(lastProjectId);
@@ -194,7 +226,7 @@ function MonthlyView({ onNavigate }) {
         };
 
         fetchProjectsData();
-    }, [selectedAxis]);
+    }, [selectedAxis, activeSprint]);
 
     useEffect(() => {
         if (selectedProjectId && selectedAxis) {
@@ -203,31 +235,6 @@ function MonthlyView({ onNavigate }) {
     }, [selectedProjectId, selectedAxis]);
 
     // --- Handlers ---
-    const handleAddEvent = async (e) => {
-        e.preventDefault();
-        if (isAddingEvent || !newEventText.trim() || !newEventDate) return;
-        setIsAddingEvent(true);
-        setAddEventError(null);
-        const monthIdForEvent = `${currentYear}-${String(currentMonthIndex + 1).padStart(2, '0')}`;
-        const docRef = doc(db, "monthlyPlans", monthIdForEvent);
-        const newEventObject = { date: newEventDate, text: newEventText.trim(), axis: newEventAxis };
-        try {
-            const docSnap = await getDoc(docRef);
-            if (docSnap.exists()) {
-                await updateDoc(docRef, { events: arrayUnion(newEventObject) });
-            } else {
-                await setDoc(docRef, { events: [newEventObject], monthId: monthIdForEvent, monthName: getMonthNameAndYear(new Date(currentYear, currentMonthIndex)) }, { merge: true });
-            }
-            setMonthData(prevData => ({ ...prevData, events: [...(prevData?.events || []), newEventObject] }));
-            setNewEventText("");
-        } catch (err) {
-            console.error("Error adding event:", err);
-            setAddEventError(`Failed to add event: ${err.message}`);
-        } finally {
-            setIsAddingEvent(false);
-        }
-    };
-    
     const handleOpenMonthlyThemeModal = () => {
         const monthId = `${currentYear}-${String(currentMonthIndex + 1).padStart(2, '0')}`;
         setCurrentPlanDataForModal(monthData || {
@@ -251,12 +258,61 @@ function MonthlyView({ onNavigate }) {
             const updatedData = { ...(monthData || {}), ...dataForFirestore };
             setMonthData(updatedData);
             setCurrentPlanDataForModal(updatedData);
+
+            // Create end-of-month reward task if reward is set
+            if (dataToSave.reward && dataToSave.reward.trim()) {
+                await createMonthEndRewardTask(monthDocId, dataToSave.monthName, dataToSave.reward);
+            }
+
             setIsMonthlyThemeModalOpen(false);
         } catch (error) {
             console.error("Error saving monthly plan:", error);
             setError("Failed to save monthly plan.");
         } finally {
             setIsSaving(false);
+        }
+    };
+
+    const createMonthEndRewardTask = async (monthId, monthName, rewardText) => {
+        try {
+            // Parse monthId to get year and month (format: YYYY-MM)
+            const [year, month] = monthId.split('-').map(Number);
+
+            // Get the last day of the month
+            const lastDay = new Date(year, month, 0).getDate();
+            const lastDayDate = `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
+
+            // Check if a reward task already exists for this month
+            const tasksCollectionRef = collection(db, "new_tasks");
+            const existingTasksQuery = await getDocs(tasksCollectionRef);
+            const rewardTaskExists = existingTasksQuery.docs.some(doc => {
+                const data = doc.data();
+                return data.title && data.title.includes(`${monthName} reward:`) && data.assignedDate === lastDayDate;
+            });
+
+            if (rewardTaskExists) {
+                console.log("Reward task already exists for this month.");
+                return;
+            }
+
+            // Create the reward task with matching NowView data structure
+            const rewardTaskData = {
+                title: `Congratulations, ${monthName} reward: ${rewardText}`,
+                axisTheme: 'On Track N+1',
+                parentId: monthId,
+                parentType: 'monthlyPlan',
+                taskType: 'reward',
+                status: 'todo',
+                createdAt: serverTimestamp(),
+                completedAt: null,
+                assignedDate: lastDayDate,
+            };
+
+            await addDoc(tasksCollectionRef, rewardTaskData);
+            console.log(`Reward task created for ${monthName} on ${lastDayDate}`);
+        } catch (error) {
+            console.error("Error creating month-end reward task:", error);
+            // Don't throw error - this is not critical enough to fail the whole save
         }
     };
     
@@ -287,6 +343,75 @@ function MonthlyView({ onNavigate }) {
             alert("Failed to create project.");
         } finally {
             setIsCreatingProject(false);
+        }
+    };
+    
+    const handleMarkProjectComplete = async () => {
+        if (!selectedProjectId || !selectedProject) return;
+        
+        const confirmComplete = window.confirm(
+            `Mark "${selectedProject.projectName}" as complete? This will move it to Completed Projects.`
+        );
+        
+        if (!confirmComplete) return;
+        
+        try {
+            await kanbanService.markProjectComplete(selectedProjectId);
+            
+            // Remove from current projects list
+            setProjects(prev => prev.filter(p => p.id !== selectedProjectId));
+            
+            // Select next available project or clear selection
+            const remainingProjects = projects.filter(p => p.id !== selectedProjectId);
+            if (remainingProjects.length > 0) {
+                setSelectedProjectId(remainingProjects[0].id);
+            } else {
+                setSelectedProjectId('');
+            }
+            
+            alert(`"${selectedProject.projectName}" marked as complete!`);
+        } catch (error) {
+            console.error("Error marking project complete:", error);
+            alert("Failed to mark project complete. Please try again.");
+        }
+    };
+    
+    const handleDeleteProject = async () => {
+        if (!selectedProjectId || !selectedProject) return;
+        
+        const confirmDelete = window.confirm(
+            `Delete "${selectedProject.projectName}"? This will permanently remove the project and all its tasks. This cannot be undone.`
+        );
+        
+        if (!confirmDelete) return;
+        
+        try {
+            // Delete all kanban cards for this project
+            const cards = await kanbanService.getKanbanCards(selectedProjectId);
+            const deletePromises = cards.map(card => 
+                kanbanService.deleteKanbanCard(card.id)
+            );
+            await Promise.all(deletePromises);
+            
+            // Delete the project document
+            const projectRef = doc(db, "projects", selectedProjectId);
+            await deleteDoc(projectRef);
+            
+            // Remove from projects list
+            setProjects(prev => prev.filter(p => p.id !== selectedProjectId));
+            
+            // Select next available project or clear selection
+            const remainingProjects = projects.filter(p => p.id !== selectedProjectId);
+            if (remainingProjects.length > 0) {
+                setSelectedProjectId(remainingProjects[0].id);
+            } else {
+                setSelectedProjectId('');
+            }
+            
+            alert(`"${selectedProject.projectName}" deleted successfully.`);
+        } catch (error) {
+            console.error("Error deleting project:", error);
+            alert("Failed to delete project. Please try again.");
         }
     };
     
@@ -398,7 +523,7 @@ function MonthlyView({ onNavigate }) {
         }
     };
     
-    const { monthFocus, monthObjective, reward, events = [], weeklyData = {} } = monthData || {};
+    const { monthFocus, monthObjective, events = [], weeklyData = {} } = monthData || {};
     const getEventsForDate = (dateString) => (events).filter(event => event.type !== 'sprint' && event.date === dateString);
 
     return (
@@ -417,7 +542,7 @@ function MonthlyView({ onNavigate }) {
                              <p className={styles.monthObjectiveDisplay}>Objective: {monthObjective || "Not Set"}</p>
                         </div>
                         <div className={styles.headerRight}>
-                             <button onClick={handleOpenMonthlyThemeModal} className={styles.editMonthPlanButton} disabled={isSaving}>Edit Plan</button>
+                             <button onClick={handleOpenMonthlyThemeModal} className={styles.editMonthPlanButton} disabled={isSaving}>Edit Monthly Plan</button>
                         </div>
                     </div>
 
@@ -436,7 +561,7 @@ function MonthlyView({ onNavigate }) {
                                                         if (day === null) return <td key={`empty-${weekIndex}-${dayIndex}`} className={styles.calendarEmptyCell}></td>;
                                                         const dateString = formatDateString(currentYear, currentMonthIndex, day);
                                                         const dayEvents = getEventsForDate(dateString);
-                                                        const sprintsToday = (events).filter(e => e.type === 'sprint' && dateString >= e.startDate && dateString <= e.endDate);
+                                                        const sprintsToday = [...events.filter(e => e.type === 'sprint'), ...carryoverSprints].filter(e => dateString >= e.startDate && dateString <= e.endDate);
                                                         return (
                                                             <td key={`day-${weekIndex}-${dayIndex}`} className={`${styles.calendarDayCell} ${getTodayDateString() === dateString ? styles.todayCell : ''}`}>
                                                                 <div className={styles.dayNumber}>{day}</div>
@@ -449,7 +574,7 @@ function MonthlyView({ onNavigate }) {
                                                                         const isStart = sprint.startDate === dateString || dayIndex === 0;
                                                                         const isEnd = sprint.endDate === dateString || dayIndex === 6;
                                                                         const bandClass = `${styles.sprintBand} ${isStart ? styles.sprintStart : ''} ${isEnd ? styles.sprintEnd : ''}`;
-                                                                        return <div key={index} className={bandClass} style={{top: `${20 + index * 22}px`, backgroundColor: sprintColor}} onClick={() => setEditingSprint(sprint)}>{isStart && sprint.text}</div>
+                                                                        return <div key={index} className={bandClass} style={{top: `${index * 20}px`, backgroundColor: sprintColor}} onClick={() => setEditingSprint(sprint)}>{isStart && sprint.text}</div>
                                                                     })}
                                                                 </div>
                                                             </td>
@@ -463,43 +588,12 @@ function MonthlyView({ onNavigate }) {
                                 </table>
                             </div>
                         </div>
+                        
                         <div className={styles.sidebar}>
-                           <div className={styles.addEventSection}>
-                                <h3 className={styles.sectionTitle}>Add Event</h3>
-                                <form onSubmit={handleAddEvent} className={styles.addEventForm}>
-                                    <div className={styles.formRow}>
-                                        <label htmlFor="eventText">Event:</label>
-                                        <input type="text" id="eventText" value={newEventText} onChange={(e) => setNewEventText(e.target.value)} placeholder="Enter event description" required className={styles.eventTextInput}/>
-                                    </div>
-                                    <div className={styles.formRow}>
-                                        <label htmlFor="eventDate">Date:</label>
-                                        <input type="date" id="eventDate" value={newEventDate} onChange={(e) => setNewEventDate(e.target.value)} required className={styles.eventDateInput}/>
-                                    </div>
-                                    <div className={styles.formRow}>
-                                        <label htmlFor="eventAxis">Axis:</label>
-                                        <select id="eventAxis" value={newEventAxis} onChange={(e) => setNewEventAxis(e.target.value)} className={styles.eventAxisSelect}>
-                                            <option value="No Affiliation">No Affiliation</option>
-                                            {availableAxes.map(axis => (<option key={axis.id} value={axis.name}>{axis.name}</option>))}
-                                        </select>
-                                    </div>
-                                    <div className={styles.formRow}>
-                                        <button type="submit" disabled={isAddingEvent} className={styles.addEventButton}>{isAddingEvent ? 'Adding...' : 'Add Event'}</button>
-                                    </div>
-                                    {addEventError && <p className={styles.errorText}>{addEventError}</p>}
-                                </form>
-                           </div>
-                           <div className={styles.rewardSection}>
-                               <h3 className={styles.sectionTitle}>Month Reward</h3>
-                               <p className={styles.rewardText}>{reward || "Not Set"}</p>
-                           </div>
-                        </div>
-                    </div>
-                    
-                    <div className={styles.kanbanControlsSection}>
-                        <h2 className={styles.sectionTitle}>Project Controls</h2>
-                        <div className={styles.controlsContainer}>
-                            <div className={styles.controlRow}>
-                                <div className={styles.controlGroup}>
+                            <div className={styles.kanbanControlsSection}>
+                                <h3 className={styles.sidebarTitle}>Project Controls</h3>
+                                
+                                <div className={styles.sidebarControlGroup}>
                                     <label htmlFor="axis-select" className={styles.label}>Axis:</label>
                                     <select id="axis-select" value={selectedAxis} onChange={(e) => setSelectedAxis(e.target.value)} className={styles.select}>
                                         {availableAxes.map(axis => (<option key={axis.id} value={axis.name}>{axis.name}</option>))}
@@ -507,7 +601,8 @@ function MonthlyView({ onNavigate }) {
                                         <option key="completed-projects" value="Completed Projects">Completed Projects</option>
                                     </select>
                                 </div>
-                                <div className={styles.controlGroup}>
+                                
+                                <div className={styles.sidebarControlGroup}>
                                     <label htmlFor="project-select" className={styles.label}>Project:</label>
                                     <select id="project-select" value={selectedProjectId} onChange={(e) => setSelectedProjectId(e.target.value)} className={styles.select} disabled={isLoadingProjects || projects.length === 0}>
                                         {isLoadingProjects && <option>Loading...</option>}
@@ -515,35 +610,52 @@ function MonthlyView({ onNavigate }) {
                                         {projects.map(proj => (<option key={proj.id} value={proj.id}>{proj.projectName}</option>))}
                                     </select>
                                 </div>
-                                <div className={styles.controlGroup}>
-                                    <label htmlFor="sprint-start" className={styles.label}>Start:</label>
-                                    <input type="date" id="sprint-start" value={sprintStartDate} onChange={e => setSprintStartDate(e.target.value)} className={styles.input} />
+                                
+                                <div className={styles.sprintScheduleSection}>
+                                    <h4 className={styles.subsectionTitle}>Schedule Sprint</h4>
+                                    <div className={styles.sidebarControlGroup}>
+                                        <label htmlFor="sprint-start" className={styles.label}>Start Date:</label>
+                                        <input type="date" id="sprint-start" value={sprintStartDate} onChange={e => setSprintStartDate(e.target.value)} className={styles.input} />
+                                    </div>
+                                    <div className={styles.sidebarControlGroup}>
+                                        <label htmlFor="sprint-duration" className={styles.label}>Duration:</label>
+                                        <select id="sprint-duration" value={sprintDuration} onChange={e => setSprintDuration(e.target.value)} className={styles.select}>
+                                            <option value="7">1 Week</option>
+                                            <option value="14">2 Weeks</option>
+                                            <option value="21">3 Weeks</option>
+                                            <option value="30">1 Month</option>
+                                        </select>
+                                    </div>
+                                    <button onClick={handleScheduleSprint} className={styles.button} disabled={!selectedProjectId}>Schedule Sprint</button>
                                 </div>
-                                <div className={styles.controlGroup}>
-                                    <label htmlFor="sprint-duration" className={styles.label}>Duration:</label>
-                                    <select id="sprint-duration" value={sprintDuration} onChange={e => setSprintDuration(e.target.value)} className={styles.select}>
-                                        <option value="7">1 Week</option>
-                                        <option value="14">2 Weeks</option>
-                                        <option value="21">3 Weeks</option>
-                                        <option value="30">1 Month</option>
-                                    </select>
+                                
+                                <div className={styles.projectActionsSection}>
+                                    <h4 className={styles.subsectionTitle}>Actions</h4>
+                                    <button onClick={() => setIsProjectFormVisible(prev => !prev)} className={styles.toggleButton}>
+                                        {isProjectFormVisible ? 'Cancel' : '+ New Project'}
+                                    </button>
+                                    {selectedProjectId && selectedAxis !== 'Completed Projects' && (
+                                        <>
+                                            <button onClick={handleMarkProjectComplete} className={styles.completeButton}>
+                                                ✓ Mark Complete
+                                            </button>
+                                            <button onClick={handleDeleteProject} className={styles.deleteButton}>
+                                                🗑️ Delete Project
+                                            </button>
+                                        </>
+                                    )}
                                 </div>
-                                <button onClick={handleScheduleSprint} className={styles.button}>Schedule Sprint</button>
-                            </div>
-                            <div>
-                                <button onClick={() => setIsProjectFormVisible(prev => !prev)} className={styles.toggleButton}>
-                                    {isProjectFormVisible ? 'Cancel' : '+ New Project'}
-                                </button>
+                                
                                 <div className={`${styles.createProjectForm} ${isProjectFormVisible ? styles.isOpen : ''}`}>
-                                    <div className={styles.controlGroup}>
-                                        <label htmlFor="new-project" className={styles.label}>New Project Name:</label>
-                                        <input type="text" id="new-project" value={newProjectName} onChange={e => setNewProjectName(e.target.value)} className={styles.input} style={{flexGrow: 1}} placeholder="e.g., Scrum Certification" />
+                                    <div className={styles.sidebarControlGroup}>
+                                        <label htmlFor="new-project" className={styles.label}>Project Name:</label>
+                                        <input type="text" id="new-project" value={newProjectName} onChange={e => setNewProjectName(e.target.value)} className={styles.input} placeholder="e.g., Scrum Certification" />
                                     </div>
-                                    <div className={styles.controlGroup} style={{marginTop: '10px'}}>
-                                        <label htmlFor="new-vision" className={styles.label}>Project Vision:</label>
-                                        <textarea id="new-vision" value={newProjectVision} onChange={e => setNewProjectVision(e.target.value)} className={styles.textarea} placeholder="The long-term objective for this project..." />
+                                    <div className={styles.sidebarControlGroup}>
+                                        <label htmlFor="new-vision" className={styles.label}>Vision:</label>
+                                        <textarea id="new-vision" value={newProjectVision} onChange={e => setNewProjectVision(e.target.value)} className={styles.textarea} placeholder="Long-term objective..." rows="3" />
                                     </div>
-                                    <button onClick={handleCreateProject} className={styles.button} style={{marginTop: '10px'}} disabled={isCreatingProject}>
+                                    <button onClick={handleCreateProject} className={styles.button} disabled={isCreatingProject}>
                                         {isCreatingProject ? 'Creating...' : 'Create Project'}
                                     </button>
                                 </div>

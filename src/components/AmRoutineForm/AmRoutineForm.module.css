@@ -130,7 +130,7 @@
   }
   
   .submitButton {
-    background-color: #074539; /* Peacock light*/
+    background-color: #e7514c; /* Physical axis red */
     color: white;
     border: none;
     padding: 0.8rem 1.5rem;
@@ -150,6 +150,71 @@
   }
   
   .submitButton:hover:not(:disabled) {
-    background-color: #04231d; /* Peacock */
+    background-color: #c93e3a; /* Physical axis red darker */
   }
-  
+
+  .chartButton {
+    background-color: #618882;
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: background-color 0.2s ease;
+    display: block;
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+  .chartButton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  .chartButton:hover:not(:disabled) {
+    background-color: #4a6b65;
+  }
+
+  /* Today's axis display */
+  .axisDisplay {
+    background: linear-gradient(135deg, #BCDDDC, #eaf1fa);
+    border-left: 4px solid #618882;
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+  .axisLabel {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #618882;
+    font-weight: 700;
+    margin: 0 0 0.2rem;
+  }
+  .axisName {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #053229;
+    margin: 0 0 0.3rem;
+  }
+  .axisSubtext {
+    font-size: 0.85rem;
+    color: #4a5568;
+    margin: 0;
+    font-style: italic;
+  }
+
+  .recitationDisplay {
+    background-color: #f0f9f0;
+    border-left: 3px solid #4CAF50;
+    padding: 0.6rem 0.75rem;
+    margin: 0.25rem 0 0.75rem 1.5rem;
+    border-radius: 3px;
+  }
+  .recitationText {
+    font-size: 0.9rem;
+    color: #2d6a2d;
+    margin: 0;
+    font-style: italic;
+  }

@@ -5,8 +5,7 @@ import Timeline from '../Timeline';
 import YearlyTimelineModal from '../YearlyTimelineModal/YearlyTimelineModal'; // Import the new modal
 
 const PARETO_AXES_ORDER = ["Physical", "Financial", "Gear", "Environment", "Misdirect"];
-// MODIFIED: Updated "On Track N+1" to "on-track-n+1" to match Firestore spelling
-const SUPPORT_AXES_ORDER = ["Rest and preparation", "on-track-n+1"];
+const SUPPORT_AXES_ORDER = ["Rest and preparation", "On Track N+1"];
 
 function ParetoTimelineModal({ isOpen, onClose }) {
     const [isLoading, setIsLoading] = useState(true);

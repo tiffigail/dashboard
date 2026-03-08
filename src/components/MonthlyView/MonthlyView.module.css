@@ -1,504 +1,677 @@
 /* src/components/MonthlyView/MonthlyView.module.css */
+/* Updated to match NowView/DailyView color scheme */
 
-/* --- Main Layout --- */
+/* Color Palette Reference (matching NowView/DailyView):
+    --text-primary: var(--color-on-track-n-plus-1-4); (#053229 Peacock)
+    --text-secondary: var(--color-on-track-n-plus-1-3); (#355E58 Spruce)
+    --text-muted: var(--color-rest-and-preparation-5); (#6c757d Dark Grey)
+    --border-light: var(--color-on-track-n-plus-1-1); (#BCDDDC Arctic)
+    --border-secondary: var(--color-on-track-n-plus-1-2); (#72B0AB Sapphire)
+    --border-primary: var(--color-on-track-n-plus-1-3); (#355E58 Spruce)
+    --bg-card: var(--color-white); (#FFFFFF White)
+    --bg-panel: var(--color-on-track-n-plus-1-1); (#BCDDDC Arctic)
+    --bg-panel-accent: #e0f2f7; (Lighter Arctic)
+    --bg-input: var(--color-white); (#FFFFFF White)
+    --button-primary-bg: var(--color-on-track-n-plus-1-2); (#72B0AB Sapphire)
+    --button-primary-text: var(--color-white); (#FFFFFF White)
+    --button-primary-border: var(--color-on-track-n-plus-1-3); (#355E58 Spruce)
+    --button-primary-hover-bg: var(--color-on-track-n-plus-1-3); (#355E58 Spruce)
+*/
+
 .monthlyViewContainer {
-    padding: var(--space-lg);
-    max-width: 1600px; /* Allow wider view */
+    padding: 20px;
+    max-width: 1800px;
     margin: 0 auto;
-    color: var(--text-primary);
+    background: var(--bg-panel-accent, #e0f2f7);
+    min-height: 100vh;
 }
 
-.layoutContainer {
-    display: flex;
-    flex-wrap: wrap; /* Allow sidebar to wrap on smaller screens */
-    gap: var(--space-lg);
-    margin-top: var(--space-lg);
-}
-
-.mainContent {
-    flex: 3; /* Takes up 3/4 of the space */
-    min-width: 600px; /* Minimum width before wrapping */
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-lg);
-}
-
-.sidebar {
-    flex: 1; /* Takes up 1/4 of the space */
-    min-width: 300px;
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-lg);
-}
-
-.errorText {
-    color: var(--text-error);
-    text-align: center;
-    margin-top: var(--space-md);
-    font-weight: bold;
-}
-
-/* --- Compact Header Section --- */
+/* ===== HEADER SECTION ===== */
 .headerSection {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: var(--space-md) var(--space-lg); /* Reduced padding */
-    background-color: var(--bg-panel);
-    border: 1px solid var(--border-primary);
-    border-radius: 8px;
-    gap: var(--space-lg);
+    margin-bottom: 30px;
+    background: var(--bg-card, white);
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 2px solid var(--border-secondary, #72B0AB);
 }
 
-.headerLeft, .headerRight {
+.headerLeft {
     display: flex;
     align-items: center;
-    gap: var(--space-md);
+    gap: 16px;
+}
+
+.navButton {
+    background: var(--button-primary-bg, #72B0AB);
+    color: var(--button-primary-text, white);
+    border: 1px solid var(--button-primary-border, #355E58);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    font-weight: bold;
+}
+
+.navButton:hover {
+    background-color: var(--button-primary-hover-bg, #355E58);
+    box-shadow: 0 4px 12px rgba(114, 176, 171, 0.4);
+}
+
+.monthNameTitle {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--text-secondary, #355E58);
+    margin: 0;
 }
 
 .headerCenter {
     text-align: center;
-    flex-grow: 1;
-}
-
-.navButton {
-    background-color: var(--bg-button);
-    border: 1px solid var(--border-secondary);
-    color: var(--text-primary);
-    padding: var(--space-xs) var(--space-sm);
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1em;
-}
-.navButton:hover {
-    background-color: var(--bg-button-hover);
-}
-
-.monthNameTitle {
-    font-size: 1.2em; /* Smaller title */
-    color: var(--text-primary);
-    margin: 0;
-    font-weight: bold;
-    white-space: nowrap;
+    flex: 1;
 }
 
 .monthFocusDisplay {
-    font-size: 1.8em; /* Smaller focus text */
-    font-weight: bold;
-    color: var(--text-primary);
-    margin: 0;
-    line-height: 1.1;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-primary, #053229);
+    margin: 0 0 8px 0;
 }
 
 .monthObjectiveDisplay {
-    font-size: 0.9em;
-    color: var(--text-secondary);
+    font-size: 16px;
+    color: var(--text-secondary, #355E58);
     margin: 0;
-    line-height: 1.2;
+}
+
+.headerRight {
+    display: flex;
+    gap: 12px;
 }
 
 .editMonthPlanButton {
-    /* Style is similar to navButton, can be consolidated if desired */
-    background-color: var(--bg-button-action);
-    color: var(--color-white);
-    border: none;
-    padding: var(--space-sm) var(--space-md);
-    border-radius: 4px;
+    background: var(--button-primary-bg, #72B0AB);
+    color: var(--button-primary-text, white);
+    border: 1px solid var(--button-primary-border, #355E58);
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
     cursor: pointer;
-    font-weight: bold;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
 }
+
+.editMonthPlanButton:hover:not(:disabled) {
+    background-color: var(--button-primary-hover-bg, #355E58);
+    box-shadow: 0 4px 12px rgba(114, 176, 171, 0.3);
+}
+
 .editMonthPlanButton:disabled {
     opacity: 0.6;
     cursor: not-allowed;
 }
 
-/* --- Calendar Section (Smaller) --- */
+/* ===== LAYOUT CONTAINER ===== */
+.layoutContainer {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 24px;
+    margin-bottom: 30px;
+}
+
+.mainContent {
+    min-width: 0; /* Prevents grid overflow */
+}
+
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* ===== CALENDAR SECTION ===== */
 .calendarSection {
-    background-color: var(--bg-card);
-    padding: var(--space-md); /* Reduced padding */
-    border-radius: 8px;
-    box-shadow: 0 1px 3px var(--shadow-color);
-    border: 1px solid var(--border-light);
+    background: var(--bg-card, white);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--border-light, #BCDDDC);
 }
 
 .calendarTable {
     width: 100%;
-    border-collapse: collapse;
-    table-layout: fixed;
-    border: 1px solid var(--border-muted);
+    border-collapse: separate;
+    border-spacing: 0;
 }
 
-.calendarTable th {
+.calendarTable thead th {
+    background: var(--button-primary-hover-bg, #355E58);
+    color: var(--button-primary-text, white);
+    padding: 12px;
+    font-weight: 600;
     text-align: center;
-    padding: var(--space-xs) 0;
-    font-weight: bold;
-    color: var(--text-secondary);
-    border-bottom: 2px solid var(--border-secondary);
-    font-size: 0.8em;
-    background-color: var(--bg-panel-accent);
-    border-left: 1px solid var(--border-light);
+    font-size: 14px;
+    border: none;
 }
-.calendarTable th:first-child { border-left: none; }
-.calendarTable th:last-child { border-right: 1px solid var(--border-light); }
 
-.calendarTable td {
-    border: 1px solid var(--border-light);
-    vertical-align: top;
-    position: relative;
-    padding: 0;
+.calendarTable thead th:first-child {
+    border-top-left-radius: 8px;
+}
+
+.calendarTable thead th:last-child {
+    border-top-right-radius: 8px;
 }
 
 .calendarWeekRow {
-    height: 85px; /* Reduced height */
+    border-bottom: none;
 }
 
 .calendarDayCell {
-    background-color: var(--color-white);
-    padding: 2px;
-    height: 100%;
+    border: 1px solid var(--border-light, #BCDDDC);
+    padding: 8px;
+    vertical-align: top;
+    min-height: 90px;
+    height: 100px;
+    position: relative;
+    background: var(--bg-card, white);
+    transition: background-color 0.2s ease;
 }
+
+.calendarDayCell:hover {
+    background-color: var(--bg-panel-accent, #e0f2f7);
+}
+
+.calendarEmptyCell {
+    border: 1px solid var(--border-light, #BCDDDC);
+    background: var(--bg-panel, #BCDDDC);
+    opacity: 0.3;
+}
+
 .todayCell {
-    background-color: var(--bg-highlight); /* Highlight for today's date */
+    background: var(--bg-panel-accent, #e0f2f7);
+    border: 2px solid var(--border-secondary, #72B0AB);
+    font-weight: 600;
 }
 
 .dayNumber {
-    font-size: 0.75em;
-    font-weight: bold;
-    color: var(--text-muted);
-    position: absolute;
-    top: 3px;
-    right: 4px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary, #053229);
+    margin-bottom: 4px;
 }
 
 .dayContent {
-    margin-top: 1.2em;
+    font-size: 12px;
+    color: var(--text-secondary, #355E58);
 }
 
 .dayEventsList {
     list-style: none;
     padding: 0;
-    margin: 0;
-    font-size: 0.75em; /* Smaller event text */
-    line-height: 1.3;
+    margin: 4px 0;
 }
+
 .dayEventsList li {
-    background-color: var(--bg-tag);
-    padding: 2px 4px;
-    border-radius: 3px;
-    margin-bottom: 2px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-
-.weekInfoRow {
-    background-color: var(--bg-panel-accent);
-}
-.weekInfoDataCell {
-    padding: var(--space-xs) var(--space-md);
-    text-align: center;
-    font-size: 0.8em;
-    color: var(--text-secondary);
-    border-top: 1px dashed var(--border-secondary);
-    border-bottom: 1px solid var(--border-muted);
-}
-.weekInfoContent {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    gap: var(--space-md);
-}
-.weekFocus, .weekObjective {
-    margin: 0; flex: 1; text-align: left;
-}
-.weekFocus strong, .weekObjective strong {
-    color: var(--text-primary); margin-right: var(--space-xs);
-}
-.notSet {
-    font-style: italic; opacity: 0.7; color: var(--text-muted);
-}
-
-
-/* --- Sidebar Sections --- */
-.addEventSection, .rewardSection {
-    background-color: var(--bg-card);
-    padding: var(--space-lg);
-    border-radius: 8px;
-    box-shadow: 0 1px 3px var(--shadow-color);
-    border: 1px solid var(--border-light);
-    margin-bottom: 0; /* Gap is handled by parent */
-}
-
-.sectionTitle {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--text-secondary);
-    margin-top: 0;
-    margin-bottom: var(--space-md);
-    text-align: center;
-    border-bottom: 1px solid var(--border-secondary);
-    padding-bottom: var(--space-sm);
-}
-
-.addEventForm {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-md);
-}
-.formRow {
-    display: flex;
-    flex-direction: column;
-}
-.formRow label {
-    margin-bottom: var(--space-xs);
-    font-weight: 600;
-    font-size: 0.9em;
-}
-.eventTextInput, .eventDateInput, .eventAxisSelect {
-    width: 100%;
-    padding: var(--space-sm);
-    border: 1px solid var(--border-muted);
+    background: var(--bg-panel-accent, #e0f2f7);
+    padding: 4px 8px;
+    margin: 2px 0;
     border-radius: 4px;
-    background-color: var(--bg-input);
-    color: var(--text-primary);
-}
-
-.addEventButton {
-    width: 100%;
-    padding: var(--space-sm);
-    background-color: var(--bg-button-success);
-    color: var(--color-white);
-    border: none;
-    border-radius: 4px;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-.rewardText {
-    font-size: 1em;
-    line-height: 1.5;
-    margin-top: 0;
-    color: var(--text-primary);
-    font-style: italic;
-    text-align: center;
-}
-
-.chartPlaceholder {
-    background-color: var(--bg-panel-accent);
-    border: 1px dashed var(--border-muted);
-    text-align: center;
-    padding: var(--space-xl) var(--space-md);
-    color: var(--text-muted);
-    font-style: italic;
-    border-radius: 8px;
-}
-
-/* --- KANBAN STYLES FOR MONTHLY VIEW --- */
-
-.kanbanControlsSection, .kanbanBoardSection {
-  margin-top: 2rem;
-  padding: 1.5rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  background-color: #ffffff;
-}
-
-.controlsContainer {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.controlRow {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 1.5rem;
-}
-
-.controlGroup {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.label {
-  font-weight: 600;
-  white-space: nowrap;
-  font-size: 0.9rem;
-  color: #4a5568;
-}
-
-.input, .select {
-  padding: 8px 12px;
-  font-size: 0.9rem;
-  border: 1px solid #cbd5e0;
-  border-radius: 6px;
-}
-
-.select {
-  min-width: 200px;
-  cursor: pointer;
-}
-
-.toggleButton {
-  background-color: #6c757d;
-  color: white;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  margin-bottom: 1rem;
-}
-.createProjectForm {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
-  opacity: 0;
-}
-.createProjectForm.isOpen {
-  max-height: 300px;
-  opacity: 1;
-  transition: max-height 0.4s ease-in, opacity 0.4s ease-in;
-}
-
-.imageUploaderSection {
-  margin-top: 2rem;
-  padding: 1.5rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  background-color: #ffffff;
-}
-
-.calendarDayCell {
-    position: relative; /* This is crucial for the bands */
+    font-size: 11px;
+    border-left: 3px solid var(--border-secondary, #72B0AB);
+    color: var(--text-primary, #053229);
 }
 
 .sprintLanes {
     position: absolute;
-    top: 0;
+    top: 30px; /* Start below the day number */
     left: 0;
     right: 0;
     bottom: 0;
-    overflow: hidden;
+    pointer-events: none;
 }
 
 .sprintBand {
     position: absolute;
     left: 0;
     right: 0;
-    height: 20px;
-    background-color: #e0e0e0;
-    color: #fff;
-    font-size: 0.75rem;
-    padding: 2px 8px;
-    white-space: nowrap;
+    height: 18px;
+    color: white;
+    font-size: 10px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    padding-left: 4px;
+    cursor: pointer;
+    pointer-events: auto;
+    transition: opacity 0.2s ease;
     overflow: hidden;
     text-overflow: ellipsis;
-    box-sizing: border-box;
-    z-index: 1;
+    white-space: nowrap;
+}
+
+.sprintBand:hover {
+    opacity: 0.8;
 }
 
 .sprintStart {
-    border-top-left-radius: 10px;
-    border-bottom-left-radius: 10px;
-    left: 4px; /* Add some padding from the edge */
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
 }
 
 .sprintEnd {
-    border-top-right-radius: 10px;
-    border-bottom-right-radius: 10px;
-    right: 4px; /* Add some padding from the edge */
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
 }
 
-/* --- You can add your specific axis colors here --- */
-/* Example for one of your axes */
-.axisColor_physical {
-    background-color: #f59284; /* This should match your 'medium' physical color */
+.weekInfoRow {
+    background: var(--bg-panel, #BCDDDC);
 }
-/* --- Mobile Responsive Styles --- */
-@media (max-width: 768px) {
-  .monthlyViewContainer {
-    padding: 0.5rem;
-    font-size: 16px; /* Increase base font size for readability */
-  }
 
-  .sectionTitle {
-    font-size: 1.2rem;
-  }
+.weekInfoDataCell {
+    padding: 12px 16px;
+    border: 1px solid var(--border-light, #BCDDDC);
+}
 
-  /* --- Header --- */
-  .headerSection {
+.weekInfoContent {
+    display: flex;
+    gap: 24px;
+    font-size: 13px;
+    color: var(--text-secondary, #355E58);
+}
+
+.weekFocus,
+.weekObjective {
+    color: var(--text-primary, #053229);
+}
+
+.notSet {
+    color: var(--text-muted, #6c757d);
+    font-style: italic;
+}
+
+/* ===== PROJECT CONTROLS SIDEBAR ===== */
+.kanbanControlsSection {
+    background: var(--bg-card, white);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--border-light, #BCDDDC);
+}
+
+.sidebarTitle {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary, #053229);
+    margin: 0 0 16px 0;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--border-secondary, #72B0AB);
+}
+
+.subsectionTitle {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary, #355E58);
+    margin: 16px 0 12px 0;
+}
+
+.sidebarControlGroup {
+    display: flex;
     flex-direction: column;
-    gap: 0.75rem;
-    padding: 0.75rem;
-  }
+    gap: 6px;
+    margin-bottom: 16px;
+}
 
-  .monthNameTitle {
-    font-size: 1.75rem;
-  }
-  
-  .monthFocusDisplay {
-    font-size: 1.25rem;
-  }
+.sprintScheduleSection {
+    padding-top: 16px;
+    border-top: 1px solid var(--border-light, #BCDDDC);
+    margin-top: 16px;
+}
 
-  /* --- Calendar --- */
-  .calendarTable {
-    display: block;
-    overflow-x: auto; /* Allow calendar to scroll horizontally if needed */
-  }
+.projectActionsSection {
+    padding-top: 16px;
+    border-top: 1px solid var(--border-light, #BCDDDC);
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
 
-  .calendarDayCell {
-    padding: 4px;
-    min-height: 90px;
-    min-width: 70px;
-  }
+.sectionTitle {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-primary, #053229);
+    margin: 0 0 20px 0;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--border-secondary, #72B0AB);
+}
 
-  .dayNumber {
-    font-size: 0.8rem;
-  }
+.controlsContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
 
-  .dayEventsList li {
-    font-size: 0.75rem;
-    margin-bottom: 3px;
+.controlRow {
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+.projectActionsRow {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.controlGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 150px;
+}
+
+.label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary, #355E58);
+}
+
+.select,
+.input {
+    padding: 10px 12px;
+    border: 1px solid var(--border-secondary, #72B0AB);
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    background: var(--bg-input, white);
+    color: var(--text-primary, #053229);
+}
+
+.select:hover,
+.input:hover {
+    border-color: var(--button-primary-hover-bg, #355E58);
+}
+
+.select:focus,
+.input:focus {
+    outline: none;
+    border-color: var(--button-primary-hover-bg, #355E58);
+    box-shadow: 0 0 0 3px rgba(114, 176, 171, 0.2);
+}
+
+.select:disabled {
+    background: var(--bg-input-disabled, #f8f9fa);
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.textarea {
+    padding: 10px 12px;
+    border: 1px solid var(--border-secondary, #72B0AB);
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+    resize: vertical;
+    min-height: 80px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    background: var(--bg-input, white);
+    color: var(--text-primary, #053229);
+}
+
+.textarea:hover {
+    border-color: var(--button-primary-hover-bg, #355E58);
+}
+
+.textarea:focus {
+    outline: none;
+    border-color: var(--button-primary-hover-bg, #355E58);
+    box-shadow: 0 0 0 3px rgba(114, 176, 171, 0.2);
+}
+
+.button {
+    background: var(--button-primary-bg, #72B0AB);
+    color: var(--button-primary-text, white);
+    border: 1px solid var(--button-primary-border, #355E58);
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  
-  .sprintBand {
-      font-size: 0.7rem;
-      height: 18px;
-  }
-
-  /* --- Controls, Forms, and Sections --- */
-  .layoutContainer {
-    grid-template-columns: 1fr; /* Stack calendar and sidebar */
-  }
-
-  .sidebar {
-      margin-top: 1.5rem;
-  }
-  
-  .kanbanControlsSection, .imageUploaderSection, .kanbanBoardSection {
-    padding: 1rem;
-  }
-
-  .controlRow, .controlGroup {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.75rem;
-  }
-  
-  .input, .select, .button, .toggleButton, .textarea {
     width: 100%;
-    padding: 12px;
-    font-size: 1rem; /* Ensure form elements are easy to read */
-    box-sizing: border-box;
-  }
+}
+
+.button:hover:not(:disabled) {
+    background-color: var(--button-primary-hover-bg, #355E58);
+    box-shadow: 0 4px 12px rgba(114, 176, 171, 0.3);
+}
+
+.button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.toggleButton {
+    background: var(--border-secondary, #72B0AB);
+    color: var(--button-primary-text, white);
+    border: 1px solid var(--button-primary-border, #355E58);
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    width: 100%;
+}
+
+.toggleButton:hover {
+    background-color: var(--button-primary-hover-bg, #355E58);
+    box-shadow: 0 4px 12px rgba(114, 176, 171, 0.3);
+}
+
+.completeButton {
+    background: var(--button-primary-bg, #72B0AB);
+    color: var(--button-primary-text, white);
+    border: 1px solid var(--button-primary-border, #355E58);
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    width: 100%;
+}
+
+.completeButton:hover {
+    background-color: var(--button-primary-hover-bg, #355E58);
+    box-shadow: 0 4px 12px rgba(114, 176, 171, 0.3);
+}
+
+.deleteButton {
+    background: #d32f2f;
+    color: white;
+    border: 1px solid #b71c1c;
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    width: 100%;
+}
+
+.deleteButton:hover {
+    background-color: #b71c1c;
+    box-shadow: 0 4px 12px rgba(211, 47, 47, 0.3);
+}
+
+.createProjectForm {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.3s ease, opacity 0.3s ease, padding 0.3s ease;
+    background: var(--bg-panel-accent, #e0f2f7);
+    border-radius: 8px;
+}
+
+.createProjectForm.isOpen {
+    max-height: 400px;
+    opacity: 1;
+    padding: 16px;
+    margin-top: 8px;
+    border: 1px solid var(--border-secondary, #72B0AB);
+}
+
+/* ===== KANBAN BOARD SECTION ===== */
+.kanbanBoardSection {
+    background: var(--bg-card, white);
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--border-light, #BCDDDC);
+}
+
+/* ===== ERROR HANDLING ===== */
+.errorText {
+    color: #d32f2f;
+    background: #ffebee;
+    padding: 12px 16px;
+    border-radius: 6px;
+    border-left: 4px solid #d32f2f;
+    margin: 16px 0;
+    font-size: 14px;
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+@media (max-width: 1200px) {
+    .layoutContainer {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar {
+        order: -1; /* Move sidebar above calendar on mobile */
+    }
+
+    .headerSection {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .headerLeft,
+    .headerCenter,
+    .headerRight {
+        width: 100%;
+    }
+
+    .controlRow {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .controlGroup {
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .monthlyViewContainer {
+        padding: 12px;
+    }
+
+    .headerSection {
+        padding: 16px;
+    }
+
+    .monthFocusDisplay {
+        font-size: 22px;
+    }
+
+    .monthObjectiveDisplay {
+        font-size: 14px;
+    }
+
+    .calendarSection {
+        padding: 12px;
+    }
+
+    .calendarDayCell {
+        min-height: 80px;
+        height: 90px;
+        font-size: 11px;
+        padding: 6px;
+    }
+
+    .dayNumber {
+        font-size: 14px;
+    }
+
+    .sprintBand {
+        font-size: 9px;
+        height: 16px;
+    }
+
+    .weekInfoContent {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .kanbanControlsSection {
+        padding: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .monthlyViewContainer {
+        padding: 8px;
+    }
+
+    .headerSection {
+        padding: 12px;
+    }
+
+    .monthFocusDisplay {
+        font-size: 20px;
+    }
+
+    .monthNameTitle {
+        font-size: 18px;
+    }
+
+    .navButton {
+        width: 35px;
+        height: 35px;
+        font-size: 16px;
+    }
+
+    .editMonthPlanButton {
+        width: 100%;
+        padding: 10px 16px;
+    }
+
+    .calendarTable thead th {
+        padding: 8px 4px;
+        font-size: 12px;
+    }
+
+    .calendarDayCell {
+        min-height: 70px;
+        height: 80px;
+        padding: 4px;
+    }
+
+    .dayNumber {
+        font-size: 12px;
+    }
+
+    .dayEventsList li {
+        font-size: 10px;
+        padding: 3px 6px;
+    }
 }

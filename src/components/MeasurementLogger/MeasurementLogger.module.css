@@ -1,0 +1,236 @@
+.logger {
+  padding: 4px 0;
+}
+
+.headerRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.heading {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  font-size: 28px;
+  color: #999;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+  /* Bigger tap target */
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.formGroup {
+  margin-bottom: 14px;
+}
+
+.formGroup label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 6px;
+}
+
+.dateInput {
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 16px; /* 16px prevents iOS zoom */
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.dateInput:focus {
+  border-color: #e7514c;
+  outline: none;
+}
+
+.lastMeasuredNote {
+  font-size: 12px;
+  color: #888;
+  margin: -6px 0 12px;
+  font-style: italic;
+}
+
+.section {
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 14px;
+}
+
+.sectionTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: #e7514c;
+  margin: 0 0 10px 0;
+}
+
+.fieldRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.fieldLabel {
+  font-size: 13px;
+  color: #555;
+  min-width: 100px;
+  flex-shrink: 0;
+}
+
+.fieldInput {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 8px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 16px; /* 16px prevents iOS zoom */
+  text-align: center;
+  font-family: inherit;
+}
+
+.input:focus {
+  border-color: #e7514c;
+  outline: none;
+}
+
+.unit {
+  font-size: 12px;
+  color: #999;
+  flex-shrink: 0;
+}
+
+.change {
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+  min-width: 54px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.changePositive {
+  color: #43a047;
+}
+
+.changeNegative {
+  color: #e53935;
+}
+
+.lastValue {
+  font-size: 11px;
+  color: #aaa;
+  min-width: 54px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.notesInput {
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 16px; /* 16px prevents iOS zoom */
+  box-sizing: border-box;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.notesInput:focus {
+  border-color: #e7514c;
+  outline: none;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+
+.cancelButton {
+  padding: 12px 20px;
+  background: #f0f0f0;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  color: #555;
+}
+
+.saveButton {
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #e7514c 0%, #FE9179 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.saveButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Mobile ───────────────────────────────────────── */
+@media (max-width: 480px) {
+  .fieldRow {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .fieldLabel {
+    width: 100%;
+    min-width: unset;
+    font-size: 12px;
+    color: #777;
+    margin-bottom: 2px;
+  }
+
+  .fieldInput {
+    flex: 1;
+  }
+
+  .change,
+  .lastValue {
+    min-width: 48px;
+    font-size: 11px;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+
+  .cancelButton,
+  .saveButton {
+    width: 100%;
+    text-align: center;
+    padding: 14px;
+  }
+}

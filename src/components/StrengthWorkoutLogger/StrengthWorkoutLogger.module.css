@@ -1,0 +1,300 @@
+.logger {
+  padding: 4px 0;
+}
+
+.headerRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.heading {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.subtitle {
+  font-size: 13px;
+  color: #666;
+  margin: 4px 0 0 0;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #999;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+.exerciseNav {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.navDot {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid #e0e0e0;
+  background: white;
+  font-size: 13px;
+  font-weight: 600;
+  color: #999;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.navDotActive {
+  border-color: #e7514c;
+  color: #e7514c;
+  background: #fef0ef;
+}
+
+.navDotDone {
+  border-color: #43a047;
+  color: #43a047;
+  background: #e8f5e9;
+}
+
+.exerciseBlock {
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 14px;
+}
+
+.exerciseName {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 4px 0;
+}
+
+.target {
+  font-size: 13px;
+  color: #e7514c;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 2px;
+}
+
+.restInfo {
+  font-size: 12px;
+  color: #999;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.cuesBox {
+  background: #f9f9f9;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 14px;
+}
+
+.cuesTitle {
+  font-size: 12px;
+  font-weight: 600;
+  color: #555;
+  margin: 0 0 6px 0;
+}
+
+.cuesList {
+  margin: 0;
+  padding-left: 16px;
+  font-size: 12px;
+  color: #555;
+  line-height: 1.6;
+}
+
+.setsHeader {
+  display: grid;
+  grid-template-columns: 36px 1fr 1fr 40px;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.setLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: #999;
+  text-transform: uppercase;
+}
+
+.setRow {
+  display: grid;
+  grid-template-columns: 36px 1fr 1fr 40px;
+  gap: 8px;
+  margin-bottom: 6px;
+  align-items: center;
+}
+
+.setDone {
+  opacity: 0.6;
+}
+
+.setNum {
+  font-size: 14px;
+  font-weight: 600;
+  color: #999;
+  text-align: center;
+}
+
+.setInput {
+  width: 100%;
+  padding: 8px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  text-align: center;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.setInput:focus {
+  border-color: #e7514c;
+  outline: none;
+}
+
+.completeSetBtn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid #e0e0e0;
+  background: white;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #43a047;
+}
+
+.completeSetBtn:disabled {
+  color: #ccc;
+  cursor: default;
+}
+
+.volumeRow {
+  text-align: right;
+  font-size: 12px;
+  color: #666;
+  font-weight: 600;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.navActions {
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.navButton {
+  padding: 10px 20px;
+  background: #f0f0f0;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  color: #555;
+}
+
+.navButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.saveButton {
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #e7514c 0%, #FE9179 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.saveButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.notesGroup {
+  margin-bottom: 8px;
+}
+
+.notesGroup label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 6px;
+}
+
+.notesInput {
+  width: 100%;
+  padding: 8px 10px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 13px;
+  box-sizing: border-box;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.notesInput:focus {
+  border-color: #e7514c;
+  outline: none;
+}
+
+/* Feedback */
+.feedbackSection {
+  background: #f0faf0;
+  border-radius: 10px;
+  padding: 16px;
+  margin: 16px 0;
+}
+
+.feedbackTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 10px 0;
+}
+
+.feedbackItem {
+  font-size: 13px;
+  color: #333;
+  padding: 6px 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.feedbackItem:last-child {
+  border-bottom: none;
+}
+
+.doneButton {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #e7514c 0%, #FE9179 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}

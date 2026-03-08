@@ -1,0 +1,1053 @@
+# INCREASE STRENGTH - COMPLETE SPECIFICATION FOR CLAUDE CODE
+
+## 🎯 MISSION
+
+Build a **STRENGTH TRAINING PROGRAM** focused on **MAXIMUM STRENGTH** and **MUSCLE DENSITY** (NOT size/hypertrophy).
+
+**Key Difference from Build Muscle:**
+- **Build Muscle (Hypertrophy):** Moderate weight (60-85% 1RM), 8-12 reps, 60-90 sec rest → BIGGER muscles
+- **Increase Strength:** Heavy weight (80-95% 1RM), 1-5 reps, 3-5 min rest → STRONGER, DENSER muscles
+
+---
+
+## 🔬 THE SCIENCE OF STRENGTH TRAINING
+
+### What Is Strength Training?
+
+Strength training uses low repetition schemes with heavy loads (1 to 5 repetitions per set with 80% to 100% of 1-repetition maximum) to optimize strength increases
+
+**Strength vs Hypertrophy:**
+- Strength: 1-5 reps at 85-100% of 1RM with 3-5 minute rest periods
+- Hypertrophy: 6-12 reps at 75-85% of 1RM with 60-90 second rest
+
+### Muscle Density Explained
+
+**Denser muscles** means:
+- Increased myofibrillar density (more contractile proteins per muscle fiber)
+- Enhanced neural efficiency (better muscle fiber recruitment)
+- Stronger muscles WITHOUT necessarily adding significant size
+- Strength training makes muscles produce more force without the same size gains as hypertrophy
+
+### Neural Adaptations
+
+Study showed weight training strengthened the nerve-muscle connection before muscle growth - neural adaptations come first
+
+**What happens:**
+1. Brain learns to recruit MORE muscle fibers simultaneously
+2. Motor units fire more efficiently and forcefully
+3. You get STRONGER without getting BIGGER (initially)
+4. Strength training enhances neuromuscular adaptations that facilitate force production
+
+### Progressive Overload for Strength
+
+Strength gains come from gradually lifting more weight while maintaining proper form - add weight to the bar, not sets or reps
+
+**Key Principle:** Linear progression
+- Add 2.5-5 lbs each week (upper body)
+- Add 5-10 lbs each week (lower body)
+- When you can complete all sets × reps with good form, add weight
+
+---
+
+## 🏋️ THE 5 MACHINES PROGRAM
+
+### Machine Selection (Your Request)
+
+1. **Squat Machine** (Leg Press OR Smith Machine Squat)
+2. **Bench Press** (Barbell Bench Press OR Machine Chest Press)
+3. **Abs Machine** (Cable Crunches OR Ab Crunch Machine)
+4. **Back Machine** (Lat Pulldown OR Seated Row Machine)
+5. **Shoulder Press** (Overhead Press Machine OR Smith Machine)
+
+**Why these 5?**
+- Compound movements (multiple joints, multiple muscles)
+- Safe to load heavy on machines
+- Easy to track progressive overload
+- Cover entire body (legs, chest, core, back, shoulders)
+
+---
+
+## 📋 PROGRAM STRUCTURE
+
+### Template ID: `strength-training-5x5`
+
+### Complete Data Structure
+
+```javascript
+{
+  templateId: "strength-training-5x5",
+  category: "strength",
+  programType: "linear-progression",
+  
+  title: "5×5 Strength Program",
+  subtitle: "Maximum Strength & Muscle Density",
+  emoji: "🏋️",
+  description: "8-week linear progression strength program using 5 core machines. Build maximum strength and dense muscles with heavy weights and low reps. NOT a hypertrophy program.",
+  
+  // Core principles
+  corePhilosophy: {
+    goal: "Maximum strength gains (increase 1RM)",
+    notGoal: "Muscle size (hypertrophy)",
+    approach: "Heavy weight, low reps, long rest periods",
+    progression: "Linear - add weight every week",
+    frequency: "3 days per week",
+    sessionDuration: "60-75 minutes"
+  },
+  
+  // Program details
+  duration: 8, // weeks
+  sessionsPerWeek: 3,
+  schedule: ["Monday", "Wednesday", "Friday"],
+  deloadWeek: 5, // Week 5 = deload
+  
+  // Strength parameters (NOT hypertrophy)
+  trainingParameters: {
+    repsPerSet: "5 reps (fixed)", // NEVER varies
+    setsPerExercise: 5,
+    intensityRange: "80-90% of 1RM",
+    restBetweenSets: "3-5 minutes (CRITICAL - must be full recovery)",
+    tempoSeconds: "2-0-1 (2 sec down, 0 pause, 1 sec explosive up)",
+    trainingToFailure: false, // stop 1 rep before failure
+    rpe: "8/10 (hard but not max effort)"
+  },
+  
+  // The 5 Core Exercises
+  exercises: [
+    {
+      exerciseId: "squat-machine",
+      exerciseName: "Squat Machine (Leg Press OR Smith Squat)",
+      primaryMuscle: "quadriceps, glutes, hamstrings",
+      movementPattern: "leg push",
+      machineAlternatives: ["Leg Press Machine", "Smith Machine Squat", "Hack Squat Machine"],
+      
+      // Starting weight calculation
+      startingWeight: {
+        method: "% of 1RM",
+        recommendation: "Start at 70% of 1RM",
+        example: "If 1RM = 300 lbs, start at 210 lbs",
+        testingNote: "If you don't know your 1RM, test it Week 0 or estimate from 5RM"
+      },
+      
+      // Week-by-week progression (8 weeks)
+      weeklyProgression: {
+        week1: {
+          weight: "70% 1RM",
+          sets: 5,
+          reps: 5,
+          rest: "3 min",
+          notes: "Establish baseline - perfect form"
+        },
+        week2: {
+          weight: "+10 lbs from Week 1",
+          sets: 5,
+          reps: 5,
+          rest: "3-4 min",
+          notes: "First weight increase"
+        },
+        week3: {
+          weight: "+10 lbs from Week 2",
+          sets: 5,
+          reps: 5,
+          rest: "4 min",
+          notes: "Should feel challenging"
+        },
+        week4: {
+          weight: "+10 lbs from Week 3",
+          sets: 5,
+          reps: 5,
+          rest: "4-5 min",
+          notes: "Getting heavy - maintain form"
+        },
+        week5: {
+          weight: "Week 3 weight (-20 lbs from Week 4)",
+          sets: 5,
+          reps: 5,
+          rest: "3 min",
+          notes: "DELOAD WEEK - active recovery"
+        },
+        week6: {
+          weight: "Week 4 weight + 5 lbs",
+          sets: 5,
+          reps: 5,
+          rest: "4-5 min",
+          notes: "Back to work, slight PR"
+        },
+        week7: {
+          weight: "+10 lbs from Week 6",
+          sets: 5,
+          reps: 5,
+          rest: "5 min",
+          notes: "Peak intensity"
+        },
+        week8: {
+          weight: "+5-10 lbs from Week 7",
+          sets: 5,
+          reps: 5,
+          rest: "5 min",
+          notes: "Final push - test new 1RM after"
+        }
+      },
+      
+      formCues: [
+        "SAFETY FIRST - if using Smith Machine, set safety bars",
+        "Feet shoulder-width apart",
+        "Descend until thighs parallel to ground (90 degrees)",
+        "Keep chest up, core braced throughout",
+        "Drive through heels explosively on ascent",
+        "DO NOT bounce at bottom - controlled movement",
+        "Stop 1 rep before failure - leave 1 in tank"
+      ],
+      
+      machineSetup: {
+        legPress: "Feet mid-platform, shoulder-width, toes slightly out",
+        smithSquat: "Bar across upper back/traps, feet slightly forward of bar",
+        hackSquat: "Back against pad, feet shoulder-width on platform"
+      }
+    },
+    
+    {
+      exerciseId: "bench-press-machine",
+      exerciseName: "Bench Press (Barbell OR Machine)",
+      primaryMuscle: "pectoralis major, anterior deltoids, triceps",
+      movementPattern: "upper body push",
+      machineAlternatives: ["Barbell Bench Press", "Smith Machine Bench", "Chest Press Machine"],
+      
+      startingWeight: {
+        method: "% of 1RM",
+        recommendation: "Start at 70% of 1RM",
+        example: "If 1RM = 200 lbs, start at 140 lbs"
+      },
+      
+      weeklyProgression: {
+        week1: { weight: "70% 1RM", sets: 5, reps: 5, rest: "3 min", notes: "Perfect technique" },
+        week2: { weight: "+5 lbs", sets: 5, reps: 5, rest: "3-4 min", notes: "Small increase" },
+        week3: { weight: "+5 lbs", sets: 5, reps: 5, rest: "4 min" },
+        week4: { weight: "+5 lbs", sets: 5, reps: 5, rest: "4-5 min", notes: "Getting challenging" },
+        week5: { weight: "Week 3 weight", sets: 5, reps: 5, rest: "3 min", notes: "DELOAD" },
+        week6: { weight: "Week 4 + 5 lbs", sets: 5, reps: 5, rest: "4 min" },
+        week7: { weight: "+5 lbs", sets: 5, reps: 5, rest: "5 min", notes: "Heavy" },
+        week8: { weight: "+5 lbs", sets: 5, reps: 5, rest: "5 min", notes: "Peak strength" }
+      },
+      
+      formCues: [
+        "ALWAYS use spotter or safety bars for barbell",
+        "Grip width: slightly wider than shoulders",
+        "Lower bar to mid-chest (nipple line)",
+        "Elbows at 45-degree angle (not 90 degrees flared)",
+        "Touch chest lightly, then press explosively",
+        "Keep shoulder blades retracted (pinched together)",
+        "Feet flat on floor, drive through legs",
+        "Breathe: inhale down, exhale up"
+      ]
+    },
+    
+    {
+      exerciseId: "lat-pulldown-machine",
+      exerciseName: "Lat Pulldown (Back Machine)",
+      primaryMuscle: "latissimus dorsi, rhomboids, biceps",
+      movementPattern: "upper body pull",
+      machineAlternatives: ["Lat Pulldown Machine", "Assisted Pull-Up Machine", "Seated Row Machine"],
+      
+      startingWeight: {
+        method: "% of bodyweight or % of 1RM",
+        recommendation: "Start at 70% of your max pulldown weight",
+        example: "If max = 200 lbs, start at 140 lbs"
+      },
+      
+      weeklyProgression: {
+        week1: { weight: "70% max", sets: 5, reps: 5, rest: "3 min" },
+        week2: { weight: "+5 lbs", sets: 5, reps: 5, rest: "3 min" },
+        week3: { weight: "+5 lbs", sets: 5, reps: 5, rest: "4 min" },
+        week4: { weight: "+5 lbs", sets: 5, reps: 5, rest: "4 min" },
+        week5: { weight: "Week 3 weight", sets: 5, reps: 5, rest: "3 min", notes: "DELOAD" },
+        week6: { weight: "Week 4 + 5 lbs", sets: 5, reps: 5, rest: "4 min" },
+        week7: { weight: "+5 lbs", sets: 5, reps: 5, rest: "4-5 min" },
+        week8: { weight: "+5 lbs", sets: 5, reps: 5, rest: "5 min" }
+      },
+      
+      formCues: [
+        "Grip width: slightly wider than shoulders (pronated/overhand)",
+        "Pull bar to upper chest/collarbone",
+        "Lean back slightly (15-20 degrees)",
+        "Lead with elbows - pull elbows down and back",
+        "Squeeze shoulder blades together at bottom",
+        "Slow controlled release back to top",
+        "Don't use momentum - strict form"
+      ],
+      
+      alternativeExercise: {
+        name: "Seated Row Machine",
+        reason: "If lat pulldown feels awkward, use horizontal row instead",
+        formChange: "Pull handles to lower chest/sternum, same 5×5 protocol"
+      }
+    },
+    
+    {
+      exerciseId: "overhead-press-machine",
+      exerciseName: "Shoulder Press Machine",
+      primaryMuscle: "deltoids, triceps, upper chest",
+      movementPattern: "overhead press",
+      machineAlternatives: ["Overhead Press Machine", "Smith Machine Shoulder Press", "Seated Barbell Press"],
+      
+      startingWeight: {
+        method: "% of 1RM",
+        recommendation: "Start at 65% of 1RM (overhead press is hardest)",
+        example: "If 1RM = 135 lbs, start at 90 lbs"
+      },
+      
+      weeklyProgression: {
+        week1: { weight: "65% 1RM", sets: 5, reps: 5, rest: "3 min", notes: "Overhead press is HARD" },
+        week2: { weight: "+5 lbs", sets: 5, reps: 5, rest: "3-4 min" },
+        week3: { weight: "+5 lbs", sets: 5, reps: 5, rest: "4 min" },
+        week4: { weight: "+5 lbs", sets: 5, reps: 5, rest: "4-5 min" },
+        week5: { weight: "Week 3 weight", sets: 5, reps: 5, rest: "3 min", notes: "DELOAD" },
+        week6: { weight: "Week 4 + 5 lbs", sets: 5, reps: 5, rest: "4 min" },
+        week7: { weight: "+5 lbs", sets: 5, reps: 5, rest: "5 min" },
+        week8: { weight: "+5 lbs", sets: 5, reps: 5, rest: "5 min" }
+      },
+      
+      formCues: [
+        "Seated or standing - core braced either way",
+        "Grip slightly wider than shoulders",
+        "Press straight up (not forward)",
+        "Keep wrists straight, directly under bar",
+        "Lockout arms at top without hyperextending elbows",
+        "Control descent - don't drop weight",
+        "Breathe out as you press up"
+      ]
+    },
+    
+    {
+      exerciseId: "cable-crunch-abs",
+      exerciseName: "Cable Crunches (Abs)",
+      primaryMuscle: "rectus abdominis, obliques",
+      movementPattern: "core flexion",
+      machineAlternatives: ["Cable Crunch Machine", "Ab Crunch Machine", "Weighted Decline Sit-Ups"],
+      
+      startingWeight: {
+        method: "start moderate",
+        recommendation: "Start at 50-70 lbs",
+        example: "Most people can handle 50-100 lbs range"
+      },
+      
+      weeklyProgression: {
+        week1: { weight: "50-70 lbs", sets: 4, reps: 8, rest: "2 min", notes: "Core work - higher reps OK" },
+        week2: { weight: "+5-10 lbs", sets: 4, reps: 8, rest: "2 min" },
+        week3: { weight: "+5-10 lbs", sets: 5, reps: 8, rest: "2 min" },
+        week4: { weight: "+5-10 lbs", sets: 5, reps: 8, rest: "2 min" },
+        week5: { weight: "Week 3 weight", sets: 4, reps: 8, rest: "2 min", notes: "DELOAD" },
+        week6: { weight: "Week 4 + 5-10 lbs", sets: 5, reps: 8, rest: "2 min" },
+        week7: { weight: "+5-10 lbs", sets: 5, reps: 8, rest: "2 min" },
+        week8: { weight: "+5-10 lbs", sets: 5, reps: 8, rest: "2 min" }
+      },
+      
+      formCues: [
+        "Kneel facing away from cable machine",
+        "Hold rope attachment behind head/neck",
+        "Crunch down by flexing spine (not hips)",
+        "Pull elbows toward knees",
+        "Squeeze abs hard at bottom",
+        "Slow controlled return to start",
+        "Keep weight consistent throughout movement"
+      ],
+      
+      note: "Abs trained 4×8 instead of 5×5 because core responds better to slightly higher reps"
+    }
+  ],
+  
+  // Weekly Training Schedule
+  weeklySchedule: {
+    monday: {
+      sessionName: "Full Body A",
+      exercises: [
+        "squat-machine",
+        "bench-press-machine", 
+        "cable-crunch-abs"
+      ],
+      duration: "60-75 minutes",
+      notes: "Start with squats when fresh, finish with abs"
+    },
+    tuesday: {
+      sessionName: "REST",
+      activity: "Complete rest or light walking only",
+      notes: "Let CNS recover from Monday's heavy lifting"
+    },
+    wednesday: {
+      sessionName: "Full Body B",
+      exercises: [
+        "squat-machine",
+        "lat-pulldown-machine",
+        "overhead-press-machine"
+      ],
+      duration: "60-75 minutes",
+      notes: "Squat again - 5×5 programs squat 3x/week"
+    },
+    thursday: {
+      sessionName: "REST",
+      activity: "Complete rest or light walking",
+      notes: "Recovery day"
+    },
+    friday: {
+      sessionName: "Full Body C",
+      exercises: [
+        "squat-machine",
+        "bench-press-machine",
+        "lat-pulldown-machine",
+        "cable-crunch-abs"
+      ],
+      duration: "75-90 minutes",
+      notes: "Squat 3rd time this week - you'll be strongest Friday"
+    },
+    saturday: {
+      sessionName: "REST",
+      activity: "Complete rest",
+      notes: "Weekend recovery"
+    },
+    sunday: {
+      sessionName: "REST",
+      activity: "Optional light activity (walk, yoga, stretch)",
+      notes: "Prepare for Monday"
+    }
+  },
+  
+  // Critical Rules
+  criticalRules: [
+    {
+      rule: "ALWAYS rest 3-5 minutes between sets",
+      why: "Strength requires full ATP/CP recovery - short rest = fatigue = can't lift heavy = no strength gains",
+      violation: "If you rest only 60-90 sec, you're doing hypertrophy, NOT strength"
+    },
+    {
+      rule: "NEVER train to failure",
+      why: "Stop 1 rep before failure (RPE 8/10). Training to failure damages CNS and prevents progressive overload",
+      guideline: "If prescribed 5 reps and rep 5 feels like absolute max, weight is too heavy"
+    },
+    {
+      rule: "Add weight EVERY week (except deload)",
+      why: "Linear progression is the core of strength programs - must progressively overload",
+      exception: "If you fail to complete 5×5, repeat same weight next week"
+    },
+    {
+      rule: "Squat 3 times per week",
+      why: "Squats are the king of strength exercises - frequency builds technique and strength",
+      note: "Yes, this seems like a lot. Trust the program."
+    },
+    {
+      rule: "Perfect form > Heavy weight",
+      why: "Bad form = injury. Good form = strength gains. Always prioritize technique",
+      check: "Video yourself quarterly to audit form"
+    }
+  ],
+  
+  // Deload Week (Week 5)
+  deloadProtocol: {
+    week: 5,
+    purpose: "Allow CNS and connective tissue to recover",
+    changes: [
+      "Reduce weight to Week 3 levels (about 85% of Week 4)",
+      "Keep same 5×5 structure",
+      "Keep rest periods same",
+      "Workouts should feel EASY",
+      "No PRs this week - just move weight smoothly"
+    ],
+    why: "Many powerlifters take deload weeks where they reduce weight and increase reps to prevent CNS burnout"
+  },
+  
+  // What to do if you fail (plateau)
+  plateauProtocol: {
+    scenario: "You attempt Week 4 weight but can only get 4 reps instead of 5 on one set",
+    response: {
+      option1: {
+        name: "Repeat the weight",
+        action: "Do same weight next week - try again",
+        works: "90% of the time this works"
+      },
+      option2: {
+        name: "Micro-loading",
+        action: "Add only 2.5 lbs instead of 5 lbs",
+        when: "If repeating weight fails twice"
+      },
+      option3: {
+        name: "Deload and build back up",
+        action: "Drop back 10% and rebuild over 2-3 weeks",
+        when: "If you've failed same weight 3 times"
+      },
+      option4: {
+        name: "Switch to 5×3 (advanced)",
+        action: "Change from 5 sets of 5 reps to 5 sets of 3 reps, add weight",
+        when: "After 12+ weeks when linear progression stalls completely",
+        note: "When lifter fails 5×5, switch to 5×3 and continue adding weight"
+      }
+    }
+  },
+  
+  // Nutrition for Strength
+  nutritionGuidelines: {
+    calories: {
+      recommendation: "Maintenance or slight surplus (+200-300 cal)",
+      why: "Don't need huge surplus like hypertrophy. Just fuel workouts.",
+      note: "Strength training doesn't require as much food as muscle building"
+    },
+    protein: {
+      amount: "1.6-2.0g per kg bodyweight",
+      timing: "Doesn't matter much - hit daily total",
+      sources: "Lean meats, eggs, dairy, protein powder"
+    },
+    carbs: {
+      amount: "Moderate to high (for energy)",
+      timing: "Pre-workout meal 2-3 hours before",
+      why: "Heavy lifting needs glycogen - eat carbs"
+    },
+    preworkout: {
+      food: "Carbs + moderate protein 2-3 hours before",
+      example: "Oatmeal + eggs, rice + chicken, pasta + meat",
+      avoid: "Don't lift fasted - you need energy for max effort"
+    },
+    postworkout: {
+      food: "Protein + carbs within 2 hours",
+      example: "Protein shake + banana, chicken + rice",
+      why: "Replenish glycogen, support recovery"
+    }
+  },
+  
+  // Recovery Requirements
+  recoveryGuidelines: {
+    sleep: {
+      hours: "8-9 hours per night (MORE than hypertrophy training)",
+      why: "CNS needs more recovery than muscles - neural adaptations require sleep",
+      quality: "Deep sleep is when nervous system repairs"
+    },
+    restDays: {
+      frequency: "Strict - train Mon/Wed/Fri, rest Tue/Thu/Sat/Sun",
+      why: "CNS fatigue is real - you MUST rest between sessions",
+      violation: "Training 4-5x/week will lead to overtraining and plateau"
+    },
+    stretching: {
+      when: "After workouts, not before",
+      duration: "10-15 minutes post-workout",
+      focus: "Major muscle groups, especially hips and shoulders"
+    },
+    activeRecovery: {
+      activities: "Walking, light cycling, yoga, swimming",
+      intensity: "Very low - heart rate under 120 bpm",
+      when: "Rest days if desired",
+      avoid: "No running, HIIT, or anything intense"
+    }
+  },
+  
+  // Progress Tracking
+  progressMetrics: {
+    primary: "1RM increases on all 5 lifts",
+    secondary: "Bodyweight (should stay relatively stable)",
+    tertiary: "Muscle measurements (optional - won't change much)",
+    
+    expectedGains: {
+      beginner: {
+        squat: "+50-100 lbs over 8 weeks",
+        benchPress: "+20-40 lbs over 8 weeks",
+        overhead: "+15-30 lbs over 8 weeks",
+        pulldown: "+20-50 lbs over 8 weeks"
+      },
+      intermediate: {
+        squat: "+20-40 lbs over 8 weeks",
+        benchPress: "+10-20 lbs over 8 weeks",
+        overhead: "+5-15 lbs over 8 weeks",
+        pulldown: "+10-25 lbs over 8 weeks"
+      }
+    },
+    
+    testingProtocol: {
+      when: "Week 0 (before program) and Week 9 (after program)",
+      method: "1RM test on each lift",
+      safety: "ALWAYS use spotter or safety bars",
+      restBetween: "10+ minutes rest between 1RM attempts",
+      warmup: "Extensive warmup: bar × 10, 50% × 5, 70% × 3, 85% × 1, 95% × 1, 100% × 1"
+    }
+  }
+}
+```
+
+---
+
+## 🗄️ FIRESTORE SCHEMA
+
+### Collection: `strengthPrograms`
+
+User's active strength program:
+
+```javascript
+{
+  userId: "abc123",
+  programId: "strength-5x5-2026-01",
+  templateId: "strength-training-5x5",
+  
+  title: "5×5 Strength Program",
+  category: "strength",
+  status: "active", // active, completed, paused
+  
+  // Program dates
+  startDate: "2026-01-29",
+  currentWeek: 3,
+  totalWeeks: 8,
+  estimatedEndDate: "2026-03-26",
+  
+  // Initial 1RM tests (Week 0)
+  baseline1RM: {
+    squatMachine: 275, // lbs
+    benchPress: 185,
+    latPulldown: 180,
+    shoulderPress: 115,
+    testedOn: "2026-01-22"
+  },
+  
+  // Current working weights (updated weekly)
+  currentWeights: {
+    squatMachine: 225, // Week 3: 70% of 275 = 192.5, +10+10 = 212.5, round to 225
+    benchPress: 145,   // 70% of 185 = 129.5, +5+5 = 139.5, round to 145
+    latPulldown: 135,  // 70% of 180 = 126, +5+5 = 136, use 135
+    shoulderPress: 90, // 65% of 115 = 74.75, +5+5 = 84.75, round to 90
+    cableCrunch: 80
+  },
+  
+  // Weight progression tracking
+  progressionHistory: [
+    { week: 1, squat: 195, bench: 130, pulldown: 125, shoulder: 75, abs: 60 },
+    { week: 2, squat: 205, bench: 135, pulldown: 130, shoulder: 80, abs: 70 },
+    { week: 3, squat: 215, bench: 140, pulldown: 135, shoulder: 85, abs: 80 }
+  ],
+  
+  // Next workout targets
+  nextWorkout: {
+    week: 3,
+    day: "Friday",
+    exercises: [
+      {
+        exerciseId: "squat-machine",
+        targetWeight: 215,
+        targetSets: 5,
+        targetReps: 5,
+        restSeconds: 240
+      },
+      {
+        exerciseId: "bench-press-machine",
+        targetWeight: 140,
+        targetSets: 5,
+        targetReps: 5,
+        restSeconds: 240
+      },
+      {
+        exerciseId: "lat-pulldown-machine",
+        targetWeight: 135,
+        targetSets: 5,
+        targetReps: 5,
+        restSeconds: 240
+      },
+      {
+        exerciseId: "cable-crunch-abs",
+        targetWeight: 80,
+        targetSets: 4,
+        targetReps: 8,
+        restSeconds: 120
+      }
+    ]
+  },
+  
+  createdAt: serverTimestamp(),
+  lastUpdated: serverTimestamp()
+}
+```
+
+### Collection: `strengthWorkoutLogs`
+
+Each training session logged:
+
+```javascript
+{
+  userId: "abc123",
+  programId: "strength-5x5-2026-01",
+  sessionId: "2026-02-12-monday",
+  
+  date: "2026-02-12",
+  weekNumber: 3,
+  dayOfWeek: "Monday",
+  sessionName: "Full Body A",
+  
+  exercises: [
+    {
+      exerciseId: "squat-machine",
+      exerciseName: "Leg Press",
+      machineUsed: "Leg Press Machine",
+      targetWeight: 215,
+      targetReps: 5,
+      
+      sets: [
+        {
+          setNumber: 1,
+          weight: 215,
+          repsCompleted: 5,
+          rpe: 7, // 1-10 scale
+          restSeconds: 240,
+          notes: "Felt strong"
+        },
+        {
+          setNumber: 2,
+          weight: 215,
+          repsCompleted: 5,
+          rpe: 7,
+          restSeconds: 240,
+          notes: "Good depth"
+        },
+        {
+          setNumber: 3,
+          weight: 215,
+          repsCompleted: 5,
+          rpe: 8,
+          restSeconds: 240,
+          notes: "Getting harder"
+        },
+        {
+          setNumber: 4,
+          weight: 215,
+          repsCompleted: 5,
+          rpe: 8,
+          restSeconds: 300,
+          notes: "Needed extra rest"
+        },
+        {
+          setNumber: 5,
+          weight: 215,
+          repsCompleted: 5,
+          rpe: 9,
+          restSeconds: 300,
+          notes: "Last rep was tough but got it"
+        }
+      ],
+      
+      completed: true,
+      totalReps: 25,
+      totalVolume: 5375, // 215 × 25
+      
+      // Progressive overload check
+      lastWeekWeight: 205,
+      progressMade: true,
+      progressAmount: +10 // lbs
+    },
+    
+    {
+      exerciseId: "bench-press-machine",
+      // ... similar structure
+    },
+    
+    {
+      exerciseId: "cable-crunch-abs",
+      // ... similar structure but 4×8 instead of 5×5
+    }
+  ],
+  
+  // Session summary
+  totalDuration: 68, // minutes
+  caloriesBurned: 320, // estimate
+  overallRPE: 8, // average across all exercises
+  
+  // Notes
+  preworkoutMeal: "Oatmeal + eggs 2 hours before",
+  energyLevel: "high", // low, medium, high
+  sessionNotes: "Felt great today. Squats moving smoothly. Ready for next week's weight increase.",
+  
+  createdAt: serverTimestamp()
+}
+```
+
+### Collection: `strength1RMTests`
+
+Track 1RM progress:
+
+```javascript
+{
+  userId: "abc123",
+  testDate: "2026-03-27",
+  testType: "post-program", // baseline, mid-program, post-program
+  programId: "strength-5x5-2026-01",
+  
+  results: {
+    squatMachine: {
+      oneRepMax: 325, // lbs (was 275 at baseline)
+      increase: +50,
+      percentIncrease: 18.2
+    },
+    benchPress: {
+      oneRepMax: 205, // (was 185)
+      increase: +20,
+      percentIncrease: 10.8
+    },
+    latPulldown: {
+      oneRepMax: 215, // (was 180)
+      increase: +35,
+      percentIncrease: 19.4
+    },
+    shoulderPress: {
+      oneRepMax: 135, // (was 115)
+      increase: +20,
+      percentIncrease: 17.4
+    }
+  },
+  
+  // Comparison
+  totalStrengthGain: 125, // lbs across all lifts
+  averagePercentIncrease: 16.5,
+  
+  notes: "Huge PRs across the board! Program worked great. Ready to run it again or switch to intermediate program.",
+  
+  createdAt: serverTimestamp()
+}
+```
+
+---
+
+## 🎨 UI COMPONENTS
+
+### 1. StrengthProgramCard.jsx
+
+Shows current program overview:
+
+```
+┌─────────────────────────────────────────┐
+│  🏋️ 5×5 STRENGTH PROGRAM               │
+├─────────────────────────────────────────┤
+│  Week 3 of 8                             │
+│  ████████░░░░░░░░░░░░░  37% Complete    │
+│                                          │
+│  NEXT WORKOUT: Friday, Feb 14            │
+│  Full Body C                             │
+│                                          │
+│  TODAY'S LIFTS:                          │
+│  • Squat Machine:    215 lbs × 5×5       │
+│  • Bench Press:      140 lbs × 5×5       │
+│  • Lat Pulldown:     135 lbs × 5×5       │
+│  • Cable Crunch:      80 lbs × 4×8       │
+│                                          │
+│  Est. Duration: 75 min                   │
+│  Rest: 3-5 min between sets              │
+│                                          │
+│  [Start Workout]  [View Progress]       │
+└─────────────────────────────────────────┘
+```
+
+### 2. StrengthWorkoutLogger.jsx
+
+Live workout tracking interface:
+
+```
+┌─────────────────────────────────────────┐
+│  🏋️ WORKOUT IN PROGRESS                │
+│  Full Body A - Week 3, Monday           │
+├─────────────────────────────────────────┤
+│                                          │
+│  EXERCISE 1/3: Squat Machine            │
+│  Target: 215 lbs × 5 reps × 5 sets      │
+│                                          │
+│  Set 1: [215] lbs × [5] reps  RPE: [8]  │
+│    Rest Timer: 4:00 ⏱️                   │
+│    ✓ Complete Set                        │
+│                                          │
+│  Set 2: [   ] lbs × [  ] reps  RPE: [ ] │
+│    [Start Set 2]                         │
+│                                          │
+│  Set 3: Not started                      │
+│  Set 4: Not started                      │
+│  Set 5: Not started                      │
+│                                          │
+│  ✅ FORM REMINDER:                       │
+│  • Feet shoulder-width                   │
+│  • Descend to parallel                   │
+│  • Drive through heels                   │
+│  • Stop 1 rep before failure             │
+│                                          │
+│  [Finish Exercise →]                     │
+└─────────────────────────────────────────┘
+```
+
+### 3. StrengthProgressDashboard.jsx
+
+Visual progress tracking:
+
+```
+┌─────────────────────────────────────────┐
+│  📊 STRENGTH PROGRESS                   │
+├─────────────────────────────────────────┤
+│                                          │
+│  [Dropdown: Squat Machine ▼]            │
+│                                          │
+│  225 lbs ┤                          ●   │
+│  215 lbs ┤                     ●        │
+│  205 lbs ┤                ●             │
+│  195 lbs ┤           ●                  │
+│  185 lbs └─────────────────────          │
+│           Wk1   Wk2   Wk3   Wk4         │
+│                                          │
+│  Baseline 1RM:  275 lbs                 │
+│  Current Work:  215 lbs (78% of 1RM)    │
+│  Total Gain:    +30 lbs (+15.4%)        │
+│  Projected 1RM: ~315 lbs                │
+│                                          │
+│  📈 STRENGTH GAINED: +40 lbs             │
+│  (Estimated based on 5RM progression)   │
+│                                          │
+│  [View All Lifts]  [Test 1RM]           │
+└─────────────────────────────────────────┘
+```
+
+### 4. DeloadWeekReminder.jsx
+
+Alert when deload week approaches:
+
+```
+┌─────────────────────────────────────────┐
+│  ⚠️  DELOAD WEEK NEXT WEEK              │
+├─────────────────────────────────────────┤
+│                                          │
+│  Week 5 is your scheduled deload week.  │
+│                                          │
+│  REDUCE ALL WEIGHTS TO WEEK 3 LEVELS:   │
+│  • Squat:    215 lbs → 205 lbs          │
+│  • Bench:    145 lbs → 135 lbs          │
+│  • Pulldown: 140 lbs → 130 lbs          │
+│  • Shoulder:  95 lbs →  85 lbs          │
+│  • Abs:       90 lbs →  80 lbs          │
+│                                          │
+│  This is ACTIVE RECOVERY - not laziness.│
+│  Your CNS needs rest to keep progressing.│
+│                                          │
+│  Workouts should feel EASY this week.   │
+│                                          │
+│  [Got It]  [Learn More About Deload]    │
+└─────────────────────────────────────────┘
+```
+
+---
+
+## 💡 KEY IMPLEMENTATION NOTES FOR CLAUDE CODE
+
+### 1. Auto-Calculate Next Workout Weights
+
+```javascript
+function calculateNextWeekWeight(exercise, currentWeek, currentWeight, completedAllReps) {
+  // Week 5 = deload (go back to Week 3 weight)
+  if (currentWeek === 4 && nextWeek === 5) {
+    return week3Weight; // deload
+  }
+  
+  // If user completed all 5×5, add weight
+  if (completedAllReps) {
+    const increment = exercise.includes('squat') ? 10 : 5;
+    return currentWeight + increment;
+  }
+  
+  // If user failed, repeat same weight
+  return currentWeight;
+}
+```
+
+### 2. Rest Timer Component
+
+**CRITICAL:** Build a countdown timer that shows between sets
+
+```javascript
+// Automatically starts 3-5 minute countdown after completing a set
+// Vibrates/alerts when rest is complete
+// User can manually end rest early if recovered
+```
+
+### 3. RPE Tracker
+
+After each set, prompt user for RPE (Rate of Perceived Exertion) 1-10:
+- 7 = Could do 3 more reps
+- 8 = Could do 2 more reps (IDEAL for strength)
+- 9 = Could do 1 more rep
+- 10 = Absolute max (FAILURE - avoid this)
+
+### 4. 1RM Calculator
+
+Estimate 1RM from 5RM:
+```
+Estimated 1RM = 5RM weight ÷ 0.85
+Example: If 5RM = 225 lbs, estimated 1RM = 225 ÷ 0.85 = 265 lbs
+```
+
+### 5. Form Video Links (Optional Enhancement)
+
+Link each exercise to YouTube form videos:
+- Squat Machine / Leg Press
+- Barbell Bench Press
+- Lat Pulldown
+- Overhead Press
+- Cable Crunches
+
+---
+
+## 🚨 IMPORTANT DISTINCTIONS FROM BUILD MUSCLE PROGRAM
+
+| Feature | STRENGTH (This Spec) | HYPERTROPHY (Build Muscle) |
+|---------|---------------------|---------------------------|
+| **Goal** | Max strength, dense muscles | Bigger muscles |
+| **Reps** | 5 (fixed) | 8-12 (varies) |
+| **Sets** | 5 | 3-4 |
+| **Weight** | 80-95% 1RM | 60-80% 1RM |
+| **Rest** | 3-5 minutes | 60-90 seconds |
+| **Frequency** | 3x/week | 2-3x/week per muscle |
+| **Exercises** | Same 5 every week | Variety of exercises |
+| **Progression** | Add weight weekly | Add weight OR reps OR sets |
+| **CNS Fatigue** | Very high | Moderate |
+| **Measurements** | 1RM tests | Circumference (biceps, etc.) |
+| **Nutrition** | Maintenance calories | Calorie surplus |
+| **Results** | Much stronger, slightly bigger | Much bigger, moderately stronger |
+
+---
+
+## 📁 FILES TO CREATE
+
+1. **Service:** `src/services/strengthProgramService.js`
+   - Functions: startProgram, logWorkout, calculateNextWeights, test1RM
+
+2. **Components:**
+   - `StrengthProgramCard.jsx` - program overview
+   - `StrengthWorkoutLogger.jsx` - live workout tracking with rest timer
+   - `StrengthProgressDashboard.jsx` - charts and 1RM tracking
+   - `RestTimer.jsx` - countdown timer component
+   - `OneRMCalculator.jsx` - estimate 1RM from work sets
+
+3. **Integration:**
+   - Add "Start Strength Program" to PhysicalDashboard.jsx
+   - Add "Log Strength Workout" to routines
+
+---
+
+## 🎯 SUCCESS METRICS
+
+After 8 weeks, user should achieve:
+- ✅ Squat 1RM: +20-50 lbs (beginner) or +10-25 lbs (intermediate)
+- ✅ Bench 1RM: +10-20 lbs (beginner) or +5-15 lbs (intermediate)  
+- ✅ Pulldown: +15-35 lbs
+- ✅ Overhead: +10-20 lbs
+- ✅ Completed all 24 workouts (3/week × 8 weeks)
+- ✅ Perfect 5×5 form on all lifts
+- ✅ Muscle density (feel harder/firmer)
+- ✅ Minimal size gain (maybe 1-2 lbs bodyweight)
+
+**This is a STRENGTH program. If user wants SIZE, direct them to BUILD MUSCLE program instead!**
+
+---
+
+## 📚 RESEARCH SOURCES USED
+
+1. Low rep heavy loads (1-5 reps at 80-100% 1RM) optimize strength increases
+2. Strength training: 1-5 reps at 85-100% 1RM with 3-5 minute rest
+3. Neural adaptations from strength training strengthen nerve-muscle connection before muscles grow
+4. High-load routine (8-12 reps) increased back squat strength 19.6% vs 8.8% for low-load routine
+5. 5×5 programs: Squat/Bench/Deadlift/Row/Press for 5 sets of 5 reps, 3x/week
+
+---
+
+**READY FOR IMPLEMENTATION BY CLAUDE CODE** 🚀
+
+All data structures, UI designs, progression logic, and backend functions are fully specified above.

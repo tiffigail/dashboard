@@ -1,0 +1,108 @@
+.section {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.headerRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.select {
+  padding: 8px 10px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  color: #555;
+  flex: 1;
+  max-width: 220px;
+  /* 16px prevents iOS zoom on focus */
+  font-size: 16px;
+}
+
+.summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  color: #333;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.summaryRange {
+  font-size: 11px;
+  color: #aaa;
+}
+
+.summaryValues {
+  font-weight: 600;
+  flex: 1;
+}
+
+.summaryChange {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.positive {
+  color: #43a047;
+}
+
+.negative {
+  color: #e53935;
+}
+
+.chart {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.dateLabels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #999;
+  margin-top: 4px;
+}
+
+.empty {
+  font-size: 13px;
+  color: #999;
+  text-align: center;
+  padding: 20px 0;
+}
+
+/* ── Mobile ───────────────────────────────────────── */
+@media (max-width: 480px) {
+  .headerRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .select {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .summaryValues {
+    flex: unset;
+    width: 100%;
+  }
+}

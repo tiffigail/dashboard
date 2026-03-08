@@ -204,6 +204,39 @@
   box-sizing: border-box;
   flex-shrink: 0;
 }
+.gymTimeCard {
+  width: 100%;
+  max-width: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px;
+  margin-top: 0.5rem;
+  background: linear-gradient(135deg, #e7514c 0%, #FE9179 100%);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.gymTimeCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(231, 81, 76, 0.4);
+}
+
+.gymTimeEmoji {
+  font-size: 1.4rem;
+}
+
+.gymTimeText {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.5px;
+}
+
 .journalLabel {
   display: block;
   margin-bottom: var(--space-sm, 0.5rem);
@@ -260,7 +293,7 @@
   background-color: var(--bg-card, #fff);
   margin-bottom: var(--space-lg, 1.5rem);
   box-sizing: border-box;
-  flex-grow: 1;
+  flex-grow: 0;
   min-height: 0;
   overflow: hidden;
 }
@@ -382,7 +415,8 @@
   width: 100%;
   overflow-y: auto;
   overflow-x: hidden;
-  max-height: calc(6 * (var(--space-sm, 0.5rem)*2 + 1rem + var(--space-sm, 0.5rem))); /* Approx 6 items */
+  min-height: 0;
+  max-height: calc(9 * (var(--space-sm, 0.5rem)*2 + 1rem + var(--space-sm, 0.5rem))); /* Approx 6 items */
   padding-bottom: var(--space-sm, 0.5rem);
   scrollbar-width: thin;
   scrollbar-color: var(--border-secondary, #72B0AB) var(--bg-panel, #BCDDDC);
@@ -394,8 +428,9 @@
 
 /* Task Item Styling (Using ::before for Stripes) */
 .taskItem {
-  display: flex; /* KEEP: Already a flex container */
-  align-items: center; /* KEEP: Already aligning items center */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
   margin-bottom: var(--space-sm, 0.5rem);
   padding: var(--space-sm, 0.5rem) var(--space-md, 1rem);
   padding-left: calc(6mm + var(--space-md, 1rem)); /* Space for stripes */
@@ -509,7 +544,7 @@
   margin-right: var(--space-sm, 0.5rem); /* ADDED: Space between label and date input */
 }
 
-.completedTask { /* Class is on the label */ }
+.completedTask { opacity: 0.5; text-decoration: line-through; }
 .allTasksDoneMessage {
   text-align: center; font-style: italic; color: var(--text-muted, #6c757d);
   padding: var(--space-md, 1rem) 0;
@@ -522,29 +557,106 @@
   display: inline-block;
 }
 
-/* --- ADDED: Styles for the Date Input in Task List --- */
-.dueDateInput {
-    font-size: 0.75em;   /* Smaller font size */
-    padding: 3px 5px;    /* Adjust padding to make it smaller */
-    border: 1px solid var(--border-secondary, #72B0AB); /* Use existing theme border color */
+/* Task main row (checkbox + label + desktop date input) */
+.taskMainRow {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+/* Reschedule group: date input + confirm button, pushed to the right */
+.rescheduleGroup {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+/* Confirm-move button (→) that appears after picking a future date */
+.moveConfirmBtn {
+    font-size: 13px;
+    padding: 2px 8px;
+    background: #43a047;
+    color: #fff;
+    border: none;
     border-radius: 4px;
-    margin-left: auto;   /* Aligns to the right, pushing itself after other flex items */
-    flex-shrink: 0;     /* Prevents the input from shrinking too much if space is tight */
-    max-width: 125px;   /* Controls the maximum width, adjust as needed */
-    height: auto;       /* Let height be determined by font and padding */
-    line-height: normal;/* Ensure line height is not too large */
-    box-sizing: border-box; /* Ensures padding and border are included in the element's total width and height */
-    background-color: var(--bg-input, #fff); /* Consistent background with other inputs */
-    color: var(--text-primary, #053229); /* Consistent text color */
+    cursor: pointer;
+    font-weight: 700;
+    line-height: 1.5;
+    transition: background-color 0.15s;
+}
+.moveConfirmBtn:hover {
+    background: #2e7d32;
+}
+
+/* Mobile-only reschedule row — hidden on desktop */
+.taskRescheduleRow {
+    display: none;
+}
+
+/* "Moved" confirmation placeholder */
+.taskItemMoved {
+    overflow: hidden;
+    border-radius: 6px;
+    border-left: 4px solid #72B0AB;
+    background: #e8f5e9;
+    animation: fadeOutMoved 1.8s forwards;
+}
+
+.movedConfirmation {
+    font-size: 0.85rem;
+    color: #2e7d32;
+    font-weight: 600;
+}
+
+@keyframes fadeOutMoved {
+    0%   { opacity: 1; max-height: 60px; padding: 0.5rem 0.75rem; margin-bottom: 0.5rem; }
+    55%  { opacity: 1; max-height: 60px; padding: 0.5rem 0.75rem; margin-bottom: 0.5rem; }
+    80%  { opacity: 0; max-height: 60px; padding: 0.5rem 0.75rem; margin-bottom: 0.5rem; }
+    100% { opacity: 0; max-height: 0;    padding: 0;              margin-bottom: 0;      }
+}
+
+/* --- Styles for the Date Input in Task List --- */
+.dueDateInput {
+    font-size: 0.75em;
+    padding: 3px 5px;
+    border: 1px solid var(--border-secondary, #72B0AB);
+    border-radius: 4px;
+    margin-left: auto;
+    flex-shrink: 0;
+    max-width: 125px;
+    height: auto;
+    line-height: normal;
+    box-sizing: border-box;
+    background-color: var(--bg-input, #fff);
+    color: var(--text-primary, #053229);
 }
 
 .dueDateInput:focus {
-    border-color: var(--button-primary-hover-bg, #355E58); /* Use a theme color for focus indication */
-    box-shadow: 0 0 0 0.2rem rgba(114, 176, 171, 0.25); /* Using var(--button-primary-bg) with alpha for shadow */
-    /* You can use a direct color if a variable isn't suitable for RGBA conversion: */
-    /* box-shadow: 0 0 0 0.2rem rgba(188, 221, 220, 0.25); */ /* Example: var(--bg-panel) with alpha */
+    border-color: var(--button-primary-hover-bg, #355E58);
+    box-shadow: 0 0 0 0.2rem rgba(114, 176, 171, 0.25);
 }
-/* --- END: Styles for the Date Input --- */
+
+/* Mobile date input — shown only on small screens */
+.dueDateInputMobile {
+    font-size: 0.8rem;
+    padding: 4px 6px;
+    border: 1px solid var(--border-secondary, #72B0AB);
+    border-radius: 4px;
+    background-color: var(--bg-input, #fff);
+    color: var(--text-primary, #053229);
+    flex: 1;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+.rescheduleLabel {
+    font-size: 0.75rem;
+    color: var(--text-muted, #6c757d);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
 
 
 /* Ad Hoc Task Form */
@@ -694,8 +806,18 @@
         /* line-height: 1.3; */  /* From previous request */
       }
   
-  .taskItem .dueDateInput {
-    display: none; /* This line hides the date input */
+  /* Hide the desktop date input on mobile */
+  .taskMainRow .dueDateInput {
+    display: none;
+  }
+
+  /* Show the reschedule row on mobile instead */
+  .taskRescheduleRow {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+    padding-left: 2rem; /* indent to align under label */
   }
   .taskItem {
     padding: var(1rem) var(1rem);

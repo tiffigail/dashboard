@@ -1,0 +1,210 @@
+.records {
+  padding: 4px 0;
+}
+
+.headerRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.heading {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.subtitle {
+  font-size: 13px;
+  color: #666;
+  margin: 4px 0 0 0;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #999;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+.loading {
+  text-align: center;
+  color: #999;
+  padding: 20px 0;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 30px 0;
+  color: #666;
+}
+
+.emptyHint {
+  font-size: 13px;
+  color: #999;
+}
+
+.recordsList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.recordCard {
+  background: linear-gradient(135deg, #fef0ef 0%, #fff 100%);
+  border: 2px solid #e7514c;
+  border-radius: 12px;
+  padding: 14px;
+}
+
+.recordHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.recordType {
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+  text-transform: uppercase;
+}
+
+.recordBest {
+  font-size: 22px;
+  font-weight: 700;
+  color: #e7514c;
+}
+
+.recordMeta {
+  font-size: 12px;
+  color: #999;
+  margin-bottom: 6px;
+}
+
+.recordNotes {
+  font-size: 13px;
+  color: #666;
+  font-style: italic;
+  margin: 8px 0 0 0;
+}
+
+.historySection {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(231, 81, 76, 0.2);
+}
+
+.historyLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: #999;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.historyList {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.historyItem {
+  font-size: 12px;
+  color: #666;
+}
+
+.addButton {
+  width: 100%;
+  padding: 12px;
+  background: #f0f0f0;
+  color: #555;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.addForm {
+  background: #f9f9f9;
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.formTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 12px 0;
+}
+
+.formGroup {
+  margin-bottom: 12px;
+}
+
+.formGroup label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 6px;
+}
+
+.input,
+.select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.input:focus,
+.select:focus {
+  border-color: #e7514c;
+  outline: none;
+}
+
+.formActions {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.cancelBtn {
+  flex: 1;
+  padding: 10px;
+  background: #f0f0f0;
+  color: #555;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.saveBtn {
+  flex: 1;
+  padding: 10px;
+  background: linear-gradient(135deg, #e7514c 0%, #FE9179 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.saveBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

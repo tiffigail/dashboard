@@ -1,4 +1,10 @@
-// src/components/PmRoutineForm/PmRoutineForm.jsx
+// src/components/PmRoutineForm/PmRoutineForm.jsx (UPDATED VERSION)
+// 
+// CHANGES MADE:
+// 1. Import DynamicSprintDashboard instead of PhysicalDashboard
+// 2. Change button text to "View Sprint Progress"
+// 3. Updated modal content to use DynamicSprintDashboard
+
 import React, { useState, useEffect, useCallback } from 'react';
 import styles from './PmRoutineForm.module.css';
 import { db } from '../../firebaseConfig';
@@ -6,7 +12,11 @@ import { collection, addDoc, serverTimestamp, query, where, limit, getDocs, doc,
 import PhysicalGoalsTracker from '../PhysicalGoalsTracker/PhysicalGoalsTracker';
 import StudyTracker from '../StudyTracker/StudyTracker';
 import Modal from '../Modal/Modal'; 
-import PhysicalDashboard from '../PhysicalDashboard/PhysicalDashboard';
+// CHANGED: Import DynamicSprintDashboard instead of PhysicalDashboard
+import DynamicSprintDashboard from '../DynamicSprintDashboard/DynamicSprintDashboard';
+import FitnessAchievementDashboard from '../FitnessAchievementDashboard/FitnessAchievementDashboard';
+import { useAuth } from '../../context/AuthContext';
+import { updateActiveDistanceGoals } from '../../services/enduranceGoalsService';
 
 // Helper to get today's date string
 const getTodayString = () => {
@@ -16,28 +26,55 @@ const getTodayString = () => {
     return localDate.toISOString().split('T')[0];
 };
 
-// Define the checklist items for the PM routine
-const pmRoutineItems = [
-  "PM Lumen",
-  "Foot care",
-  "Brush teeth",
-  "Ready for Tomorrow",
-  "Clothes",
-  "Charge Phone",
-  "Drink",
-  "Things I want to Remember (to learn in my sleep)",
-  "N+1 Review",
-  "Write Recite and Envision",
-  "Lotion",
-  "Pray",
-  "Meditate"
+// PM routine divided into 3 sections
+const pmSections = [
+  {
+    id: 'prepare',
+    title: 'Prepare',
+    subtitle: 'What is tomorrow? How can I ensure success?',
+    items: [
+      "Ready for Tomorrow",
+      "Shoes Off Outside Room",
+      "Drink in Fridge",
+      "Clothes Laid Out",
+      "Charge Phone",
+      "Charge Mask",
+      "Flashcards",
+      "N+1 Review",
+      "Write Recite and Envision",
+      "Things I want to Remember (to learn in my sleep)",
+    ],
+  },
+  {
+    id: 'transition',
+    title: 'Transition',
+    items: [
+      "Brush Teeth",
+      "Red Lenses",
+      "Lotion",
+      "PJs",
+      "Cuddle",
+    ],
+  },
+  {
+    id: 'sleep',
+    title: 'Meditate & Sleep',
+    items: [
+      "Pray",
+      "Meditate",
+    ],
+  },
 ];
+
+// Flat list derived from sections — used for checkedItems init and completion %
+const pmRoutineItems = pmSections.flatMap(s => s.items);
 
 // Props: onSubmit, onClose
 function PmRoutineForm({ onSubmit, onClose }) {
 
+  const { currentUser } = useAuth();
   const didSubmit = React.useRef(false);
-// == State for Checklist Items ==
+  
   const [checkedItems, setCheckedItems] = useState(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('pmRoutineCheckedItems');
@@ -49,7 +86,6 @@ function PmRoutineForm({ onSubmit, onClose }) {
                 initialState[key] = parsed[key];
             }
         }
-  
         return initialState;
       } catch (e) {
         console.warn('Error parsing saved checked items:', e);
@@ -58,7 +94,6 @@ function PmRoutineForm({ onSubmit, onClose }) {
     return pmRoutineItems.reduce((acc, item) => ({ ...acc, [item]: false }), {});
   });
 
-  // == State for Metric Inputs ==
   const [epiphanyCount, setEpiphanyCount] = useState(() => typeof window !== 'undefined' ? localStorage.getItem('pmRoutineEpiphanyCount') || '' : '');
   const [despairCount, setDespairCount] = useState(() => typeof window !== 'undefined' ? localStorage.getItem('pmRoutineDespairCount') || '' : '');
   const [pmJournalEntry, setPmJournalEntry] = useState(() => typeof window !== 'undefined' ? localStorage.getItem('pmRoutineJournalEntry') || '' : '');
@@ -66,7 +101,6 @@ function PmRoutineForm({ onSubmit, onClose }) {
   const [submitError, setSubmitError] = useState(null);
   const [pmRecitation, setPmRecitation] = useState("Loading recitation...");
 
-  // == State for Trackers ==
   const [physicalGoals, setPhysicalGoals] = useState(() => {
     if (typeof window !== 'undefined') {
         const saved = localStorage.getItem('physicalGoalsData');
@@ -82,27 +116,24 @@ function PmRoutineForm({ onSubmit, onClose }) {
     }
     return {};
   });
+  
   const [isChartModalOpen, setIsChartModalOpen] = useState(false);
+  const [isPhysicalDashboardOpen, setIsPhysicalDashboardOpen] = useState(false);
 
-// This effect only saves data to localStorage when the modal is closed accidentally.
-    useEffect(() => {
-        // This cleanup function runs when the component unmounts (closes).
-        return () => {
-            if (!didSubmit.current) {
-                // If we HAVEN'T submitted, it's an accidental close. Save the current state.
-                localStorage.setItem('pmRoutineCheckedItems', JSON.stringify(checkedItems));
-                localStorage.setItem('pmRoutineEpiphanyCount', epiphanyCount);
-                localStorage.setItem('pmRoutineDespairCount', despairCount);
-                localStorage.setItem('pmRoutineJournalEntry', pmJournalEntry);
-                localStorage.setItem('physicalGoalsData', JSON.stringify(physicalGoals));
-                localStorage.setItem('pmStudyData', JSON.stringify(studyData));
-                console.log("Form closed without submission. Data saved.");
-            }
-        };
-        // The dependency array includes all state so the cleanup function has the latest data.
-    }, [checkedItems, epiphanyCount, despairCount, pmJournalEntry, physicalGoals, studyData]);
+  useEffect(() => {
+    return () => {
+        if (!didSubmit.current) {
+            localStorage.setItem('pmRoutineCheckedItems', JSON.stringify(checkedItems));
+            localStorage.setItem('pmRoutineEpiphanyCount', epiphanyCount);
+            localStorage.setItem('pmRoutineDespairCount', despairCount);
+            localStorage.setItem('pmRoutineJournalEntry', pmJournalEntry);
+            localStorage.setItem('physicalGoalsData', JSON.stringify(physicalGoals));
+            localStorage.setItem('pmStudyData', JSON.stringify(studyData));
+            console.log("Form closed without submission. Data saved.");
+        }
+    };
+  }, [checkedItems, epiphanyCount, despairCount, pmJournalEntry, physicalGoals, studyData]);
 
-  // --- Effect to fetch active PM recitation ---
   useEffect(() => {
     const fetchRecitation = async () => {
       console.log("Fetching active PM recitation...");
@@ -132,19 +163,18 @@ function PmRoutineForm({ onSubmit, onClose }) {
     fetchRecitation();
   }, []);
 
-  // == Handlers ==
   const handleCheckboxChange = (event) => {
     const { name, checked } = event.target;
     setCheckedItems(prevItems => ({ ...prevItems, [name]: checked }));
   };
 
- const handlePhysicalGoalsChange = useCallback((data) => {
-    setPhysicalGoals(data);
-  }, []); // The empty array means this function is created once and never changes
+  const handlePhysicalGoalsChange = useCallback((data) => {
+    setPhysicalGoals(data);
+  }, []);
 
-  const handleStudyDataChange = useCallback((data) => {
-    setStudyData(data);
-  }, []); // The empty array means this function is created once and never changes
+  const handleStudyDataChange = useCallback((data) => {
+    setStudyData(data);
+  }, []);
 
   const resetForm = () => {
     setCheckedItems(pmRoutineItems.reduce((acc, task) => ({ ...acc, [task]: false }), {}));
@@ -152,9 +182,9 @@ function PmRoutineForm({ onSubmit, onClose }) {
     setDespairCount('');
     setPmJournalEntry('');
     setPhysicalGoals({});
-    setStudyData({ linkedinMinutes: '' }); // Reset study data, keeping the object structure
+    setStudyData({ linkedinMinutes: '' });
     console.log("Form state has been reset.");
-};
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -183,12 +213,10 @@ function PmRoutineForm({ onSubmit, onClose }) {
     const now = new Date();
 
     try {
-      // 1. Save routine completion log
       didSubmit.current = true;
       const routineDocRef = await addDoc(collection(db, "pmRoutineLogs"), baseFormData);
       console.log("PM Routine Log Document written with ID: ", routineDocRef.id);
 
-      // 2. If journal entry exists, save it
       if (journalText) {
         const journalData = {
           entryText: journalText,
@@ -200,39 +228,45 @@ function PmRoutineForm({ onSubmit, onClose }) {
         await addDoc(collection(db, "journalEntries"), journalData);
       }
 
-      // 3. Update physical goals log
-if (Object.keys(physicalGoals).length > 0 && Object.values(physicalGoals).some(v => v)) {
-    
-    // This is the YYYY-MM-DD ID you already defined, e.g., "2025-10-24"
-    const docId = dateString; 
+      if (Object.keys(physicalGoals).length > 0 && Object.values(physicalGoals).some(v => v)) {
+        const docId = dateString;
+        const physicalLogRef = doc(db, "physicalGoalsLogs", docId);
+        const goalsData = {
+            steps: Number(physicalGoals.steps) || 0,
+            waterCount: physicalGoals.waterCount || 0,
+            meals: physicalGoals.meals || { Breakfast: false, Lunch: false, Dinner: false, Snacks: false },
+            wentToGym: physicalGoals.wentToGym || false,
+            pmMetricsCompletedAt: serverTimestamp()
+        };
+        await setDoc(physicalLogRef, goalsData, { merge: true });
+        console.log("Physical Goals Log *updated* for:", docId);
 
-    // Create a reference to the *specific* document for today
-    const physicalLogRef = doc(db, "physicalGoalsLogs", docId);
+        // Auto-feed steps into active endurance distance goals
+        const stepCount = Number(physicalGoals.steps) || 0;
+        if (stepCount > 0 && currentUser?.uid) {
+          try {
+            await updateActiveDistanceGoals(currentUser.uid, docId, stepCount);
+            console.log("Endurance goals updated with", stepCount, "steps");
+          } catch (err) {
+            console.error("Error updating endurance goals:", err);
+          }
+        }
+      }
 
-    const goalsData = {
-        steps: Number(physicalGoals.steps) || 0,
-        waterCount: physicalGoals.waterCount || 0,
-        meals: physicalGoals.meals || { Breakfast: false, Lunch: false, Dinner: false, Snacks: false },
-        wentToGym: physicalGoals.wentToGym || false,
-        pmMetricsCompletedAt: serverTimestamp() // Renamed 'date' for clarity
-        // We don't need 'dateString' here, as it's the document's ID
-    };
+      // Fresh read from localStorage at submit time — avoids relying on the 5s poll state
+      const freshStudySeconds = Number(localStorage.getItem(`studyModalTime_${dateString}`) || 0);
+      const freshFlashcardSeconds = Number(localStorage.getItem(`flashcardsModalTime_${dateString}`) || 0);
+      const freshStudyMinutes = Math.floor(freshStudySeconds / 60);
+      const freshFlashcardMinutes = Math.floor(freshFlashcardSeconds / 60);
+      const linkedinMins = Number(studyData.linkedinMinutes || 0);
 
-    // Use setDoc with { merge: true } to *add* this data
-    // without overwriting the weight/bodyfat from the AM form.
-    await setDoc(physicalLogRef, goalsData, { merge: true });
-    console.log("Physical Goals Log *updated* for:", docId);
-}
-
-      // 4. Save daily study log
-      const hasStudyData = studyData.studyMinutes > 0 || studyData.flashcardMinutes > 0 || (studyData.linkedinMinutes && Number(studyData.linkedinMinutes) > 0);
+      const hasStudyData = freshStudyMinutes > 0 || freshFlashcardMinutes > 0 || linkedinMins > 0;
       if (hasStudyData) {
-          const totalMinutes = (studyData.studyMinutes || 0) + (studyData.flashcardMinutes || 0) + Number(studyData.linkedinMinutes || 0);
           const dailyLogData = {
-              studyModalMinutes: studyData.studyMinutes || 0,
-              flashcardsModalMinutes: studyData.flashcardMinutes || 0,
-              linkedinMinutes: Number(studyData.linkedinMinutes || 0),
-              totalMinutes: totalMinutes,
+              studyModalMinutes: freshStudyMinutes,
+              flashcardsModalMinutes: freshFlashcardMinutes,
+              linkedinMinutes: linkedinMins,
+              totalMinutes: freshStudyMinutes + freshFlashcardMinutes + linkedinMins,
               lastUpdatedAt: serverTimestamp(),
           };
           const dailyLogDocRef = doc(db, "dailyStudyLogs", dateString);
@@ -240,7 +274,6 @@ if (Object.keys(physicalGoals).length > 0 && Object.values(physicalGoals).some(v
           console.log("Daily Study Log saved/updated for:", dateString);
       }
 
-      // 5. Clear local storage on successful submission
       if (typeof window !== 'undefined') {
           localStorage.removeItem('pmRoutineCheckedItems');
           localStorage.removeItem('pmRoutineEpiphanyCount');
@@ -249,9 +282,7 @@ if (Object.keys(physicalGoals).length > 0 && Object.values(physicalGoals).some(v
           localStorage.removeItem('physicalGoalsData');
           localStorage.removeItem('pmStudyData');
       }
-      
 
-      // 6. Reset the form's internal state
       resetForm();
 
       if (onSubmit) {
@@ -267,86 +298,108 @@ if (Object.keys(physicalGoals).length > 0 && Object.values(physicalGoals).some(v
     }
   };
 
-
-  // --- Render JSX ---
   return (
     <form onSubmit={handleSubmit} className={styles.form}>
       <h3 className={styles.formTitle}>PM Orientation & Daily Input</h3>
 
-      {/* Checklist Section */}
-      <div className={styles.section}>
-        <h4 className={styles.sectionTitle}>PM Routine Checklist:</h4>
-        {pmRoutineItems.map((item) => (
-          <React.Fragment key={item}>
-            <div className={styles.checkItem}>
-              <input
-                type="checkbox"
-                id={`pm-${item.replace(/\s+/g, '-')}`}
-                name={item}
-                checked={!!checkedItems[item]}
-                onChange={handleCheckboxChange}
-                className={styles.checkbox}
-                disabled={isSubmitting}
-              />
-              <label htmlFor={`pm-${item.replace(/\s+/g, '-')}`}>{item}</label>
-            </div>
-            {item === "Write Recite and Envision" && (
-              <>
-                {(pmRecitation && pmRecitation !== "Loading recitation..." && pmRecitation !== "No active PM recitation set." && pmRecitation !== "Error loading recitation.") && (
+      {pmSections.map((section) => (
+        <div key={section.id} className={styles.section}>
+          <h4 className={styles.sectionTitle}>{section.title}</h4>
+          {section.subtitle && (
+            <p className={styles.sectionSubtitle}>{section.subtitle}</p>
+          )}
+          {section.items.map((item) => (
+            <React.Fragment key={item}>
+              <div className={styles.checkItem}>
+                <input
+                  type="checkbox"
+                  id={`pm-${item.replace(/\s+/g, '-')}`}
+                  name={item}
+                  checked={!!checkedItems[item]}
+                  onChange={handleCheckboxChange}
+                  className={styles.checkbox}
+                  disabled={isSubmitting}
+                />
+                <label htmlFor={`pm-${item.replace(/\s+/g, '-')}`}>{item}</label>
+              </div>
+              {item === "Write Recite and Envision" && (
+                <>
+                  {(pmRecitation && pmRecitation !== "Loading recitation..." && pmRecitation !== "No active PM recitation set." && pmRecitation !== "Error loading recitation.") && (
                     <div className={styles.recitationDisplay}>
-                        <p className={styles.recitationText}>{pmRecitation}</p>
+                      <p className={styles.recitationText}>{pmRecitation}</p>
                     </div>
-                )}
-                <div className={styles.journalField}>
-                  <label htmlFor="pmJournalEntry">Thoughts on the Day: What did you do and how was it rewarding?</label>
-                  <textarea
-                    id="pmJournalEntry"
-                    name="pmJournalEntry"
-                    rows="5"
-                    value={pmJournalEntry}
-                    onChange={(e) => setPmJournalEntry(e.target.value)}
-                    disabled={isSubmitting}
-                    placeholder="Enter any thoughts..."
-                  />
-                </div>
-              </>
-            )}
-          </React.Fragment>
-        ))}
-      </div>
+                  )}
+                  <div className={styles.journalField}>
+                    <label htmlFor="pmJournalEntry">Thoughts on the Day: What did you do and how was it rewarding?</label>
+                    <textarea
+                      id="pmJournalEntry"
+                      name="pmJournalEntry"
+                      rows="5"
+                      value={pmJournalEntry}
+                      onChange={(e) => setPmJournalEntry(e.target.value)}
+                      disabled={isSubmitting}
+                      placeholder="Enter any thoughts..."
+                    />
+                  </div>
+                </>
+              )}
+            </React.Fragment>
+          ))}
+        </div>
+      ))}
 
-<button 
-      type="button" 
-      className={styles.chartButton} 
-      onClick={() => setIsChartModalOpen(true)}
-      disabled={isSubmitting} // Disable button while submitting
-    >
-      View Progress Chart
-    </button>
-      {/* Physical Goals Tracker Section */}
+      {/* CHANGED: Button text updated */}
+      <button 
+        type="button" 
+        className={styles.chartButton} 
+        onClick={() => setIsChartModalOpen(true)}
+        disabled={isSubmitting}
+      >
+        View Sprint Progress
+      </button>
+
       <PhysicalGoalsTracker
         onDataChange={handlePhysicalGoalsChange}
         initialData={physicalGoals}
         disabled={isSubmitting}
       />
       
-      {/* Study Tracker Section */}
       <StudyTracker
         onDataChange={handleStudyDataChange}
         initialData={studyData}
         disabled={isSubmitting}
       />
+      
       {submitError && <p className={styles.errorText}>Error: {submitError}</p>}
+
+      <button
+        type="button"
+        className={styles.chartButton}
+        onClick={() => setIsPhysicalDashboardOpen(true)}
+        disabled={isSubmitting}
+      >
+        View Physical Progress
+      </button>
+
       <button type="submit" className={styles.submitButton} disabled={isSubmitting}>
         {isSubmitting ? 'Saving...' : 'Complete PM Routine'}
       </button>
-      <Modal 
-  isOpen={isChartModalOpen} 
-  onClose={() => setIsChartModalOpen(false)}
-  closeOnClickOutside={true} 
->
-  <PhysicalDashboard />
-</Modal>
+
+      {/* CHANGED: Modal now uses DynamicSprintDashboard */}
+      <Modal
+        isOpen={isChartModalOpen}
+        onClose={() => setIsChartModalOpen(false)}
+        closeOnClickOutside={true}
+      >
+        <DynamicSprintDashboard />
+      </Modal>
+
+      <Modal
+        isOpen={isPhysicalDashboardOpen}
+        onClose={() => setIsPhysicalDashboardOpen(false)}
+      >
+        <FitnessAchievementDashboard />
+      </Modal>
     </form>
   );
 }

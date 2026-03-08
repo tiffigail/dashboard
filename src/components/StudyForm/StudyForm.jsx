@@ -101,7 +101,8 @@ function StudyForm({ onSubmit, onClose, axisQuestion }) {
         console.log("Attempting to save Study Session Log:", studyLogData);
 
         try {
-            const dateString = new Date().toISOString().split('T')[0];
+            const now2 = new Date();
+            const dateString = new Date(now2 - now2.getTimezoneOffset() * 60000).toISOString().split('T')[0];
             const docId = `${dateString}-${Date.now()}`;
             const studyLogDocRef = doc(db, "study", docId);
             await setDoc(studyLogDocRef, studyLogData);

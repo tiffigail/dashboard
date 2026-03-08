@@ -1,0 +1,165 @@
+/* src/components/KanbanProgressWidget/KanbanProgressWidget.module.css */
+
+.widget {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 24px;
+}
+
+.title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #667eea;
+    padding-bottom: 8px;
+}
+
+.loading,
+.emptyState {
+    text-align: center;
+    padding: 20px;
+    color: #999;
+    font-style: italic;
+}
+
+/* Overall Progress Section */
+.overallProgress {
+    margin-bottom: 24px;
+    padding: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 8px;
+    color: white;
+}
+
+.progressHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.progressLabel {
+    font-size: 14px;
+    font-weight: 500;
+    opacity: 0.9;
+}
+
+.progressPercentage {
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.progressBar {
+    width: 100%;
+    height: 12px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.progressFill {
+    height: 100%;
+    background: white;
+    border-radius: 6px;
+    transition: width 0.3s ease;
+}
+
+.progressStats {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    font-size: 13px;
+    opacity: 0.9;
+}
+
+/* Breakdown Cards */
+.breakdown {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.statCard {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 2px solid #e0e0e0;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.statCard:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.doneCard {
+    border-color: #4caf50;
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+}
+
+.statIcon {
+    font-size: 24px;
+    line-height: 1;
+}
+
+.statContent {
+    flex: 1;
+}
+
+.statValue {
+    font-size: 24px;
+    font-weight: 700;
+    color: #333;
+    line-height: 1;
+    margin-bottom: 4px;
+}
+
+.statLabel {
+    font-size: 12px;
+    color: #666;
+    font-weight: 500;
+}
+
+/* Active Work Banner */
+.activeWorkBanner {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    border-radius: 8px;
+    color: #856404;
+}
+
+.activeWorkIcon {
+    font-size: 20px;
+}
+
+.activeWorkText {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .breakdown {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .statValue {
+        font-size: 20px;
+    }
+
+    .progressPercentage {
+        font-size: 20px;
+    }
+}

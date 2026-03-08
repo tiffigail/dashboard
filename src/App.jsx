@@ -20,7 +20,6 @@ import MonthlyView from './components/MonthlyView/MonthlyView';
 import YearlyView from './components/YearlyView/YearlyView';
 import ParetoView from './components/ParetoView/ParetoView';
 import LifeMapView from './components/LifeMapView/LifeMapView';
-import ScrapPaper from './components/ScrapPaper/ScrapPaper';
 import LoginPage from './components/LoginPage/LoginPage';
 import ParetoViewDemo from './components/ParetoView/ParetoViewDemo.jsx';
 
@@ -28,8 +27,6 @@ function AppLayout() {
     const { currentUser } = useAuth();
     const buttonStyle = { margin: '0.5rem', padding: '0.5rem 1rem', cursor: 'pointer', border: '1px solid #ccc', borderRadius: '4px', backgroundColor: '#e7e7e7', transition: 'background-color 0.2s ease', fontSize: '0.9em', textDecoration: 'none', color: 'black' };
     const activeButtonStyle = { ...buttonStyle, backgroundColor: '#a0a0a0', fontWeight: 'bold', borderColor: '#888' };
-    const scrapPaperButtonStyle = { ...buttonStyle, backgroundColor: '#ffc107', color: '#212529' };
-    const activeScrapPaperButtonStyle = { ...scrapPaperButtonStyle, backgroundColor: '#e0a800', fontWeight: 'bold' };
 
     const handleLogout = async () => {
         try {
@@ -50,9 +47,6 @@ function AppLayout() {
                     <NavLink to="/weekly" style={({ isActive }) => isActive ? activeButtonStyle : buttonStyle}>Weekly</NavLink>
                     <NavLink to="/daily" style={({ isActive }) => isActive ? activeButtonStyle : buttonStyle}>Daily</NavLink>
                     <NavLink to="/now" end style={({ isActive }) => isActive ? activeButtonStyle : buttonStyle}>Now</NavLink>
-                    <NavLink to="/scrappaper" style={({ isActive }) => isActive ? activeScrapPaperButtonStyle : scrapPaperButtonStyle}>
-                        📝 Scrap Paper
-                    </NavLink>
                     {currentUser ? (
                         <button onClick={handleLogout} style={buttonStyle}>Logout</button>
                     ) : (
@@ -76,7 +70,6 @@ function AppLayout() {
                     <Route path="/yearly" element={<YearlyView />} />
                     <Route path="/pareto" element={<ParetoView />} />
                     <Route path="/life" element={<LifeMapView />} />
-                    <Route path="/scrappaper" element={<ScrapPaper />} />
                     <Route path="/login" element={<LoginPage />} />
                 </Routes>
             </div>

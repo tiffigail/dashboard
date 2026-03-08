@@ -108,14 +108,24 @@ function WeeklyView({ onNavigate }) {
             setCurrentWeekDates(getWeekDates(currentWeek));
 
             try {
+                // Get current year for filtering milestones
+                const currentYear = today.getFullYear();
+
+                // Fetch yearly goals for current year to get their goalIds
+                const goalsQuery = query(
+                    collection(db, "new_goals"),
+                    where("type", "==", "yearly"),
+                    where("year", "==", currentYear)
+                );
+
                 const currentPlanRef = doc(db, "new_weeklyPlans", currentWeek);
                 const nextWeekPlanRef = doc(db, "new_weeklyPlans", nextWeek);
-                
-                const [currentPlanSnap, nextWeekPlanSnap, axesSnapshot, milestonesSnapshot] = await Promise.all([
+
+                const [currentPlanSnap, nextWeekPlanSnap, axesSnapshot, goalsSnapshot] = await Promise.all([
                     getDoc(currentPlanRef),
                     getDoc(nextWeekPlanRef),
                     getDocs(collection(db, "new_axes")),
-                    getDocs(collection(db, "new_milestones")),
+                    getDocs(goalsQuery),
                 ]);
 
                 setCurrentWeeklyPlanData(currentPlanSnap.exists() ? currentPlanSnap.data() : { weeklyGoals: {} });
@@ -127,13 +137,25 @@ function WeeklyView({ onNavigate }) {
                 }
 
                 const axesDataMap = {};
-                axesSnapshot.forEach(doc => { 
-                    const d = doc.data(); 
-                    if(d.axisName) axesDataMap[d.axisName] = { id: doc.id, ...d }; 
+                axesSnapshot.forEach(doc => {
+                    const d = doc.data();
+                    if(d.axisName) axesDataMap[d.axisName] = { id: doc.id, ...d };
                 });
                 setAllAxesData(axesDataMap);
 
-                const milestonesList = milestonesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                // Extract goalIds from current year's goals
+                const currentYearGoalIds = goalsSnapshot.docs.map(doc => doc.data().goalId).filter(Boolean);
+
+                // Fetch only milestones linked to current year's goals
+                let milestonesList = [];
+                if (currentYearGoalIds.length > 0) {
+                    const milestonesQuery = query(
+                        collection(db, "new_milestones"),
+                        where("goalId", "in", currentYearGoalIds)
+                    );
+                    const milestonesSnapshot = await getDocs(milestonesQuery);
+                    milestonesList = milestonesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                }
                 setAllMilestones(milestonesList);
 
             } catch (err) {

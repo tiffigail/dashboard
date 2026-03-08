@@ -148,7 +148,7 @@ function DailyView({ onNavigate }) {
             const goalsQuery = query(
                 collection(db, "new_goals"),
                 where("type", "==", "yearly"),
-                where("year", "==", 2025)
+                where("year", "==", currentYear)
             );
 
             const [axesSnapshot, goalsSnapshot, milestonesSnapshot] = await Promise.all([
@@ -190,7 +190,7 @@ function DailyView({ onNavigate }) {
                         .map(m => ({...m, text: m.title}))
                         .sort((a,b) => (a.dueDate?.toMillis() || 0) - (b.dueDate?.toMillis() || 0));
                 } else {
-                    console.warn(`Could not find a 2025 goal for axisID: ${currentAxisObject.id}`);
+                    console.warn(`Could not find a ${currentYear} goal for axisID: ${currentAxisObject.id}`);
                 }
             } else {
                 console.warn(`Could not find axis data for axisName: ${currentAxisThemeOfDay} in new_axes collection.`);

@@ -1,0 +1,415 @@
+.section {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.headerRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.sectionTitle {
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.logToggleButton {
+  padding: 6px 16px;
+  background: linear-gradient(135deg, #f48fb1 0%, #e91e63 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.loading {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+}
+
+.cycleInfo {
+  background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.currentStatus {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.currentStatus h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #333;
+}
+
+.currentStatus p {
+  margin: 4px 0 0 0;
+  font-size: 14px;
+  color: #555;
+}
+
+.predictions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.prediction {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+}
+
+.predictionLabel {
+  color: #555;
+  font-weight: 600;
+}
+
+.predictionValue {
+  color: #333;
+}
+
+/* Logging Form */
+.form {
+  background: #fafafa;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.formGroup {
+  margin-bottom: 14px;
+}
+
+.formGroup label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 6px;
+}
+
+.dateInput {
+  width: 100%;
+  padding: 8px 10px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.dateInput:focus {
+  border-color: #f48fb1;
+  outline: none;
+}
+
+.flowSelector {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.flowChip {
+  padding: 6px 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 20px;
+  background: white;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  color: #555;
+}
+
+.flowChipActive {
+  color: #333;
+  border-color: #f48fb1;
+}
+
+.symptomChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.symptomChip {
+  padding: 5px 10px;
+  border: 1px solid #ddd;
+  border-radius: 16px;
+  background: white;
+  font-size: 12px;
+  cursor: pointer;
+  color: #666;
+}
+
+.symptomChipActive {
+  background: #fce4ec;
+  border-color: #f48fb1;
+  color: #c2185b;
+}
+
+.energySelector {
+  display: flex;
+  gap: 6px;
+}
+
+.energyBtn {
+  width: 36px;
+  height: 36px;
+  border: 2px solid #e0e0e0;
+  border-radius: 50%;
+  background: white;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  color: #555;
+}
+
+.energyBtnActive {
+  background: #f48fb1;
+  border-color: #f48fb1;
+  color: white;
+}
+
+.energyLabels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #999;
+  margin-top: 4px;
+  padding: 0 4px;
+}
+
+.notesInput {
+  width: 100%;
+  padding: 8px 10px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 13px;
+  box-sizing: border-box;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.notesInput:focus {
+  border-color: #f48fb1;
+  outline: none;
+}
+
+.formActions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+.newCycleButton {
+  padding: 8px 16px;
+  background: #fff;
+  border: 2px solid #e91e63;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  color: #e91e63;
+}
+
+.newCycleButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.saveButton {
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #f48fb1 0%, #e91e63 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.saveButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.formHint {
+  font-size: 12px;
+  color: #e91e63;
+  text-align: center;
+  margin: 8px 0 0 0;
+}
+
+/* Charts */
+.chartSection {
+  margin-top: 20px;
+}
+
+.chartTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 12px 0;
+}
+
+/* Bar Chart */
+.barChart {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  height: 120px;
+  padding: 0 8px;
+  position: relative;
+  border-bottom: 1px solid #e0e0e0;
+  margin-bottom: 12px;
+}
+
+.barCol {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  justify-content: flex-end;
+}
+
+.barLabel {
+  font-size: 10px;
+  color: #555;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.bar {
+  width: 100%;
+  max-width: 28px;
+  background: linear-gradient(180deg, #f48fb1 0%, #e91e63 100%);
+  border-radius: 4px 4px 0 0;
+  min-height: 4px;
+}
+
+.barDate {
+  font-size: 10px;
+  color: #999;
+  margin-top: 4px;
+}
+
+.avgLine {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-top: 2px dashed #999;
+  pointer-events: none;
+}
+
+.avgLabel {
+  position: absolute;
+  right: 0;
+  top: -14px;
+  font-size: 10px;
+  color: #999;
+  font-weight: 600;
+}
+
+/* Calendar Heatmap */
+.calendarGrid {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.calMonth {
+  flex: 1;
+  min-width: 160px;
+}
+
+.calMonthLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 6px;
+  text-align: center;
+}
+
+.calDayHeaders {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  margin-bottom: 2px;
+}
+
+.calDayHeader {
+  font-size: 10px;
+  color: #999;
+  text-align: center;
+}
+
+.calDays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.calDay {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  color: #555;
+  border-radius: 3px;
+  border: 1px solid #eee;
+}
+
+.calDayEmpty {
+  aspect-ratio: 1;
+}
+
+.calLegend {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: #666;
+}
+
+.legendDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  border: 1px solid #ddd;
+}

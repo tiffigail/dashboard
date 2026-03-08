@@ -1,0 +1,345 @@
+.dashboard {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+  background: #f8f9fa;
+  min-height: 100vh;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+  gap: 16px;
+}
+
+.title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #333;
+  margin: 0;
+}
+
+.headerActions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.createGoalButton,
+.logWorkoutButton,
+.logMeasurementButton {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  white-space: nowrap;
+}
+
+.createGoalButton {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.logWorkoutButton {
+  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+  color: white;
+}
+
+.logMeasurementButton {
+  background: linear-gradient(135deg, #FE9179 0%, #e7514c 100%);
+  color: white;
+}
+
+.createGoalButton:hover,
+.logWorkoutButton:hover,
+.logMeasurementButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.section {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.sectionTitle {
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 20px 0;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.goalsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+}
+
+.createFirstGoalButton {
+  margin-top: 16px;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.workoutsList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.workoutCard {
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #43e97b;
+}
+
+.workoutHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 6px;
+  gap: 8px;
+}
+
+.workoutHeaderClickable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.workoutHeaderClickable:hover .workoutTitleRow h3 {
+  color: #43a047;
+}
+
+.workoutTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.workoutTitleRow h3 {
+  margin: 0;
+  font-size: 15px;
+  color: #333;
+}
+
+.expandChevron {
+  font-size: 11px;
+  color: #aaa;
+}
+
+.workoutDate {
+  font-size: 13px;
+  color: #666;
+  white-space: nowrap;
+}
+
+.workoutStats {
+  display: flex;
+  gap: 10px;
+  font-size: 13px;
+  color: #555;
+  flex-wrap: wrap;
+  margin-bottom: 0;
+}
+
+.volumeStat {
+  font-weight: 600;
+  color: #333;
+}
+
+.prBadge {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+/* Expanded exercise detail */
+.exerciseDetails {
+  margin-top: 12px;
+  border-top: 1px solid #e8e8e8;
+  padding-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.exerciseRow {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.exerciseRowHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.exerciseRowName {
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+}
+
+.exerciseRowVolume {
+  font-size: 12px;
+  color: #888;
+  white-space: nowrap;
+}
+
+.setsRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.setChip {
+  background: #e8f5e9;
+  color: #2e7d32;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 12px;
+  white-space: nowrap;
+}
+
+.measurementsDate {
+  font-size: 13px;
+  color: #888;
+  margin: -8px 0 12px;
+}
+
+.measurementsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+}
+
+.measurementsGrid > div {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.measureLabel {
+  font-size: 11px;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.loading {
+  text-align: center;
+  padding: 40px;
+  font-size: 18px;
+  color: #666;
+}
+
+/* ── Mobile ───────────────────────────────────────── */
+@media (max-width: 600px) {
+  .dashboard {
+    padding: 12px;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+    margin-bottom: 20px;
+    gap: 12px;
+  }
+
+  .title {
+    font-size: 24px;
+  }
+
+  .headerActions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .createGoalButton,
+  .logWorkoutButton,
+  .logMeasurementButton {
+    padding: 12px 8px;
+    font-size: 13px;
+    text-align: center;
+    white-space: normal;
+  }
+
+  /* third button spans full width */
+  .logMeasurementButton {
+    grid-column: 1 / -1;
+  }
+
+  .section {
+    padding: 16px 12px;
+    margin-bottom: 16px;
+    border-radius: 10px;
+  }
+
+  .sectionTitle {
+    font-size: 17px;
+    margin-bottom: 14px;
+  }
+
+  .goalsGrid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .emptyState {
+    padding: 24px 12px;
+  }
+
+  .workoutHeader {
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .workoutDate {
+    font-size: 12px;
+  }
+
+  .setChip {
+    font-size: 11px;
+    padding: 2px 6px;
+  }
+
+  .exerciseRowName {
+    font-size: 12px;
+  }
+
+  .measurementsGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}

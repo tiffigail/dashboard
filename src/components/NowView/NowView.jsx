@@ -7,6 +7,8 @@ import Modal from '../Modal/Modal';
 import BreakReviewForm from '../BreakReviewForm/BreakReviewForm';
 import StudyFlashcardsModal from '../StudyFlashcardsModal/StudyFlashcardsModal';
 import DearAbiMarquee from '../DearAbiMarquee/DearAbiMarquee';
+import SprintSnapshot from '../SprintSnapshot/SprintSnapshot';
+import FitnessAchievementDashboard from '../FitnessAchievementDashboard/FitnessAchievementDashboard';
 import {
     collection, doc, addDoc, setDoc, getDocs, getDoc, query, where,
     updateDoc, serverTimestamp, Timestamp
@@ -102,6 +104,7 @@ function NowView() {
     const [availableAxes, setAvailableAxes] = useState([]);
     const [isSavingAdHoc, setIsSavingAdHoc] = useState(false);
     const [focusAdHocInput, setFocusAdHocInput] = useState(false);
+    const [focusMomentInput, setFocusMomentInput] = useState(null); // 'epiphany' | 'despair' | null
     const [epiphanyDetail, setEpiphanyDetail] = useState('');
     const [despairDetail, setDespairDetail] = useState('');
     const [isSavingDetail, setIsSavingDetail] = useState(false);
@@ -109,8 +112,9 @@ function NowView() {
     const [currentBreakIdea, setCurrentBreakIdea] = useState('');
     const [timerFinishedAt, setTimerFinishedAt] = useState(null);
     const [isFlashcardModalOpen, setIsFlashcardModalOpen] = useState(false);
+    const [isPhysicalDashboardOpen, setIsPhysicalDashboardOpen] = useState(false);
     const [currentMonthTheme, setCurrentMonthTheme] = useState(null);
-    const [savingDateTaskId, setSavingDateTaskId] = useState(null);
+    const [pendingDates, setPendingDates] = useState({}); // uncommitted date selections
 
     // FIX: productivityScore is now a direct counter, loaded and saved.
     const [productivityScore, setProductivityScore] = useState(0);
@@ -122,6 +126,9 @@ function NowView() {
     const dragItem = useRef(null);
     const dragOverItem = useRef(null);
     const adHocInputRef = useRef(null);
+    const epiphanyInputRef = useRef(null);
+    const despairInputRef = useRef(null);
+    const dateTimerRef = useRef({}); // debounce commit timers keyed by task.originalId
 
     // == Derived State ==
     const todayDateStr = getTodayDateString();
@@ -136,6 +143,16 @@ function NowView() {
             setFocusAdHocInput(false);
         }
     }, [focusAdHocInput]);
+
+    useEffect(() => {
+        if (focusMomentInput === 'epiphany' && epiphanyInputRef.current) {
+            epiphanyInputRef.current.focus();
+            setFocusMomentInput(null);
+        } else if (focusMomentInput === 'despair' && despairInputRef.current) {
+            despairInputRef.current.focus();
+            setFocusMomentInput(null);
+        }
+    }, [focusMomentInput]);
 
     useEffect(() => { // Fetch Axes
         const fetchAxes = async () => {
@@ -474,6 +491,9 @@ const handleSetCurrentTask = (taskId) => {
                 setIsSavingDetail(false);
             }
         }
+
+        // Refocus the input after save so the next entry can be typed immediately
+        setFocusMomentInput(type);
     };
 
     const incrementEpiphany = () => saveMoment('epiphany', epiphanyCount, epiphanyDetail);
@@ -550,28 +570,19 @@ const handleSetCurrentTask = (taskId) => {
         dragOverItem.current = null;
     };
 
-    const handleAssignedDateChange = async (originalFirestoreId, newDateString) => {
+    const handleAssignedDateChange = (originalFirestoreId, newDateString) => {
         if (!originalFirestoreId || !newDateString) return;
 
         const task = tasks.find(t => t.originalId === originalFirestoreId);
         if (task?.type === 'recurring') return;
+        if (newDateString <= todayDateStr) return;
 
-        setSavingDateTaskId(originalFirestoreId);
-        try {
-            // DEBUGGING: Log the values being used
-            console.log(`[DEBUG] handleAssignedDateChange: Updating task ${originalFirestoreId} to assignedDate: ${newDateString}`);
+        // Optimistic: remove from today's list immediately
+        setTasks(prevTasks => prevTasks.filter(t => t.originalId !== originalFirestoreId));
 
-            const taskDocRef = doc(db, "new_tasks", originalFirestoreId);
-            await updateDoc(taskDocRef, { assignedDate: newDateString });
-
-            console.log(`[DEBUG] Firestore update successful for task ${originalFirestoreId}.`);
-
-            setTasks(prevTasks => prevTasks.filter(t => t.originalId !== originalFirestoreId));
-        } catch (error) {
-            console.error("Error updating assigned date:", error);
-        } finally {
-            setSavingDateTaskId(null);
-        }
+        // Fire-and-forget Firestore update
+        updateDoc(doc(db, "new_tasks", originalFirestoreId), { assignedDate: newDateString })
+            .catch(err => console.error("Error updating assigned date:", err));
     };
 
     const handleStartPause = () => onSetIsTimerRunning(!isTimerRunning);
@@ -617,6 +628,7 @@ const handleSetCurrentTask = (taskId) => {
                     <div className={styles.momentEntry}>
                         <div className={styles.momentCounter}><span>Epiphany: {epiphanyCount}</span><button onClick={incrementEpiphany} className={styles.momentButton} disabled={isSavingMoments || isSavingDetail}>+</button></div>
                         <input
+                            ref={epiphanyInputRef}
                             type="text"
                             value={epiphanyDetail}
                             onChange={(e) => setEpiphanyDetail(e.target.value)}
@@ -629,6 +641,7 @@ const handleSetCurrentTask = (taskId) => {
                     <div className={styles.momentEntry}>
                         <div className={styles.momentCounter}><span>Despair: {despairCount}</span><button onClick={incrementDespair} className={styles.momentButton} disabled={isSavingMoments || isSavingDetail}>+</button></div>
                         <input
+                            ref={despairInputRef}
                             type="text"
                             value={despairDetail}
                             onChange={(e) => setDespairDetail(e.target.value)}
@@ -655,6 +668,10 @@ const handleSetCurrentTask = (taskId) => {
                     <button onClick={handleJournalSave} disabled={isSavingJournal || !journalText.trim()} className={styles.saveJournalButton}>{isSavingJournal ? 'Saving...' : 'Save Thought'}</button>
                     <button type="button" onClick={() => setIsFlashcardModalOpen(true)} className={styles.flashcardButton} style={{ marginTop: '0.5rem', width: '100%' }} > Study Flashcards </button>
                 </div>
+                <div className={styles.gymTimeCard} onClick={() => setIsPhysicalDashboardOpen(true)}>
+                    <span className={styles.gymTimeEmoji}>💪</span>
+                    <span className={styles.gymTimeText}>Gym Time!</span>
+                </div>
             </div>
 
             {/* Center Panel */}
@@ -680,6 +697,8 @@ const handleSetCurrentTask = (taskId) => {
                                     
                                      console.log("[NowView Parent] Passing this value to ContextMap:", selectedAxisTheme);
 
+                                    const pendingDate = pendingDates[task.originalId];
+
                                     return (
                                         <div
                                             key={task.id}
@@ -695,26 +714,58 @@ const handleSetCurrentTask = (taskId) => {
                                             onDragEnd={handleDragEnd}
                                             onClick={() => !task.completed && handleSetCurrentTask(task.id)}
                                         >
-                                            <div className={styles.checkboxContainer} onClick={(e) => e.stopPropagation()}>
-                                                {/* Checkbox state reflects 'task.completed' which for recurring comes from tasksStatus,
-                                                    and for non-recurring will be false (they disappear upon completion) */}
-                                                <input type="checkbox" id={`task-checkbox-${task.id}`} checked={task.completed} onChange={(e) => handleTaskToggle(task.id, e)} className={styles.checkbox} disabled={isSavingTask} />
-                                                <label htmlFor={`task-checkbox-${task.id}`} className={styles.checkboxCustom}></label>
+                                            <div className={styles.taskMainRow}>
+                                                <div className={styles.checkboxContainer} onClick={(e) => e.stopPropagation()}>
+                                                    <input type="checkbox" id={`task-checkbox-${task.id}`} checked={task.completed} onChange={(e) => handleTaskToggle(task.id, e)} className={styles.checkbox} disabled={isSavingTask} />
+                                                    <label htmlFor={`task-checkbox-${task.id}`} className={styles.checkboxCustom}></label>
+                                                </div>
+                                                <label className={styles.taskLabel}>{task.text}</label>
+                                                {task.type !== 'recurring' && !task.completed && (
+                                                    <div className={styles.rescheduleGroup} onClick={(e) => e.stopPropagation()}>
+                                                        <input
+                                                            type="date"
+                                                            className={styles.dueDateInput}
+                                                            value={pendingDate || assignedDateValue}
+                                                            onKeyDown={(e) => {
+                                                                if (e.key === 'Escape') {
+                                                                    clearTimeout(dateTimerRef.current[task.originalId]);
+                                                                    delete dateTimerRef.current[task.originalId];
+                                                                    setPendingDates(prev => { const n = {...prev}; delete n[task.originalId]; return n; });
+                                                                }
+                                                            }}
+                                                            onChange={(e) => {
+                                                                const newDate = e.target.value;
+                                                                const tid = task.originalId;
+                                                                setPendingDates(prev => ({ ...prev, [tid]: newDate }));
+                                                                // Reset debounce timer — navigation clicks keep resetting it,
+                                                                // final day-click lets it fire after 6s (or immediately on blur)
+                                                                clearTimeout(dateTimerRef.current[tid]);
+                                                                if (newDate && newDate.length === 10 && newDate > todayDateStr && newDate !== assignedDateValue) {
+                                                                    dateTimerRef.current[tid] = setTimeout(() => {
+                                                                        delete dateTimerRef.current[tid];
+                                                                        handleAssignedDateChange(tid, newDate);
+                                                                        setPendingDates(prev => { const n = {...prev}; delete n[tid]; return n; });
+                                                                    }, 6000);
+                                                                }
+                                                            }}
+                                                            onBlur={() => {
+                                                                // If a timer is waiting, fire it immediately instead of waiting 600ms
+                                                                const tid = task.originalId;
+                                                                if (dateTimerRef.current[tid]) {
+                                                                    clearTimeout(dateTimerRef.current[tid]);
+                                                                    delete dateTimerRef.current[tid];
+                                                                    const p = pendingDates[tid];
+                                                                    if (p && p > todayDateStr && p !== assignedDateValue) {
+                                                                        handleAssignedDateChange(tid, p);
+                                                                        setPendingDates(prev => { const n = {...prev}; delete n[tid]; return n; });
+                                                                    }
+                                                                }
+                                                            }}
+                                                            min={todayDateStr}
+                                                        />
+                                                    </div>
+                                                )}
                                             </div>
-                                            <label className={styles.taskLabel}>
-                                                {task.text}
-                                            </label>
-                                            {task.type !== 'recurring' && (
-                                                <input
-                                                    type="date"
-                                                    className={styles.dueDateInput}
-                                                    value={assignedDateValue}
-                                                    onChange={(e) => handleAssignedDateChange(task.originalId, e.target.value)}
-                                                    onClick={(e) => e.stopPropagation()}
-                                                    title={`Assigned: ${assignedDateValue || 'Not set'}`}
-                                                    disabled={savingDateTaskId === task.originalId || task.completed}
-                                                />
-                                            )}
                                         </div>
                                     );
                                 })
@@ -759,13 +810,15 @@ const handleSetCurrentTask = (taskId) => {
                     <p className={styles.nowLabel}>NOW</p>
                 </div>
                 <div className={styles.timerSection}>
-                <DearAbiMarquee theme={currentMonthTheme} />
+                    <DearAbiMarquee theme={currentMonthTheme} />
                 </div>
+                <SprintSnapshot />
             </div>
 
             {/* Modals */}
             {isBreakModalOpen && (<Modal isOpen={isBreakModalOpen} onClose={closeBreakModal}> <BreakReviewForm onSubmit={handleBreakReviewSubmit} onClose={closeBreakModal} pomodoroDuration={pomodoroDurationMinutes} timerFinishedTimestamp={timerFinishedAt} currentTask={tasks.find(t => t.id === currentTaskId)} /> </Modal>)}
             {isFlashcardModalOpen && (<StudyFlashcardsModal isOpen={isFlashcardModalOpen} onClose={() => setIsFlashcardModalOpen(false)} />)}
+            {isPhysicalDashboardOpen && (<Modal isOpen={isPhysicalDashboardOpen} onClose={() => setIsPhysicalDashboardOpen(false)}><FitnessAchievementDashboard /></Modal>)}
         </div>
     );
 }

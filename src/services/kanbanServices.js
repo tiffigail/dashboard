@@ -84,6 +84,30 @@ export const updateProjectStatus = async (projectId, status) => {
 };
 
 /**
+ * Marks a project as complete.
+ * Updates the project status to 'completed' and adds completedAt timestamp.
+ * @param {string} projectId - The ID of the project to mark complete
+ * @returns {Promise<void>}
+ */
+export const markProjectComplete = async (projectId) => {
+    if (!projectId) {
+        throw new Error("Project ID is required");
+    }
+
+    try {
+        const projectRef = doc(db, "projects", projectId);
+        await updateDoc(projectRef, {
+            status: 'completed',
+            completedAt: serverTimestamp()
+        });
+        console.log(`Project ${projectId} marked as complete`);
+    } catch (error) {
+        console.error("Error marking project complete:", error);
+        throw error;
+    }
+};
+
+/**
  * Creates a new card document in the kanbanCards collection.
  */
 export const createKanbanCard = async (cardData) => {
@@ -108,11 +132,38 @@ export const getKanbanCardsForProject = async (projectId) => {
 };
 
 /**
+ * Alias for getKanbanCardsForProject to match MonthlyView usage
+ */
+export const getKanbanCards = async (projectId) => {
+  return await getKanbanCardsForProject(projectId);
+};
+
+/**
  * Updates a card's status and priority in Firestore.
  */
 export const updateCardStatus = async (cardId, status, priority) => {
   const cardRef = doc(db, "kanbanCards", cardId);
   await updateDoc(cardRef, { status, priority });
+};
+
+/**
+ * Deletes a kanban card.
+ * @param {string} cardId - The ID of the card to delete
+ * @returns {Promise<void>}
+ */
+export const deleteKanbanCard = async (cardId) => {
+    if (!cardId) {
+        throw new Error("Card ID is required");
+    }
+
+    try {
+        const cardRef = doc(db, "kanbanCards", cardId);
+        await deleteDoc(cardRef);
+        console.log(`Card ${cardId} deleted successfully`);
+    } catch (error) {
+        console.error("Error deleting kanban card:", error);
+        throw error;
+    }
 };
 
 /**

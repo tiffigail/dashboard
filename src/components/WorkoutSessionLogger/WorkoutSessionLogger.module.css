@@ -1,0 +1,255 @@
+.logger {
+  padding: 4px 0;
+}
+
+.headerRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.heading {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.subtitle {
+  font-size: 13px;
+  color: #666;
+  margin: 4px 0 0 0;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #999;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+.exerciseBlock {
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 14px;
+}
+
+.exerciseHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.exerciseName {
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.target {
+  font-size: 12px;
+  color: #666;
+}
+
+.suggestion {
+  font-size: 11px;
+  color: #e7514c;
+  font-weight: 600;
+  background: #fef0ef;
+  padding: 2px 8px;
+  border-radius: 8px;
+}
+
+.cuesSection {
+  margin-bottom: 10px;
+}
+
+.cuesToggle {
+  background: none;
+  border: none;
+  font-size: 12px;
+  color: #667eea;
+  cursor: pointer;
+  padding: 0;
+  font-weight: 600;
+}
+
+.cuesList {
+  margin: 6px 0 0 0;
+  padding-left: 18px;
+  font-size: 12px;
+  color: #555;
+  line-height: 1.6;
+}
+
+.setsHeader {
+  display: grid;
+  grid-template-columns: 40px 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.setLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: #999;
+  text-transform: uppercase;
+}
+
+.setRow {
+  display: grid;
+  grid-template-columns: 40px 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 6px;
+  align-items: center;
+}
+
+.setNum {
+  font-size: 14px;
+  font-weight: 600;
+  color: #999;
+  text-align: center;
+}
+
+.setInput {
+  width: 100%;
+  padding: 8px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  text-align: center;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.setInput:focus {
+  border-color: #e7514c;
+  outline: none;
+}
+
+.addSetButton {
+  background: none;
+  border: none;
+  font-size: 12px;
+  color: #e7514c;
+  cursor: pointer;
+  font-weight: 600;
+  padding: 4px 0;
+}
+
+.volumeRow {
+  text-align: right;
+  font-size: 12px;
+  color: #666;
+  font-weight: 600;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.notesGroup {
+  margin-bottom: 16px;
+}
+
+.notesGroup label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 6px;
+}
+
+.notesInput {
+  width: 100%;
+  padding: 8px 10px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 13px;
+  box-sizing: border-box;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.notesInput:focus {
+  border-color: #e7514c;
+  outline: none;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.cancelButton {
+  padding: 10px 20px;
+  background: #f0f0f0;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  color: #555;
+}
+
+.saveButton {
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #e7514c 0%, #FE9179 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.saveButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Feedback */
+.feedbackSection {
+  background: #f0faf0;
+  border-radius: 10px;
+  padding: 16px;
+  margin: 16px 0;
+}
+
+.feedbackTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 10px 0;
+}
+
+.feedbackItem {
+  font-size: 13px;
+  color: #333;
+  padding: 6px 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.feedbackItem:last-child {
+  border-bottom: none;
+}
+
+.doneButton {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #e7514c 0%, #FE9179 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}

@@ -1,0 +1,213 @@
+.logger {
+  padding: 4px 0;
+}
+
+.headerRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.heading {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.subtitle {
+  font-size: 13px;
+  color: #666;
+  margin: 4px 0 0 0;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #999;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+.formSection {
+  margin-bottom: 16px;
+}
+
+.sectionTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 10px 0;
+}
+
+.formRow {
+  display: flex;
+  gap: 12px;
+}
+
+.formGroup {
+  flex: 1;
+  margin-bottom: 12px;
+}
+
+.formGroup label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 6px;
+}
+
+.input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.input:focus {
+  border-color: #e7514c;
+  outline: none;
+}
+
+.textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  box-sizing: border-box;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.textarea:focus {
+  border-color: #e7514c;
+  outline: none;
+}
+
+.hint {
+  font-size: 11px;
+  color: #999;
+  display: block;
+  margin-top: 4px;
+}
+
+.energyOptions {
+  display: flex;
+  gap: 8px;
+}
+
+.energyBtn {
+  flex: 1;
+  padding: 8px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background: white;
+  font-size: 13px;
+  font-weight: 600;
+  color: #666;
+  cursor: pointer;
+}
+
+.energyActive {
+  border-color: #e7514c;
+  color: #e7514c;
+  background: #fef0ef;
+}
+
+.drillsSection {
+  background: #f9f9f9;
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 16px;
+}
+
+.drillItem {
+  padding: 10px 0;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.drillItem:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.drillHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.drillLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: #e7514c;
+}
+
+.drillName {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.completedTag {
+  font-size: 10px;
+  font-weight: 600;
+  color: #43a047;
+  background: #e8f5e9;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 8px;
+}
+
+.drillFreq {
+  font-size: 11px;
+  color: #999;
+}
+
+.drillNotes {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 13px;
+  margin-top: 8px;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.drillNotes:focus {
+  border-color: #e7514c;
+  outline: none;
+}
+
+.saveButton {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #e7514c 0%, #FE9179 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 8px;
+}
+
+.saveButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

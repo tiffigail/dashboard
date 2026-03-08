@@ -58,6 +58,7 @@ export default defineConfig({
       },
       workbox: {
         // Workbox options for generating the service worker
+        navigateFallback: '/index.html', // Serve index.html for all SPA routes (fixes URL-changes-but-content-doesn't)
         globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg,jpeg,woff,woff2}'], // Files to cache
         runtimeCaching: [ // Cache strategies for runtime requests (e.g., fonts, APIs)
           {

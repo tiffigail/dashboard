@@ -31,6 +31,7 @@ const axisDisplayOrder = [
 ];
 
 function YearlyView({ onNavigate }) {
+    const currentYear = new Date().getFullYear();
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     const [allAxesData, setAllAxesData] = useState([]);
@@ -48,7 +49,7 @@ function YearlyView({ onNavigate }) {
             const goalsQuery = query(
                 collection(db, "new_goals"),
                 where("type", "==", "yearly"),
-                where("year", "==", 2025)
+                where("year", "==", currentYear)
             );
 
             const [axesSnapshot, goalsSnapshot, milestonesSnapshot] = await Promise.all([
@@ -109,7 +110,7 @@ if (currentlyActive) {
                 .filter(axis => axis !== undefined);
             setAllAxesData(sortedData);
         } catch (err) {
-            console.error("Error fetching 2025 yearly data:", err);
+            console.error(`Error fetching ${currentYear} yearly data:`, err);
             setError("Failed to load yearly data.");
         } finally {
             setIsLoading(false);
@@ -132,8 +133,8 @@ if (currentlyActive) {
 
     return (
         <div className={styles.yearlyViewContainer}>
-            <h2 className={styles.viewTitle}>Yearly Dashboard (2025)</h2>
-            {isLoading ? <p>Loading 2025 Goals...</p> : error ? <p className={styles.errorText}>{error}</p> : (
+            <h2 className={styles.viewTitle}>Yearly Dashboard ({currentYear})</h2>
+            {isLoading ? <p>Loading {currentYear} Goals...</p> : error ? <p className={styles.errorText}>{error}</p> : (
                 <>
                     <div className={styles.axisGrid}>{allAxesData.map((axis) => {
                         const progress = calculateProgress(axis.milestones);
@@ -165,7 +166,7 @@ if (currentlyActive) {
                     <div className={styles.reviewActionsContainer}>
                         <div className={styles.checkinSection}>
                             <h3>Mid-Year Check-in</h3>
-                            <p>It's August! A perfect time for a 6-month check-in on your 2025 goals.</p>
+                            <p>It's August! A perfect time for a 6-month check-in on your {currentYear} goals.</p>
                             <button className={styles.checkinButton} onClick={() => setIsCheckinModalOpen(true)}>
                                 Start 6-Month Check-in
                             </button>

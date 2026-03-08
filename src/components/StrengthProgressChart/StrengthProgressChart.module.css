@@ -1,0 +1,76 @@
+.section {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.headerRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.select {
+  padding: 4px 8px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 12px;
+  font-family: inherit;
+  color: #555;
+}
+
+.statsRow {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+}
+
+.statValue {
+  font-size: 16px;
+  font-weight: 700;
+  color: #333;
+}
+
+.statLabel {
+  font-size: 11px;
+  color: #999;
+}
+
+.positive {
+  color: #43a047;
+}
+
+.chart {
+  width: 100%;
+  height: auto;
+}
+
+.dateLabels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #999;
+  margin-top: 4px;
+}
+
+.empty {
+  font-size: 13px;
+  color: #999;
+  text-align: center;
+  padding: 20px 0;
+}

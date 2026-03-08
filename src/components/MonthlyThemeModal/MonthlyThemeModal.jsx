@@ -3,31 +3,41 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Modal from '../Modal/Modal';
 import styles from './MonthlyThemeModal.module.css';
+import { db } from '../../firebaseConfig';
+import { doc, getDoc } from "firebase/firestore";
+
+const MONTHS = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+];
 
 // This is the correct "Presentational" component. It receives all data via props.
 const MonthlyThemeModal = ({ isOpen, onClose, monthId, initialData, onSave }) => {
-    
+
     // Sanity Check Log: This will show us exactly what props are arriving.
     console.log("MODAL RENDERED. Received props:", { isOpen, monthId, initialData });
 
     const [editableData, setEditableData] = useState({
         monthFocus: '',
         monthObjective: '',
-        monthName: '',
+        selectedMonth: 0,
+        selectedYear: new Date().getFullYear(),
         reward: '',
         weeklyData: [],
     });
 
     const [isSaving, setIsSaving] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
 
-    const deriveMonthName = (mId) => {
-        if (!mId || !mId.includes('-')) return "Unknown Month";
+    const parseMonthId = (mId) => {
+        if (!mId || !mId.includes('-')) return { year: new Date().getFullYear(), month: new Date().getMonth() };
         try {
             const [year, monthNum] = mId.split('-');
-            const date = new Date(Number(year), Number(monthNum) - 1, 1);
-            return date.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
-        } catch (e) { return "Invalid Month ID"; }
+            return { year: Number(year), month: Number(monthNum) - 1 };
+        } catch (e) {
+            return { year: new Date().getFullYear(), month: new Date().getMonth() };
+        }
     };
 
     // This useEffect hook listens for the `initialData` prop from the parent.
@@ -36,6 +46,8 @@ const MonthlyThemeModal = ({ isOpen, onClose, monthId, initialData, onSave }) =>
 
         setError('');
         console.log("MODAL useEffect triggered. Processing initialData:", initialData);
+
+        const { year, month } = parseMonthId(monthId);
 
         if (initialData) {
             // If data is provided, populate the form with it.
@@ -49,10 +61,18 @@ const MonthlyThemeModal = ({ isOpen, onClose, monthId, initialData, onSave }) =>
                 });
             }
 
+            // Default to 4 weeks if no weekly data
+            if (weeklyDataArray.length === 0) {
+                for (let i = 1; i <= 4; i++) {
+                    weeklyDataArray.push({ week: String(i), focus: '', objective: '' });
+                }
+            }
+
             setEditableData({
                 monthFocus: initialData.monthFocus || '',
                 monthObjective: initialData.monthObjective || '',
-                monthName: initialData.monthName || deriveMonthName(monthId),
+                selectedMonth: month,
+                selectedYear: year,
                 reward: initialData.reward || '',
                 weeklyData: weeklyDataArray,
             });
@@ -61,7 +81,8 @@ const MonthlyThemeModal = ({ isOpen, onClose, monthId, initialData, onSave }) =>
             setEditableData({
                 monthFocus: '',
                 monthObjective: '',
-                monthName: deriveMonthName(monthId),
+                selectedMonth: month,
+                selectedYear: year,
                 reward: '',
                 weeklyData: [{ week: '1', focus: '', objective: '' }, { week: '2', focus: '', objective: '' }, { week: '3', focus: '', objective: '' }, { week: '4', focus: '', objective: '' }],
             });
@@ -73,6 +94,83 @@ const MonthlyThemeModal = ({ isOpen, onClose, monthId, initialData, onSave }) =>
         const { name, value } = e.target;
         setEditableData(prev => ({ ...prev, [name]: value }));
     };
+
+    const handleMonthChange = async (e) => {
+        const newMonth = parseInt(e.target.value);
+        setEditableData(prev => ({ ...prev, selectedMonth: newMonth }));
+        await fetchMonthData(editableData.selectedYear, newMonth);
+    };
+
+    const handleYearChange = async (e) => {
+        const newYear = parseInt(e.target.value);
+        setEditableData(prev => ({ ...prev, selectedYear: newYear }));
+        await fetchMonthData(newYear, editableData.selectedMonth);
+    };
+
+    const fetchMonthData = async (year, monthIndex) => {
+        setIsLoading(true);
+        setError('');
+
+        const targetMonthId = `${year}-${String(monthIndex + 1).padStart(2, '0')}`;
+
+        try {
+            const docRef = doc(db, "monthlyPlans", targetMonthId);
+            const docSnap = await getDoc(docRef);
+
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                const weeklyDataArray = [];
+
+                if (data.weeklyData && typeof data.weeklyData === 'object') {
+                    Object.keys(data.weeklyData).sort((a, b) => parseInt(a) - parseInt(b)).forEach(weekNum => {
+                        weeklyDataArray.push({
+                            week: weekNum,
+                            ...(data.weeklyData[weekNum] || { focus: '', objective: '' })
+                        });
+                    });
+                }
+
+                // Default to 4 weeks if no weekly data
+                if (weeklyDataArray.length === 0) {
+                    for (let i = 1; i <= 4; i++) {
+                        weeklyDataArray.push({ week: String(i), focus: '', objective: '' });
+                    }
+                }
+
+                setEditableData(prev => ({
+                    ...prev,
+                    monthFocus: data.monthFocus || '',
+                    monthObjective: data.monthObjective || '',
+                    reward: data.reward || '',
+                    weeklyData: weeklyDataArray,
+                    selectedMonth: monthIndex,
+                    selectedYear: year
+                }));
+            } else {
+                // No data exists for this month, create blank form
+                setEditableData(prev => ({
+                    ...prev,
+                    monthFocus: '',
+                    monthObjective: '',
+                    reward: '',
+                    weeklyData: [
+                        { week: '1', focus: '', objective: '' },
+                        { week: '2', focus: '', objective: '' },
+                        { week: '3', focus: '', objective: '' },
+                        { week: '4', focus: '', objective: '' }
+                    ],
+                    selectedMonth: monthIndex,
+                    selectedYear: year
+                }));
+            }
+        } catch (err) {
+            console.error("Error fetching month data:", err);
+            setError("Failed to load month data. Please try again.");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     const handleWeeklyDataChange = (index, field, value) => {
         setEditableData(prev => {
             const newWeeklyData = [...prev.weeklyData];
@@ -95,16 +193,20 @@ const MonthlyThemeModal = ({ isOpen, onClose, monthId, initialData, onSave }) =>
             weeklyDataForFirestore[item.week] = { focus: item.focus || '', objective: item.objective || '' };
         });
 
+        // Construct the new monthId from selected month and year
+        const newMonthId = `${editableData.selectedYear}-${String(editableData.selectedMonth + 1).padStart(2, '0')}`;
+        const monthName = `${MONTHS[editableData.selectedMonth]} ${editableData.selectedYear}`;
+
         const dataToSave = {
             monthFocus: editableData.monthFocus,
             monthObjective: editableData.monthObjective,
-            monthName: editableData.monthName,
+            monthName: monthName,
             reward: editableData.reward,
             weeklyData: weeklyDataForFirestore,
         };
 
         try {
-            await onSave(monthId, dataToSave);
+            await onSave(newMonthId, dataToSave);
         } catch (err) {
             setError("Failed to save. Please try again.");
             setIsSaving(false);
@@ -114,29 +216,130 @@ const MonthlyThemeModal = ({ isOpen, onClose, monthId, initialData, onSave }) =>
     // --- JSX / RENDER ---
     if (!isOpen) return null;
 
+    // Generate year options (current year ± 5 years)
+    const currentYear = new Date().getFullYear();
+    const yearOptions = [];
+    for (let y = currentYear - 5; y <= currentYear + 5; y++) {
+        yearOptions.push(y);
+    }
+
+    const modalTitle = `Edit Plan for ${MONTHS[editableData.selectedMonth]} ${editableData.selectedYear}`;
+
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title={`Edit Plan for ${editableData.monthName || monthId}`}>
+        <Modal isOpen={isOpen} onClose={onClose} title={modalTitle}>
             <div className={styles.modalContent}>
                 {error && <p className={styles.errorMessage}>{error}</p>}
-                
-                {/* Your Form */}
-                <div className={styles.formGroup}><label>Month Name:</label><input name="monthName" value={editableData.monthName || ''} onChange={handleChange} disabled={isSaving}/></div>
-                <div className={styles.formGroup}><label>Month Focus:</label><textarea name="monthFocus" value={editableData.monthFocus || ''} onChange={handleChange} disabled={isSaving}/></div>
-                <div className={styles.formGroup}><label>Month Objective:</label><textarea name="monthObjective" value={editableData.monthObjective || ''} onChange={handleChange} disabled={isSaving}/></div>
-                <div className={styles.formGroup}><label>Reward:</label><input name="reward" value={editableData.reward || ''} onChange={handleChange} disabled={isSaving}/></div>
-                
-                <h4>Weekly Breakdown:</h4>
+
+                {/* Month and Year Selection */}
+                <div className={styles.dateSelectionRow}>
+                    <div className={styles.formGroup}>
+                        <label htmlFor="month-select">Month:</label>
+                        <select
+                            id="month-select"
+                            value={editableData.selectedMonth}
+                            onChange={handleMonthChange}
+                            disabled={isSaving}
+                            className={styles.selectField}
+                        >
+                            {MONTHS.map((monthName, index) => (
+                                <option key={index} value={index}>{monthName}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className={styles.formGroup}>
+                        <label htmlFor="year-select">Year:</label>
+                        <select
+                            id="year-select"
+                            value={editableData.selectedYear}
+                            onChange={handleYearChange}
+                            disabled={isSaving}
+                            className={styles.selectField}
+                        >
+                            {yearOptions.map(year => (
+                                <option key={year} value={year}>{year}</option>
+                            ))}
+                        </select>
+                    </div>
+                </div>
+
+                {/* Loading indicator */}
+                {isLoading && <p className={styles.loadingMessage}>Loading month data...</p>}
+
+                {/* Monthly Plan Fields */}
+                <div className={styles.formGroup}>
+                    <label htmlFor="monthFocus">Month Focus:</label>
+                    <textarea
+                        id="monthFocus"
+                        name="monthFocus"
+                        value={editableData.monthFocus || ''}
+                        onChange={handleChange}
+                        disabled={isSaving || isLoading}
+                        className={styles.textareaField}
+                        placeholder="What is the main focus for this month?"
+                    />
+                </div>
+                <div className={styles.formGroup}>
+                    <label htmlFor="monthObjective">Month Objective:</label>
+                    <textarea
+                        id="monthObjective"
+                        name="monthObjective"
+                        value={editableData.monthObjective || ''}
+                        onChange={handleChange}
+                        disabled={isSaving || isLoading}
+                        className={styles.textareaField}
+                        placeholder="What do you want to achieve this month?"
+                    />
+                </div>
+                <div className={styles.formGroup}>
+                    <label htmlFor="reward">Reward:</label>
+                    <input
+                        id="reward"
+                        name="reward"
+                        value={editableData.reward || ''}
+                        onChange={handleChange}
+                        disabled={isSaving || isLoading}
+                        className={styles.inputField}
+                        placeholder="Your reward for completing this month"
+                    />
+                </div>
+
+                <h4 className={styles.weeklyDataHeader}>Weekly Breakdown</h4>
                 {editableData.weeklyData.map((week, index) => (
                     <div key={week.week || index} className={styles.weekGroup}>
                         <h5>Week {week.week}</h5>
-                        <label>Focus:</label><input value={week.focus || ''} onChange={(e) => handleWeeklyDataChange(index, 'focus', e.target.value)} disabled={isSaving}/>
-                        <label>Objective:</label><textarea value={week.objective || ''} onChange={(e) => handleWeeklyDataChange(index, 'objective', e.target.value)} disabled={isSaving}/>
+                        <div className={styles.formGroup}>
+                            <label htmlFor={`week-${index}-focus`}>Focus:</label>
+                            <input
+                                id={`week-${index}-focus`}
+                                value={week.focus || ''}
+                                onChange={(e) => handleWeeklyDataChange(index, 'focus', e.target.value)}
+                                disabled={isSaving || isLoading}
+                                className={styles.inputField}
+                                placeholder="Week's focus area"
+                            />
+                        </div>
+                        <div className={styles.formGroup}>
+                            <label htmlFor={`week-${index}-objective`}>Objective:</label>
+                            <textarea
+                                id={`week-${index}-objective`}
+                                value={week.objective || ''}
+                                onChange={(e) => handleWeeklyDataChange(index, 'objective', e.target.value)}
+                                disabled={isSaving || isLoading}
+                                className={styles.textareaField}
+                                rows="2"
+                                placeholder="What to accomplish this week"
+                            />
+                        </div>
                     </div>
                 ))}
 
                 <div className={styles.modalActions}>
-                    <button onClick={handleInternalSave} className={styles.saveButton} disabled={isSaving}>{isSaving ? 'Saving...' : 'Save Changes'}</button>
-                    <button onClick={onClose} className={styles.cancelButton} disabled={isSaving}>Cancel</button>
+                    <button onClick={handleInternalSave} className={styles.saveButton} disabled={isSaving || isLoading}>
+                        {isSaving ? 'Saving...' : 'Save Changes'}
+                    </button>
+                    <button onClick={onClose} className={styles.cancelButton} disabled={isSaving}>
+                        Cancel
+                    </button>
                 </div>
             </div>
         </Modal>
