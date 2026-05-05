@@ -1,19 +1,12 @@
-// WARNING: These rules allow ANYONE with access to your Firebase project
-// configuration to read and write ALL data. This is NOT secure for
-// multi-user apps or sensitive data. Use this TEMPORARILY for debugging
-// permission issues in a personal, non-authenticated application.
-
-rules_version = '2'; // Use the latest rules version
+rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Allow anyone to read or write any document in any collection.
-    // This provides no data protection but is useful for initial testing
-    // or debugging permission errors in a single-user, no-auth setup.
-
-    match /{document=**} { // This matches every document in the database
-      allow read, write: if true;
+    // All reads and writes require a signed-in Firebase user.
+    // Since this is a single-user personal app, this is the right gate.
+    match /{document=**} {
+      allow read, write: if request.auth != null;
     }
   }
 }

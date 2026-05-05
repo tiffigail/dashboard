@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import styles from './SkillPracticeLogger.module.css';
 import { getSkillBadgeTemplateById } from '../../data/skillBadgeTemplates';
 import * as skillBadgeService from '../../services/skillBadgeService';
+import { saveCorpusEntry } from '../../services/advisorService';
 
 function SkillPracticeLogger({ badge, userId, onClose, onSave }) {
   const template = getSkillBadgeTemplateById(badge.skillId);
@@ -70,6 +71,24 @@ function SkillPracticeLogger({ badge, userId, onClose, onSave }) {
       };
 
       await skillBadgeService.logPracticeSession(userId, badge.skillId, sessionData);
+      if (userId && (sessionData.breakthroughs || sessionData.challenges || sessionData.nextFocus)) {
+        const rawParts = [
+          sessionData.breakthroughs && `Breakthroughs: ${sessionData.breakthroughs}`,
+          sessionData.challenges && `Challenges: ${sessionData.challenges}`,
+          sessionData.nextFocus && `Next focus: ${sessionData.nextFocus}`,
+        ].filter(Boolean);
+        const stateMap = { high: 'flow', medium: 'settled', low: 'depleted' };
+        saveCorpusEntry(userId, {
+          type: 'study',
+          axis: ['physical'],
+          themes: ['gym'],
+          voice_markers: sessionData.breakthroughs ? ['breakthrough'] : [],
+          state: stateMap[sessionData.energyLevel] || 'settled',
+          significance: sessionData.breakthroughs ? 3 : 2,
+          summary: `${badge.title || 'Skill'} practice. ${sessionData.breakthroughs || ''}`.trim().slice(0, 150),
+          raw: rawParts.join('\n\n'),
+        }).catch(() => {});
+      }
       onSave && onSave();
     } catch (error) {
       console.error('Error logging practice:', error);

@@ -5,6 +5,8 @@ import { db } from '../../firebaseConfig';
 import { doc, getDoc, getDocs, collection, addDoc, serverTimestamp, query, where, limit } from "firebase/firestore";
 import StarRating from '../StarRating/StarRating';
 import { useTimeAggregator } from '../../hooks/useTimeAggregator';
+import { useAuth } from '../../context/AuthContext';
+import { writeActivityEntry } from '../../services/advisorService';
 
 // Helper function to shuffle an array (Fisher-Yates algorithm)
 function shuffleArray(array) {
@@ -20,6 +22,7 @@ function shuffleArray(array) {
 
 // Props: isOpen (boolean), onClose (function)
 function StudyFlashcardsModal({ isOpen, onClose }) {
+    const { currentUser } = useAuth();
     useTimeAggregator('flashcardsModalTime');
 
     // == State ==
@@ -153,6 +156,13 @@ function StudyFlashcardsModal({ isOpen, onClose }) {
         try {
             const ratingsCollectionRef = collection(db, "flashcardRatings");
             await addDoc(ratingsCollectionRef, ratingData);
+            if (currentUser?.uid) {
+                writeActivityEntry(currentUser.uid, {
+                    type: 'flashcard_interval',
+                    source: 'dashboard',
+                    data: { card_title: ratingData.cardTitle, card_topic: ratingData.cardTopic, rating: ratingData.rating },
+                }).catch(() => {});
+            }
         } catch (err) {
             console.error("Error saving rating:", err);
             setRatingError("Failed to save rating.");

@@ -8,7 +8,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import styles from './PmRoutineForm.module.css';
 import { db } from '../../firebaseConfig';
-import { collection, addDoc, serverTimestamp, query, where, limit, getDocs, doc, setDoc } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp, query, where, limit, getDocs, doc, setDoc, getDoc } from "firebase/firestore";
 import PhysicalGoalsTracker from '../PhysicalGoalsTracker/PhysicalGoalsTracker';
 import StudyTracker from '../StudyTracker/StudyTracker';
 import Modal from '../Modal/Modal'; 
@@ -16,6 +16,7 @@ import Modal from '../Modal/Modal';
 import DynamicSprintDashboard from '../DynamicSprintDashboard/DynamicSprintDashboard';
 import FitnessAchievementDashboard from '../FitnessAchievementDashboard/FitnessAchievementDashboard';
 import { useAuth } from '../../context/AuthContext';
+import { saveCorpusEntry, writeActivityEntry } from '../../services/advisorService';
 import { updateActiveDistanceGoals } from '../../services/enduranceGoalsService';
 
 // Helper to get today's date string
@@ -163,6 +164,24 @@ function PmRoutineForm({ onSubmit, onClose }) {
     fetchRecitation();
   }, []);
 
+  useEffect(() => {
+    const fetchTodayCounts = async () => {
+      try {
+        const todayStr = getTodayString();
+        const docRef = doc(db, "dailyMetrics", todayStr);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          if (data.epiphanyCount !== undefined) setEpiphanyCount(String(data.epiphanyCount));
+          if (data.despairCount !== undefined) setDespairCount(String(data.despairCount));
+        }
+      } catch (err) {
+        console.error("Error fetching today's moment counts:", err);
+      }
+    };
+    fetchTodayCounts();
+  }, []);
+
   const handleCheckboxChange = (event) => {
     const { name, checked } = event.target;
     setCheckedItems(prevItems => ({ ...prevItems, [name]: checked }));
@@ -215,7 +234,13 @@ function PmRoutineForm({ onSubmit, onClose }) {
     try {
       didSubmit.current = true;
       const routineDocRef = await addDoc(collection(db, "pmRoutineLogs"), baseFormData);
-      console.log("PM Routine Log Document written with ID: ", routineDocRef.id);
+      if (currentUser?.uid) {
+        writeActivityEntry(currentUser.uid, {
+          type: 'routine_completion',
+          source: 'dashboard',
+          data: { which: 'pm', completion_pct: completionPercentage, items_completed: completedChecklistItems.length, items_total: pmRoutineItems.length, epiphany_count: baseFormData.epiphanyCount, despair_count: baseFormData.despairCount },
+        }).catch(() => {});
+      }
 
       if (journalText) {
         const journalData = {
@@ -226,6 +251,18 @@ function PmRoutineForm({ onSubmit, onClose }) {
           timeOfDay: 'PM',
         };
         await addDoc(collection(db, "journalEntries"), journalData);
+        if (currentUser?.uid) {
+          saveCorpusEntry(currentUser.uid, {
+            type: 'journal',
+            axis: ['mental', 'rest_prep'],
+            themes: ['pm_routine'],
+            voice_markers: [],
+            state: 'settled',
+            significance: 2,
+            summary: journalText.slice(0, 150),
+            raw: journalText,
+          }).catch(() => {});
+        }
       }
 
       if (Object.keys(physicalGoals).length > 0 && Object.values(physicalGoals).some(v => v)) {

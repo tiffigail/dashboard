@@ -195,3 +195,26 @@
   opacity: 0.6;
   cursor: not-allowed;
 }
+.bundles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.bundleBtn {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 2px solid #667eea;
+  background: white;
+  color: #667eea;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.bundleBtn:hover {
+  background: #667eea;
+  color: white;
+}

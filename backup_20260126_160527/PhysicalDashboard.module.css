@@ -1,0 +1,33 @@
+.dashboardContainer {
+    width: 100%;
+    padding: 20px;
+    background-color: #ffffff; /* White background */
+    color: #333; /* Dark text */
+}
+
+.dashboardTitle {
+    color: #d90429; /* Red accent color */
+    text-align: center;
+    margin-bottom: 24px;
+    font-size: 2rem;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr; /* 3-column grid */
+    gap: 20px;
+}
+
+/* A "card" is a white box for a chart or indicator */
+.card {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #eee;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* This makes an item span all 3 columns */
+.fullWidth {
+    grid-column: 1 / -1;
+}

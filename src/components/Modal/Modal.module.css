@@ -16,15 +16,14 @@
 
 .modalContent {
   background-color: white;
-  padding: 2rem; /* Keep padding */
+  padding: 2rem;
   border-radius: 8px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-  width:90%;
+  width: 90%;
   max-width: 1200px;
-  max-height: 90vh; /* Max height relative to viewport */
-  overflow-y: auto; /* Add scrollbar if content is too tall */
-  position: relative; /* Needed for absolute positioning of close button */
-  /* Add box-sizing for consistency */
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
   box-sizing: border-box;
 }
 

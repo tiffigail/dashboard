@@ -8,12 +8,15 @@ import BreakReviewForm from '../BreakReviewForm/BreakReviewForm';
 import StudyFlashcardsModal from '../StudyFlashcardsModal/StudyFlashcardsModal';
 import DearAbiMarquee from '../DearAbiMarquee/DearAbiMarquee';
 import SprintSnapshot from '../SprintSnapshot/SprintSnapshot';
+import PeriodQuickLog from '../PeriodQuickLog/PeriodQuickLog';
 import FitnessAchievementDashboard from '../FitnessAchievementDashboard/FitnessAchievementDashboard';
 import {
     collection, doc, addDoc, setDoc, getDocs, getDoc, query, where,
     updateDoc, serverTimestamp, Timestamp
 } from "firebase/firestore";
 import { useTimer } from '../../context/TimerContext.jsx';
+import { useAuth } from '../../context/AuthContext';
+import { saveCorpusEntry } from '../../services/advisorService';
 
 
 const LS_KEYS = {
@@ -65,17 +68,48 @@ const getTodayDateString = () => {
     return `${year}-${month}-${day}`;
 };
 const getTodayDayIndex = () => new Date().getDay();
+const getYesterdayDateString = () => {
+    const d = new Date();
+    d.setDate(d.getDate() - 1);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+};
 const axisNameToCssVarSuffix = (axisName) => {
     if (!axisName || typeof axisName !== 'string') return 'default';
     return axisName.trim().toLowerCase().replace(/\s+/g, '-').replace(/\+/g, '-plus-');
 };
 
+// --- ConfettiBurst Component ---
+const CONFETTI_COLORS = ['#ff6b6b','#ffd93d','#6bcb77','#4d96ff','#ff6bff','#ff9f43','#a29bfe','#fd79a8'];
+function ConfettiBurst() {
+    const particles = Array.from({ length: 28 }, (_, i) => {
+        const angle = (i / 28) * 360 + Math.random() * 13;
+        const distance = 55 + Math.random() * 45;
+        const tx = Math.cos((angle * Math.PI) / 180) * distance;
+        const ty = Math.sin((angle * Math.PI) / 180) * distance - 20;
+        const color = CONFETTI_COLORS[i % CONFETTI_COLORS.length];
+        const size = 5 + Math.random() * 6;
+        const dur = (0.7 + Math.random() * 0.5).toFixed(2);
+        const isCircle = Math.random() > 0.5;
+        return (
+            <div key={i} className={styles.confettiParticle} style={{
+                backgroundColor: color, width: size, height: size,
+                borderRadius: isCircle ? '50%' : '2px',
+                '--tx': `${tx}px`, '--ty': `${ty}px`,
+                animationDuration: `${dur}s`,
+                animationDelay: `${(Math.random() * 0.1).toFixed(2)}s`,
+            }} />
+        );
+    });
+    return <div className={styles.confettiBurst}>{particles}</div>;
+}
+
 // --- NowView Component ---
 function NowView() {
-    const { 
+    const { currentUser } = useAuth();
+    const {
         pomodoroDurationMinutes, timerSeconds,
         isTimerRunning, isTimerFinished,
-        onSetPomodoroDurationMinutes, onSetTimerSeconds, onSetIsTimerRunning, onSetIsTimerFinished 
+        onSetPomodoroDurationMinutes, onSetTimerSeconds, onSetIsTimerRunning, onSetIsTimerFinished
     } = useTimer();
 
     // --- ADD THIS STATE AND EFFECT BACK ---
@@ -115,6 +149,8 @@ function NowView() {
     const [isPhysicalDashboardOpen, setIsPhysicalDashboardOpen] = useState(false);
     const [currentMonthTheme, setCurrentMonthTheme] = useState(null);
     const [pendingDates, setPendingDates] = useState({}); // uncommitted date selections
+    const [topThree, setTopThree] = useState([null, null, null]);
+    const [confettiBurst, setConfettiBurst] = useState(null); // slot index 0|1|2|null
 
     // FIX: productivityScore is now a direct counter, loaded and saved.
     const [productivityScore, setProductivityScore] = useState(0);
@@ -223,6 +259,25 @@ function NowView() {
                     setProductivityScore(data.productivityScore || 0);
                     setFirestoreAxisTaskCounts(data.axisTaskCounts || {});
                 }
+
+                // Load topThree + rollover from yesterday into empty slots
+                const rawTop3 = metricsDocSnap.exists() ? (metricsDocSnap.data().topThree || [null, null, null]) : [null, null, null];
+                const finalTop3 = [...rawTop3.slice(0, 3)];
+                while (finalTop3.length < 3) finalTop3.push(null);
+                const ySnap = await getDoc(doc(db, "dailyMetrics", getYesterdayDateString()));
+                let rolledAnything = false;
+                if (ySnap.exists()) {
+                    (ySnap.data().topThree || []).slice(0, 3).forEach((slot, i) => {
+                        if (slot && !slot.completed && finalTop3[i] === null) {
+                            finalTop3[i] = { text: slot.text, axisTheme: slot.axisTheme, completed: false, completedAt: null, originalTaskId: slot.originalTaskId || null };
+                            rolledAnything = true;
+                        }
+                    });
+                }
+                if (rolledAnything) {
+                    await setDoc(metricsDocRef, { topThree: finalTop3, lastUpdated: serverTimestamp() }, { merge: true });
+                }
+                setTopThree(finalTop3);
 
                 // This query ensures that tasks that are completed (status: 'completed')
                 // in the 'new_tasks' collection will *not* be returned here.
@@ -483,6 +538,18 @@ const handleSetCurrentTask = (taskId) => {
             const detailData = { type, text: detail.trim(), date: today, timestamp: serverTimestamp() };
             try {
                 await addDoc(collection(db, "momentsLog"), detailData);
+                if (currentUser?.uid) {
+                    saveCorpusEntry(currentUser.uid, {
+                        type,
+                        axis: ['mental'],
+                        themes: type === 'epiphany' ? ['n+1'] : ['scared_voice'],
+                        voice_markers: type === 'epiphany' ? ['breakthrough'] : [],
+                        state: type === 'epiphany' ? 'flow' : 'despair',
+                        significance: 3,
+                        summary: detail.trim().slice(0, 150),
+                        raw: detail.trim(),
+                    }).catch(() => {});
+                }
                 if (type === 'epiphany') setEpiphanyDetail('');
                 else setDespairDetail('');
             } catch (error) {
@@ -570,6 +637,93 @@ const handleSetCurrentTask = (taskId) => {
         dragOverItem.current = null;
     };
 
+    // == Top 3 Handlers ==
+    const saveTopThree = async (newTop3) => {
+        const metricsDocRef = doc(db, "dailyMetrics", todayDateStr);
+        await setDoc(metricsDocRef, { topThree: newTop3, lastUpdated: serverTimestamp() }, { merge: true });
+    };
+
+    const handleTopThreeTextChange = (i, text) => {
+        setTopThree(prev => prev.map((s, idx) =>
+            idx === i ? (s ? { ...s, text } : { text, axisTheme: availableAxes[0]?.name || '', completed: false, completedAt: null, originalTaskId: null }) : s
+        ));
+    };
+
+    const handleTopThreeAxisChange = (i, axisTheme) => {
+        setTopThree(prev => prev.map((s, idx) =>
+            idx === i ? (s ? { ...s, axisTheme } : { text: '', axisTheme, completed: false, completedAt: null, originalTaskId: null }) : s
+        ));
+    };
+
+    const handleTopThreeSave = async (i) => {
+        const slot = topThree[i];
+        if (!slot?.text?.trim()) return;
+        await saveTopThree(topThree);
+    };
+
+    const handleTopThreeComplete = async (i) => {
+        const slot = topThree[i];
+        if (!slot || slot.completed) return;
+        const newTop3 = topThree.map((s, idx) =>
+            idx === i ? { ...s, completed: true, completedAt: Timestamp.now() } : s
+        );
+        setTopThree(newTop3);
+        setConfettiBurst(i);
+        setTimeout(() => setConfettiBurst(null), 1400);
+        setProductivityScore(prev => prev + 5);
+        try {
+            const metricsDocRef = doc(db, "dailyMetrics", todayDateStr);
+            const metricsSnap = await getDoc(metricsDocRef);
+            const existing = metricsSnap.data() || {};
+            const newScore = (existing.productivityScore || 0) + 5;
+            const newAxisCounts = { ...(existing.axisTaskCounts || {}) };
+            if (slot.axisTheme) newAxisCounts[slot.axisTheme] = (newAxisCounts[slot.axisTheme] || 0) + 5;
+            await setDoc(metricsDocRef, { topThree: newTop3, productivityScore: newScore, axisTaskCounts: newAxisCounts, lastUpdated: serverTimestamp() }, { merge: true });
+            if (slot.originalTaskId) {
+                await updateDoc(doc(db, "new_tasks", slot.originalTaskId), { status: 'completed', completedAt: Timestamp.now() });
+            }
+        } catch (err) {
+            console.error("Error completing top3 slot:", err);
+        }
+    };
+
+    const handleTopThreeClear = async (i) => {
+        const slot = topThree[i];
+        const newTop3 = topThree.map((s, idx) => idx === i ? null : s);
+        setTopThree(newTop3);
+        if (slot?.originalTaskId) {
+            await updateDoc(doc(db, "new_tasks", slot.originalTaskId), { status: 'todo' });
+            setTasks(prev => [...prev, {
+                id: `task-${slot.originalTaskId}`, originalId: slot.originalTaskId,
+                text: slot.text, completed: false, completedAt: null,
+                type: 'adhoc', axisTheme: slot.axisTheme, assignedDate: todayDateStr
+            }]);
+        }
+        await saveTopThree(newTop3);
+    };
+
+    const handleTop3SlotDragOver = (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+    };
+
+    const handleTop3SlotDrop = async (e, i) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (topThree[i] !== null) return;
+        const taskId = dragItem.current;
+        if (!taskId) return;
+        const task = tasks.find(t => t.id === taskId);
+        if (!task) return;
+        const newSlot = { text: task.text, axisTheme: task.axisTheme || availableAxes[0]?.name || '', completed: false, completedAt: null, originalTaskId: task.originalId || null };
+        const newTop3 = topThree.map((s, idx) => idx === i ? newSlot : s);
+        setTopThree(newTop3);
+        setTasks(prev => prev.filter(t => t.id !== taskId));
+        dragItem.current = null;
+        dragOverItem.current = null;
+        await saveTopThree(newTop3);
+    };
+
     const handleAssignedDateChange = (originalFirestoreId, newDateString) => {
         if (!originalFirestoreId || !newDateString) return;
 
@@ -604,8 +758,19 @@ const handleSetCurrentTask = (taskId) => {
     try {
         const thoughtsCollectionRef = collection(db, "thoughtsLog");
         await addDoc(thoughtsCollectionRef, thoughtData);
-        console.log("Quick thought saved successfully!");
-        setJournalText(''); // Clear the textarea after saving
+        if (currentUser?.uid) {
+            saveCorpusEntry(currentUser.uid, {
+                type: 'journal',
+                axis: ['mental'],
+                themes: ['mental_os'],
+                voice_markers: [],
+                state: 'settled',
+                significance: 2,
+                summary: thoughtData.text.slice(0, 150),
+                raw: thoughtData.text,
+            }).catch(() => {});
+        }
+        setJournalText('');
     } catch (error) {
         console.error("Error saving thought:", error);
         // Optionally, show an error message to the user
@@ -621,6 +786,74 @@ const handleSetCurrentTask = (taskId) => {
     return (
         <div className={styles.nowViewContainer}>
             <h2 className={styles.viewTitle}>Now</h2>
+
+            {/* Top 3 Section */}
+            <div className={styles.top3Section}>
+                <h3 className={styles.top3Title}>Top 3 Today <span className={styles.top3Points}>5 pts each</span></h3>
+                <div className={styles.top3Row}>
+                    {[0, 1, 2].map(i => {
+                        const slot = topThree[i];
+                        const isEmpty = !slot?.text?.trim();
+                        const isComplete = slot?.completed;
+                        const cssSuffix = axisNameToCssVarSuffix(slot?.axisTheme);
+                        const slotStyle = slot?.axisTheme ? {
+                            '--slot-color-dark': `var(--axis-color-${cssSuffix}-3, var(--axis-color-default-3))`,
+                            '--slot-color-medium': `var(--axis-color-${cssSuffix}-2, var(--axis-color-default-2))`,
+                            '--slot-color-light': `var(--axis-color-${cssSuffix}-1, var(--axis-color-default-1))`,
+                        } : {};
+                        return (
+                            <div
+                                key={i}
+                                className={`${styles.top3Slot} ${isEmpty && !slot ? styles.top3Empty : ''} ${isComplete ? styles.top3Done : ''}`}
+                                style={slotStyle}
+                                onDragOver={handleTop3SlotDragOver}
+                                onDrop={(e) => handleTop3SlotDrop(e, i)}
+                            >
+                                <div className={styles.top3SlotNum}>{i + 1}</div>
+                                {confettiBurst === i && <ConfettiBurst />}
+                                {isComplete ? (
+                                    <>
+                                        <div className={styles.top3CompleteOverlay}>
+                                            <span className={styles.top3Check}>✓</span>
+                                        </div>
+                                        <p className={styles.top3DoneText}>{slot.text}</p>
+                                        <button className={styles.top3AddAnother} onClick={() => handleTopThreeClear(i)}>+ Add Another</button>
+                                    </>
+                                ) : (
+                                    <>
+                                        <input
+                                            type="text"
+                                            className={styles.top3Input}
+                                            placeholder="Drop a task or type here…"
+                                            value={slot?.text || ''}
+                                            onChange={(e) => handleTopThreeTextChange(i, e.target.value)}
+                                            onBlur={() => handleTopThreeSave(i)}
+                                            onKeyDown={(e) => { if (e.key === 'Enter') handleTopThreeSave(i); }}
+                                        />
+                                        <div className={styles.top3Actions}>
+                                            <select
+                                                className={styles.top3Select}
+                                                value={slot?.axisTheme || ''}
+                                                onChange={(e) => { handleTopThreeAxisChange(i, e.target.value); }}
+                                                onBlur={() => handleTopThreeSave(i)}
+                                            >
+                                                <option value="">Axis…</option>
+                                                {availableAxes.map(a => <option key={a.id} value={a.name}>{a.name}</option>)}
+                                            </select>
+                                            {slot?.text?.trim() && (
+                                                <button className={styles.top3CompleteBtn} onClick={() => handleTopThreeComplete(i)}>✓ Done</button>
+                                            )}
+                                            {slot && (
+                                                <button className={styles.top3ClearBtn} onClick={() => handleTopThreeClear(i)}>✕</button>
+                                            )}
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
 
             {/* Left Panel */}
             <div className={styles.leftPanel}>
@@ -672,6 +905,7 @@ const handleSetCurrentTask = (taskId) => {
                     <span className={styles.gymTimeEmoji}>💪</span>
                     <span className={styles.gymTimeText}>Gym Time!</span>
                 </div>
+                <PeriodQuickLog />
             </div>
 
             {/* Center Panel */}

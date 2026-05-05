@@ -6,6 +6,14 @@ const FLOW_LEVELS = ['none', 'spotting', 'light', 'medium', 'heavy'];
 const FLOW_LABELS = { none: 'None', spotting: 'Spotting', light: 'Light', medium: 'Medium', heavy: 'Heavy' };
 const FLOW_COLORS = { none: '#f5f5f5', spotting: '#fce4ec', light: '#f8bbd0', medium: '#f48fb1', heavy: '#e91e63' };
 
+const PHASE_COLORS = {
+  menstrual:  '#f48fb1',
+  follicular: '#c8e6c9',
+  ovulation:  '#fff9c4',
+  luteal:     '#ffe0b2',
+};
+const PHASE_LABELS = { menstrual: 'Menstrual', follicular: 'Follicular', ovulation: 'Ovulation', luteal: 'Luteal' };
+
 const SYMPTOMS = ['Cramps', 'Bloating', 'Headache', 'Mood Swings', 'Fatigue', 'Back Pain', 'Breast Tenderness', 'Acne'];
 
 function PeriodInsightsWidget({ userId }) {
@@ -115,13 +123,45 @@ function PeriodInsightsWidget({ userId }) {
   const cycleDay = getCycleDay();
   const phase = getPhase(cycleDay);
 
-  // Build calendar heatmap data (last 3 months)
+  // Predict next period start from current cycle
+  const getNextPeriodDate = () => {
+    if (!currentCycle?.cycleStart) return null;
+    const start = new Date(currentCycle.cycleStart + 'T12:00:00');
+    const next = new Date(start);
+    next.setDate(start.getDate() + avgCycleLength);
+    return next;
+  };
+
+  // Build calendar data with estimated phase bands + logged days overlaid
   const buildCalendarData = () => {
-    const dailyLogs = {};
-    for (const cycle of cycleHistory) {
+    const dateMap = {};
+    const sortedCycles = [...cycleHistory].sort((a, b) =>
+      (a.cycleStart || '').localeCompare(b.cycleStart || ''));
+
+    for (let ci = 0; ci < sortedCycles.length; ci++) {
+      const cycle = sortedCycles[ci];
+      if (!cycle.cycleStart) continue;
+      const startDate = new Date(cycle.cycleStart + 'T12:00:00');
+      const endStr = cycle.cycleEnd ||
+        sortedCycles[ci + 1]?.cycleStart ||
+        new Date().toISOString().split('T')[0];
+      const endDate = new Date(endStr + 'T12:00:00');
+      const cur = new Date(startDate);
+      let dayNum = 1;
+      while (cur <= endDate) {
+        const dateStr = cur.toISOString().split('T')[0];
+        let phase;
+        if (dayNum <= 5) phase = 'menstrual';
+        else if (dayNum <= 13) phase = 'follicular';
+        else if (dayNum <= 16) phase = 'ovulation';
+        else phase = 'luteal';
+        dateMap[dateStr] = { phase, flow: null };
+        cur.setDate(cur.getDate() + 1);
+        dayNum++;
+      }
       if (cycle.dailyLogs) {
         for (const [date, data] of Object.entries(cycle.dailyLogs)) {
-          dailyLogs[date] = data;
+          dateMap[date] = { ...(dateMap[date] || {}), flow: data.flow || null };
         }
       }
     }
@@ -135,12 +175,11 @@ function PeriodInsightsWidget({ userId }) {
       const daysInMonth = new Date(year, month + 1, 0).getDate();
       const firstDayOfWeek = monthDate.getDay();
       const monthName = monthDate.toLocaleString('default', { month: 'short', year: 'numeric' });
-
       const days = [];
       for (let d = 1; d <= daysInMonth; d++) {
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-        const log = dailyLogs[dateStr];
-        days.push({ day: d, date: dateStr, flow: log?.flow || null });
+        const entry = dateMap[dateStr] || {};
+        days.push({ day: d, date: dateStr, flow: entry.flow || null, phase: entry.phase || null });
       }
       months.push({ monthName, firstDayOfWeek, days });
     }
@@ -171,23 +210,41 @@ function PeriodInsightsWidget({ userId }) {
       {currentCycle && cycleDay && (
         <div className={styles.cycleInfo}>
           <div className={styles.currentStatus}>
-            <div>
-              <h3>Day {cycleDay}</h3>
-              <p>{phase.charAt(0).toUpperCase() + phase.slice(1)} Phase</p>
+            <div className={styles.phaseChip} style={{ background: PHASE_COLORS[phase] }}>
+              Day {cycleDay} — {PHASE_LABELS[phase]}
             </div>
           </div>
-          {currentCycle.cycleLengthDays == null && cycleDay > 20 && (
-            <div className={styles.predictions}>
-              <div className={styles.prediction}>
-                <span className={styles.predictionLabel}>Avg cycle:</span>
-                <span className={styles.predictionValue}>{avgCycleLength} days</span>
+          <div className={styles.phaseBar}>
+            {[
+              { key: 'menstrual', label: 'M', days: 5 },
+              { key: 'follicular', label: 'F', days: 8 },
+              { key: 'ovulation', label: 'O', days: 3 },
+              { key: 'luteal', label: 'L', days: avgCycleLength - 16 },
+            ].map(seg => (
+              <div
+                key={seg.key}
+                className={`${styles.phaseSegment} ${phase === seg.key ? styles.phaseSegmentActive : ''}`}
+                style={{ flex: seg.days, background: PHASE_COLORS[seg.key] }}
+                title={PHASE_LABELS[seg.key]}
+              >
+                {seg.label}
               </div>
-              <div className={styles.prediction}>
-                <span className={styles.predictionLabel}>Expected next:</span>
-                <span className={styles.predictionValue}>~Day {avgCycleLength}</span>
-              </div>
+            ))}
+          </div>
+          <div className={styles.predictions}>
+            <div className={styles.prediction}>
+              <span className={styles.predictionLabel}>Avg cycle:</span>
+              <span className={styles.predictionValue}>{avgCycleLength} days</span>
             </div>
-          )}
+            {getNextPeriodDate() && (
+              <div className={styles.prediction}>
+                <span className={styles.predictionLabel}>Next period ~</span>
+                <span className={styles.predictionValue}>
+                  {getNextPeriodDate().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                </span>
+              </div>
+            )}
+          </div>
         </div>
       )}
 
@@ -324,25 +381,46 @@ function PeriodInsightsWidget({ userId }) {
                   {Array.from({ length: month.firstDayOfWeek }).map((_, i) => (
                     <span key={`e-${i}`} className={styles.calDayEmpty} />
                   ))}
-                  {month.days.map(d => (
-                    <span
-                      key={d.day}
-                      className={styles.calDay}
-                      style={{ background: d.flow ? FLOW_COLORS[d.flow] : '#f9f9f9' }}
-                      title={d.date + (d.flow ? ` - ${FLOW_LABELS[d.flow]}` : '')}
-                    >
-                      {d.day}
-                    </span>
-                  ))}
+                  {month.days.map(d => {
+                    const bg = d.flow && d.flow !== 'none'
+                      ? FLOW_COLORS[d.flow]
+                      : d.phase
+                        ? PHASE_COLORS[d.phase]
+                        : '#f9f9f9';
+                    const opacity = !d.flow && d.phase ? 0.55 : 1;
+                    const label = d.flow
+                      ? `${d.date} — ${FLOW_LABELS[d.flow]}`
+                      : d.phase
+                        ? `${d.date} — est. ${PHASE_LABELS[d.phase]}`
+                        : d.date;
+                    return (
+                      <span
+                        key={d.day}
+                        className={styles.calDay}
+                        style={{ background: bg, opacity }}
+                        title={label}
+                      >
+                        {d.day}
+                      </span>
+                    );
+                  })}
                 </div>
               </div>
             ))}
           </div>
           <div className={styles.calLegend}>
-            {FLOW_LEVELS.map(f => (
+            <span className={styles.legendGroup}>Flow:</span>
+            {['spotting','light','medium','heavy'].map(f => (
               <span key={f} className={styles.legendItem}>
                 <span className={styles.legendDot} style={{ background: FLOW_COLORS[f] }} />
                 {FLOW_LABELS[f]}
+              </span>
+            ))}
+            <span className={styles.legendGroup}>Phase (est):</span>
+            {Object.keys(PHASE_LABELS).map(p => (
+              <span key={p} className={styles.legendItem}>
+                <span className={styles.legendDot} style={{ background: PHASE_COLORS[p], opacity: 0.55 }} />
+                {PHASE_LABELS[p]}
               </span>
             ))}
           </div>

@@ -39,12 +39,14 @@ function getWeekId(date = new Date()) {
 function getWeekDates(weekId) {
     try {
         const [year, week] = weekId.split('-W').map(Number);
-        const aDayInWeek = new Date(Date.UTC(year, 0, 4 + (week - 1) * 7));
-        const dayOfWeek = aDayInWeek.getUTCDay();
-        const startDate = new Date(aDayInWeek);
-        startDate.setUTCDate(aDayInWeek.getUTCDate() - dayOfWeek);
+        const janFirst = new Date(year, 0, 1);
+        janFirst.setHours(12, 0, 0, 0);
+        const firstWeekStartDate = new Date(janFirst);
+        firstWeekStartDate.setDate(janFirst.getDate() - janFirst.getDay());
+        const startDate = new Date(firstWeekStartDate);
+        startDate.setDate(firstWeekStartDate.getDate() + (week - 1) * 7);
         const endDate = new Date(startDate);
-        endDate.setUTCDate(startDate.getUTCDate() + 6);
+        endDate.setDate(startDate.getDate() + 6);
         const options = { month: 'short', day: 'numeric' };
         return {
             start: startDate.toLocaleDateString(undefined, options),
@@ -269,8 +271,19 @@ function WeeklyView({ onNavigate }) {
                             
                             const weeklyGoal = weeklyGoalObject?.goal || "";
                             const goalStatus = weeklyGoalObject?.status || 'pending';
-                            const milestoneId = weeklyGoalObject?.milestoneId;
-                            const milestone = allMilestones.find(m => m.id === milestoneId);
+                            const axisId = allAxesData[axisName]?.id;
+                            const currentYear = new Date().getFullYear();
+                            const milestone = allMilestones
+                                .filter(m => {
+                                    if (m.axisId !== axisId || m.completionDate !== null) return false;
+                                    const due = m.dueDate?.toDate ? m.dueDate.toDate() : null;
+                                    return due && due.getFullYear() === currentYear;
+                                })
+                                .sort((a, b) => {
+                                    const dA = a.dueDate?.toDate ? a.dueDate.toDate() : new Date('9999-12-31');
+                                    const dB = b.dueDate?.toDate ? b.dueDate.toDate() : new Date('9999-12-31');
+                                    return dA - dB;
+                                })[0] || null;
 
                             return (
                                 <div key={axisName} className={styles.axisCard}>

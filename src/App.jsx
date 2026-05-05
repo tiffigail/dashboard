@@ -22,6 +22,7 @@ import ParetoView from './components/ParetoView/ParetoView';
 import LifeMapView from './components/LifeMapView/LifeMapView';
 import LoginPage from './components/LoginPage/LoginPage';
 import ParetoViewDemo from './components/ParetoView/ParetoViewDemo.jsx';
+import AIAdvisor from './components/AIAdvisor/AIAdvisor';
 
 function AppLayout() {
     const { currentUser } = useAuth();
@@ -73,6 +74,7 @@ function AppLayout() {
                     <Route path="/login" element={<LoginPage />} />
                 </Routes>
             </div>
+            {currentUser && <AIAdvisor />}
         </div>
     );
 }

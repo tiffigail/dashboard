@@ -2,11 +2,40 @@ import React, { useState } from 'react';
 import styles from './QuickWorkoutLogger.module.css';
 import * as physicalGoalsService from '../../services/physicalGoalsService';
 
+const BUNDLES = {
+  'At Home Arms': {
+    name: 'At Home Arms',
+    exercises: ['Push-Ups', 'Diamond Push-Ups', 'Tricep Dips', 'Bicep Curls', 'Hammer Curls'],
+  },
+  'At Home Legs': {
+    name: 'At Home Legs',
+    exercises: ['Squats', 'Reverse Lunges', 'Glute Bridges', 'Calf Raises', 'Wall Sit'],
+  },
+  'Gym Arms': {
+    name: 'Gym Arms',
+    exercises: ['Barbell Curl', 'Tricep Pushdown', 'Hammer Curl', 'Skull Crusher', 'Cable Curl'],
+  },
+  'Gym Legs': {
+    name: 'Gym Legs',
+    exercises: ['Squat', 'Romanian Deadlift', 'Leg Press', 'Leg Curl', 'Calf Raises'],
+  },
+};
+
+function makeExercise(name) {
+  return { exerciseName: name, sets: [{ reps: 0, weight: 0 }], relatedGoals: [] };
+}
+
 function QuickWorkoutLogger({ userId, goals, onClose, onSave }) {
   const [workoutName, setWorkoutName] = useState('');
   const [duration, setDuration] = useState('');
   const [exercises, setExercises] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const loadBundle = (bundleKey) => {
+    const bundle = BUNDLES[bundleKey];
+    setWorkoutName(bundle.name);
+    setExercises(bundle.exercises.map(makeExercise));
+  };
 
   const addExercise = () => {
     setExercises([
@@ -102,6 +131,22 @@ function QuickWorkoutLogger({ userId, goals, onClose, onSave }) {
               className={styles.input}
               min="0"
             />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label>Quick Start</label>
+            <div className={styles.bundles}>
+              {Object.keys(BUNDLES).map(key => (
+                <button
+                  key={key}
+                  type="button"
+                  className={styles.bundleBtn}
+                  onClick={() => loadBundle(key)}
+                >
+                  {key}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className={styles.exercises}>

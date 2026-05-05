@@ -14,6 +14,8 @@ import {
 import Modal from '../Modal/Modal';
 import DynamicSprintDashboard from '../DynamicSprintDashboard/DynamicSprintDashboard';
 import FitnessAchievementDashboard from '../FitnessAchievementDashboard/FitnessAchievementDashboard';
+import { useAuth } from '../../context/AuthContext';
+import { saveCorpusEntry, writeActivityEntry } from '../../services/advisorService';
 
 // Day index (0=Sun) → axis name
 const dayToAxisThemeMapping = [
@@ -52,6 +54,7 @@ const getTodayDateString = () => {
 
 // Props: onSubmit, onClose
 function AmRoutineForm({ onSubmit, onClose }) {
+  const { currentUser } = useAuth();
 
   // == State for Checklist Items ==
   const [checkedItems, setCheckedItems] = useState(
@@ -151,6 +154,13 @@ function AmRoutineForm({ onSubmit, onClose }) {
 
     try {
       await addDoc(collection(db, "amRoutineLogs"), baseFormData);
+      if (currentUser?.uid) {
+        writeActivityEntry(currentUser.uid, {
+          type: 'routine_completion',
+          source: 'dashboard',
+          data: { which: 'am', completion_pct: completionPercentage, items_completed: completedChecklistItems.length, items_total: amRoutineItems.length },
+        }).catch(() => {});
+      }
 
       if (journalText) {
         await addDoc(collection(db, "journalEntries"), {
@@ -160,6 +170,18 @@ function AmRoutineForm({ onSubmit, onClose }) {
           dayOfWeek,
           timeOfDay: 'AM',
         });
+        if (currentUser?.uid) {
+          saveCorpusEntry(currentUser.uid, {
+            type: 'journal',
+            axis: ['mental', 'rest_prep'],
+            themes: ['am_routine'],
+            voice_markers: [],
+            state: 'settled',
+            significance: 2,
+            summary: journalText.slice(0, 150),
+            raw: journalText,
+          }).catch(() => {});
+        }
       }
 
       if (dreamText) {
