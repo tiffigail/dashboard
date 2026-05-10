@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import styles from './WeeklyView.module.css';
 import Modal from '../Modal/Modal';
 import WeeklyPlanner from '../WeeklyPlanner/WeeklyPlanner';
-import BudgetForm from '../BudgetForm/BudgetForm';
+import FinancialPlanner from '../FinancialPlanner/FinancialPlanner';
 import { db } from '../../firebaseConfig';
 import PrepareModal from '../PrepareModal/PrepareModal';
 import {
@@ -361,7 +361,13 @@ function WeeklyView({ onNavigate }) {
             )}
 
             {isPlannerModalOpen && ( <Modal isOpen={isPlannerModalOpen} onClose={closePlannerModal}> <WeeklyPlanner onClose={closePlannerModal} allAxes={Object.values(allAxesData)} allMilestones={allMilestones} /> </Modal> )}
-            {isBudgetModalOpen && ( <Modal isOpen={isBudgetModalOpen} onClose={closeBudgetModal}> <BudgetForm onSubmit={handleBudgetSubmit} onClose={closeBudgetModal} onNavigate={onNavigate} /> </Modal> )}
+            {isBudgetModalOpen && (
+              <Modal isOpen={isBudgetModalOpen} onClose={closeBudgetModal} closeOnClickOutside>
+                <div style={{ margin: '-2rem', borderRadius: '8px', overflow: 'hidden' }}>
+                  <FinancialPlanner />
+                </div>
+              </Modal>
+            )}
             {isPrepareModalOpen && (
                 <Modal isOpen={isPrepareModalOpen} onClose={() => setIsPrepareModalOpen(false)}>
                     <PrepareModal

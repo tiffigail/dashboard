@@ -75,65 +75,44 @@ function PmRoutineForm({ onSubmit, onClose }) {
 
   const { currentUser } = useAuth();
   const didSubmit = React.useRef(false);
-  
-  const [checkedItems, setCheckedItems] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('pmRoutineCheckedItems');
-      try {
-        const parsed = saved ? JSON.parse(saved) : {};
-        const initialState = pmRoutineItems.reduce((acc, item) => ({ ...acc, [item]: false }), {});
-        for (const key in parsed) {
-            if (initialState.hasOwnProperty(key)) {
-                initialState[key] = parsed[key];
-            }
-        }
-        return initialState;
-      } catch (e) {
-        console.warn('Error parsing saved checked items:', e);
-      }
-    }
-    return pmRoutineItems.reduce((acc, item) => ({ ...acc, [item]: false }), {});
+
+  const DRAFT_KEY = `pmRoutineDraft_${getTodayString()}`;
+
+  const [draft] = useState(() => {
+    try { return JSON.parse(localStorage.getItem(DRAFT_KEY)) || {}; } catch { return {}; }
   });
 
-  const [epiphanyCount, setEpiphanyCount] = useState(() => typeof window !== 'undefined' ? localStorage.getItem('pmRoutineEpiphanyCount') || '' : '');
-  const [despairCount, setDespairCount] = useState(() => typeof window !== 'undefined' ? localStorage.getItem('pmRoutineDespairCount') || '' : '');
-  const [pmJournalEntry, setPmJournalEntry] = useState(() => typeof window !== 'undefined' ? localStorage.getItem('pmRoutineJournalEntry') || '' : '');
+  const [draftRestored] = useState(() =>
+    !!(draft.checkedItems && Object.values(draft.checkedItems).some(Boolean)) ||
+    !!(draft.pmJournalEntry || draft.epiphanyCount || draft.despairCount)
+  );
+
+  const [checkedItems, setCheckedItems] = useState(() => {
+    const initial = pmRoutineItems.reduce((acc, item) => ({ ...acc, [item]: false }), {});
+    return draft.checkedItems ? { ...initial, ...draft.checkedItems } : initial;
+  });
+
+  const [epiphanyCount, setEpiphanyCount] = useState(draft.epiphanyCount || '');
+  const [despairCount, setDespairCount] = useState(draft.despairCount || '');
+  const [pmJournalEntry, setPmJournalEntry] = useState(draft.pmJournalEntry || '');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
   const [pmRecitation, setPmRecitation] = useState("Loading recitation...");
 
-  const [physicalGoals, setPhysicalGoals] = useState(() => {
-    if (typeof window !== 'undefined') {
-        const saved = localStorage.getItem('physicalGoalsData');
-        return saved ? JSON.parse(saved) : {};
-    }
-    return {};
-  });
+  const [physicalGoals, setPhysicalGoals] = useState(() => draft.physicalGoals || {});
 
-  const [studyData, setStudyData] = useState(() => {
-    if (typeof window !== 'undefined') {
-        const saved = localStorage.getItem('pmStudyData');
-        return saved ? JSON.parse(saved) : {};
-    }
-    return {};
-  });
+  const [studyData, setStudyData] = useState(() => draft.studyData || {});
   
   const [isChartModalOpen, setIsChartModalOpen] = useState(false);
   const [isPhysicalDashboardOpen, setIsPhysicalDashboardOpen] = useState(false);
 
+  // Auto-save draft on every change
   useEffect(() => {
-    return () => {
-        if (!didSubmit.current) {
-            localStorage.setItem('pmRoutineCheckedItems', JSON.stringify(checkedItems));
-            localStorage.setItem('pmRoutineEpiphanyCount', epiphanyCount);
-            localStorage.setItem('pmRoutineDespairCount', despairCount);
-            localStorage.setItem('pmRoutineJournalEntry', pmJournalEntry);
-            localStorage.setItem('physicalGoalsData', JSON.stringify(physicalGoals));
-            localStorage.setItem('pmStudyData', JSON.stringify(studyData));
-            console.log("Form closed without submission. Data saved.");
-        }
-    };
-  }, [checkedItems, epiphanyCount, despairCount, pmJournalEntry, physicalGoals, studyData]);
+    if (didSubmit.current) return;
+    localStorage.setItem(DRAFT_KEY, JSON.stringify({
+      checkedItems, epiphanyCount, despairCount, pmJournalEntry, physicalGoals, studyData
+    }));
+  }, [DRAFT_KEY, checkedItems, epiphanyCount, despairCount, pmJournalEntry, physicalGoals, studyData]);
 
   useEffect(() => {
     const fetchRecitation = async () => {
@@ -311,14 +290,7 @@ function PmRoutineForm({ onSubmit, onClose }) {
           console.log("Daily Study Log saved/updated for:", dateString);
       }
 
-      if (typeof window !== 'undefined') {
-          localStorage.removeItem('pmRoutineCheckedItems');
-          localStorage.removeItem('pmRoutineEpiphanyCount');
-          localStorage.removeItem('pmRoutineDespairCount');
-          localStorage.removeItem('pmRoutineJournalEntry');
-          localStorage.removeItem('physicalGoalsData');
-          localStorage.removeItem('pmStudyData');
-      }
+      localStorage.removeItem(DRAFT_KEY);
 
       resetForm();
 
@@ -338,6 +310,11 @@ function PmRoutineForm({ onSubmit, onClose }) {
   return (
     <form onSubmit={handleSubmit} className={styles.form}>
       <h3 className={styles.formTitle}>PM Orientation & Daily Input</h3>
+      {draftRestored && (
+        <p style={{ fontSize: '0.78rem', color: '#8ecbac', margin: '0.2rem 0 0.5rem', opacity: 0.85 }}>
+          ↩ Resuming today's draft
+        </p>
+      )}
 
       {pmSections.map((section) => (
         <div key={section.id} className={styles.section}>

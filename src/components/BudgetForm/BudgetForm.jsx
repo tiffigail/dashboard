@@ -3,7 +3,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import styles from './BudgetForm.module.css';
 import { db } from '../../firebaseConfig';
 import { collection, addDoc, serverTimestamp, Timestamp } from "firebase/firestore"; // Ensure Timestamp is imported if used client-side
-
 // Checklist Items
 const budgetChecklistItems = [
     "Update transactions in Monarch",

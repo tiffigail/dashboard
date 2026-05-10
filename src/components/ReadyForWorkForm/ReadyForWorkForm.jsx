@@ -28,13 +28,25 @@ const getTodayString = () => {
 };
 // Props: onSubmit, onClose
 function ReadyForWorkForm({ onSubmit, onClose }) {
+    const DRAFT_KEY = `readyForWorkDraft_${getTodayString()}`;
+
+    const [draft] = useState(() => {
+        try { return JSON.parse(localStorage.getItem(DRAFT_KEY)) || {}; } catch { return {}; }
+    });
+
+    const [draftRestored] = useState(() =>
+        !!(draft.checkedItems && Object.values(draft.checkedItems).some(Boolean)) ||
+        !!(draft.weight || draft.bodyfat || draft.readinessRating)
+    );
+
     // == State ==
     const [checkedItems, setCheckedItems] = useState(() => {
-        return checklistItems.reduce((acc, item) => ({ ...acc, [item]: false }), {});
+        const initial = checklistItems.reduce((acc, item) => ({ ...acc, [item]: false }), {});
+        return draft.checkedItems ? { ...initial, ...draft.checkedItems } : initial;
     });
-    const [weight, setWeight] = useState('');
-    const [bodyfat, setBodyfat] = useState('');
-    const [readinessRating, setReadinessRating] = useState(0);
+    const [weight, setWeight] = useState(draft.weight || '');
+    const [bodyfat, setBodyfat] = useState(draft.bodyfat || '');
+    const [readinessRating, setReadinessRating] = useState(draft.readinessRating || 0);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitError, setSubmitError] = useState(null);
     const startTimeRef = useRef(Date.now());
@@ -74,6 +86,11 @@ function ReadyForWorkForm({ onSubmit, onClose }) {
 
         fetchRecitation();
     }, []); // Run once on component mount
+
+    // Auto-save draft on every change
+    useEffect(() => {
+        localStorage.setItem(DRAFT_KEY, JSON.stringify({ checkedItems, weight, bodyfat, readinessRating }));
+    }, [DRAFT_KEY, checkedItems, weight, bodyfat, readinessRating]);
 
     // == Handlers ==
     const handleCheckboxChange = (event) => {
@@ -127,8 +144,8 @@ function ReadyForWorkForm({ onSubmit, onClose }) {
     const hasPhysicalData = weight.trim() || bodyfat.trim();
     const physicalGoalsData = {
         weight: weight.trim() ? parseFloat(weight) : null,
-        bodyfatPercentage: bodyfat.trim() ? parseFloat(bodyfat) : null,
-        amMetricsCompletedAt: timestamp // Using a more specific field name
+        bodyfat: bodyfat.trim() ? parseFloat(bodyfat) : null,
+        amMetricsCompletedAt: timestamp
     };
 
     // --- Firestore Batch Write ---
@@ -151,6 +168,7 @@ function ReadyForWorkForm({ onSubmit, onClose }) {
 
         await batch.commit();
         console.log("Batch commit successful!");
+        localStorage.removeItem(DRAFT_KEY);
 
         if (onSubmit) onSubmit(readyForWorkData);
         if (onClose) onClose();
@@ -164,6 +182,11 @@ function ReadyForWorkForm({ onSubmit, onClose }) {
     return (
         <form onSubmit={handleSubmit} className={styles.form}>
             <h3 className={styles.formTitle}>Ready for Work</h3>
+            {draftRestored && (
+                <p style={{ fontSize: '0.78rem', color: '#8ecbac', margin: '0.2rem 0 0.5rem', opacity: 0.85 }}>
+                    ↩ Resuming today's draft
+                </p>
+            )}
 
             {/* Checklist Section */}
             <div className={styles.section}>

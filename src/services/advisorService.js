@@ -238,6 +238,57 @@ export const getRoutineAdherence = async (days = 14) => {
   };
 };
 
+// ── Weekly Goals ──────────────────────────────────────────────────────────────
+
+const getWeekId = (date = new Date()) => {
+  const d = new Date(date);
+  d.setHours(12, 0, 0, 0);
+  const weekStart = new Date(d);
+  weekStart.setDate(d.getDate() - d.getDay());
+  const year = weekStart.getFullYear();
+  const janFirst = new Date(year, 0, 1);
+  const firstWeekStart = new Date(janFirst);
+  firstWeekStart.setDate(janFirst.getDate() - janFirst.getDay());
+  const diffDays = (weekStart - firstWeekStart) / (1000 * 60 * 60 * 24);
+  const weekNum = Math.round(diffDays / 7) + 1;
+  return `${year}-W${String(weekNum).padStart(2, '0')}`;
+};
+
+export const getWeeklyGoals = async () => {
+  try {
+    const weekId = getWeekId();
+    const snap = await getDoc(doc(db, "new_weeklyPlans", weekId));
+    if (!snap.exists()) return null;
+    return { weekId, ...snap.data() };
+  } catch (e) {
+    return null;
+  }
+};
+
+// ── Recent Physical Metrics ───────────────────────────────────────────────────
+
+export const getRecentPhysicalMetrics = async (days = 14) => {
+  try {
+    const results = [];
+    const today = new Date();
+    for (let i = 0; i < days; i++) {
+      const d = new Date(today);
+      d.setDate(today.getDate() - i);
+      const dateStr = d.toISOString().split('T')[0];
+      const snap = await getDoc(doc(db, "physicalGoalsLogs", dateStr));
+      if (snap.exists()) {
+        const data = snap.data();
+        if (data.weight != null || data.bodyfat != null) {
+          results.push({ date: dateStr, weight: data.weight ?? null, bodyfat: data.bodyfat ?? null });
+        }
+      }
+    }
+    return results;
+  } catch (e) {
+    return [];
+  }
+};
+
 // ── Recent Journal Entries ────────────────────────────────────────────────────
 
 export const getRecentJournalEntries = async (count = 5) => {

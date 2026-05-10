@@ -1,0 +1,392 @@
+/* FinancialPlanner.module.css */
+
+.container {
+  padding: 1.5rem;
+  color: #e0d8f0;
+  background: #0d0a16;
+  border-radius: 6px;
+  min-height: 500px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  border-bottom: 2px solid #927aaa;
+  padding-bottom: 0.75rem;
+}
+
+.title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #927aaa;
+  margin: 0;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.revealBtn {
+  background: none;
+  border: 1px solid #927aaa;
+  color: #927aaa;
+  border-radius: 5px;
+  padding: 0.3rem 0.75rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.revealBtn:hover {
+  background: #927aaa22;
+}
+
+/* ── Tabs ───────────────────────────────────────────────── */
+
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  border-bottom: 1px solid #33244a;
+  padding-bottom: 0;
+}
+
+.tab {
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: var(--text-muted, #aaa);
+  font-size: 0.95rem;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+.tab:hover { color: #beaccf; }
+.tabActive {
+  color: #927aaa;
+  border-bottom-color: #927aaa;
+}
+
+.tabPanel {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* ── Shared section card ─────────────────────────────────── */
+
+.section {
+  background: #1a1126;
+  border: 1px solid #33244a;
+  border-radius: 8px;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.sectionTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #beaccf;
+  margin: 0 0 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #33244a;
+}
+
+/* ── Summary bar ─────────────────────────────────────────── */
+
+.summaryBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  background: #120d1e;
+  border: 1px solid #33244a;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.summaryItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.summaryLabel {
+  font-size: 0.75rem;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.summaryValue {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #beaccf;
+}
+
+.summaryValueRed  { color: #e57373; }
+.summaryValueGreen { color: #81c784; }
+
+/* ── Table ───────────────────────────────────────────────── */
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.table th {
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid #33244a;
+}
+
+.table td {
+  padding: 0.6rem 0.75rem;
+  border-bottom: 1px solid #1e1530;
+  vertical-align: middle;
+}
+
+.table tr:last-child td { border-bottom: none; }
+.table tr:hover td { background: #1e1530; }
+
+/* ── Form row (inline add/edit) ─────────────────────────── */
+
+.formRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  align-items: flex-end;
+  background: #120d1e;
+  border: 1px dashed #33244a;
+  border-radius: 6px;
+  padding: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+  min-width: 120px;
+}
+
+.formGroup label {
+  font-size: 0.75rem;
+  color: #888;
+  font-weight: 600;
+}
+
+.input,
+.select {
+  padding: 0.4rem 0.6rem;
+  border: 1px solid #33244a;
+  border-radius: 4px;
+  background: #0d0a16;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.input:focus,
+.select:focus {
+  outline: none;
+  border-color: #927aaa;
+}
+
+.checkbox {
+  width: 1rem;
+  height: 1rem;
+  accent-color: #927aaa;
+  margin-top: 0.5rem;
+}
+
+/* ── Buttons ─────────────────────────────────────────────── */
+
+.btnPrimary {
+  background: #927aaa;
+  border: none;
+  color: #fff;
+  padding: 0.45rem 1rem;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+.btnPrimary:hover { background: #7b639e; }
+
+.btnSecondary {
+  background: none;
+  border: 1px solid #33244a;
+  color: #beaccf;
+  padding: 0.45rem 0.85rem;
+  border-radius: 5px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: border-color 0.15s;
+  white-space: nowrap;
+}
+.btnSecondary:hover { border-color: #927aaa; }
+
+.btnDanger {
+  background: none;
+  border: none;
+  color: #e57373;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 0.3rem 0.5rem;
+}
+.btnDanger:hover { color: #ef5350; }
+
+.btnLink {
+  background: none;
+  border: none;
+  color: #beaccf;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0.2rem 0.4rem;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+.btnLink:hover { color: #927aaa; }
+
+.actionGroup {
+  display: flex;
+  gap: 0.25rem;
+  align-items: center;
+}
+
+/* ── Masked value ─────────────────────────────────────────── */
+
+.masked {
+  color: #666;
+  letter-spacing: 0.1em;
+  font-size: 0.95rem;
+}
+
+/* ── Category badge ──────────────────────────────────────── */
+
+.badge {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  background: #2a1f3d;
+  color: #beaccf;
+  text-transform: capitalize;
+}
+
+/* ── Calculator panels ───────────────────────────────────── */
+
+.calcGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 640px) {
+  .calcGrid { grid-template-columns: 1fr; }
+}
+
+.calcPanel {
+  background: #1a1126;
+  border: 1px solid #33244a;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.calcPanelRed { border-color: #7a3a3a; }
+.calcPanelGreen { border-color: #3a6b3a; }
+
+.calcPanelTitle {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+}
+.calcPanelTitleRed   { color: #e57373; }
+.calcPanelTitleGreen { color: #81c784; }
+
+.calcRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 0.3rem 0;
+  border-bottom: 1px solid #1e1530;
+  font-size: 0.88rem;
+}
+.calcRow:last-child { border-bottom: none; }
+
+.calcRowLabel { color: #999; }
+.calcRowValue { font-weight: 600; color: #e0d8f0; }
+.calcRowValueGood { color: #81c784; }
+.calcRowValueBad  { color: #e57373; }
+
+/* ── Extra cash input ────────────────────────────────────── */
+
+.calcInputRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.calcInputRow label {
+  font-size: 0.9rem;
+  color: #beaccf;
+  white-space: nowrap;
+}
+
+.calcInput {
+  width: 130px;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid #33244a;
+  border-radius: 4px;
+  background: #0d0a16;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+.calcInput:focus {
+  outline: none;
+  border-color: #927aaa;
+}
+
+/* ── Empty state ─────────────────────────────────────────── */
+
+.empty {
+  color: #666;
+  font-size: 0.9rem;
+  text-align: center;
+  padding: 2rem;
+}
+
+/* ── Export row ──────────────────────────────────────────── */
+
+.exportRow {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.5rem;
+}
+
+/* ── Screen blur on tab hidden ───────────────────────────── */
+
+.blurred {
+  filter: blur(8px);
+  pointer-events: none;
+  user-select: none;
+}

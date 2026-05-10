@@ -68,7 +68,7 @@ function formatProjects(projects) {
   }).join('\n');
 }
 
-function buildSystemPrompt({ contextDocs, page, recentMetrics, recentConvos, axesGoals, period, sprints, projects, deepData, identity, learnings }) {
+function buildSystemPrompt({ contextDocs, page, recentMetrics, recentConvos, axesGoals, period, sprints, projects, deepData, identity, learnings, weeklyGoals, physicalMetrics }) {
   const today = new Date().toISOString().split('T')[0];
   const pageName = PAGE_LABELS[page] || page;
 
@@ -153,11 +153,23 @@ Today: ${today}
 Current page: ${pageName}
 
 ${contextDocs.season ? `CURRENT SEASON:\n${contextDocs.season}\n` : ''}${axesText ? `CURRENT GOALS & TRAJECTORY:\n${axesText}\n` : ''}
+WEEKLY GOALS (${weeklyGoals?.weekId || 'this week'}):
+${weeklyGoals?.weeklyGoals
+  ? Object.entries(weeklyGoals.weeklyGoals)
+      .map(([axis, g]) => `• ${axis}: "${g.goal || '(none)'}" [${g.status || 'todo'}]`)
+      .join('\n')
+  : 'No weekly plan set yet.'}
+
 ACTIVE SPRINT:
 ${formatSprints(sprints)}
 
 ACTIVE PROJECTS:
 ${formatProjects(projects)}
+
+PHYSICAL METRICS (last entries):
+${physicalMetrics && physicalMetrics.length
+  ? physicalMetrics.slice(0, 7).map((m) => `${m.date}: weight=${m.weight ?? '—'} lbs, bodyfat=${m.bodyfat ?? '—'}%`).join('\n')
+  : 'No recent physical data.'}
 
 PERIOD TRACKING:
 ${formatPeriod(period)}
@@ -182,6 +194,8 @@ Existing Gearshift data loaded into LIVE CONTEXT above:
 - Goals/milestones: new_axes, new_goals, new_milestones
 - Projects/kanban: projects, kanbanCards — active cards by project
 - Active sprints: monthlyPlans — current sprint window
+- Weekly goals: new_weeklyPlans — per-axis goal + status for current week
+- Physical metrics: physicalGoalsLogs — daily weight + bodyfat (fed by Ready for Work form)
 - Routines: amRoutineLogs, pmRoutineLogs — completion history
 - Writing corpus: /users/{uid}/corpus/ — use CORPUS_QUERY to retrieve entries`;
 }
@@ -250,7 +264,7 @@ function AdvisorPanel({ page, pageName, userId }) {
 
     const load = async () => {
       try {
-        const [docs, recentMetrics, recentConvos, axesGoals, period, sprints, projects, identity, learnings] = await Promise.all([
+        const [docs, recentMetrics, recentConvos, axesGoals, period, sprints, projects, identity, learnings, weeklyGoals, physicalMetrics] = await Promise.all([
           advisorService.getContextDocs(),
           advisorService.getRecentDailyMetrics(7),
           advisorService.getRecentConversations(3),
@@ -260,6 +274,8 @@ function AdvisorPanel({ page, pageName, userId }) {
           advisorService.getActiveProjectsContext(),
           advisorService.getAdvisorIdentity(),
           advisorService.getLearnings(15),
+          advisorService.getWeeklyGoals(),
+          advisorService.getRecentPhysicalMetrics(14),
         ]);
 
         setContextDocs({
@@ -270,7 +286,7 @@ function AdvisorPanel({ page, pageName, userId }) {
           coaching: docs.coaching || '',
         });
 
-        setSystemPrompt(buildSystemPrompt({ contextDocs: docs, page, recentMetrics, recentConvos, axesGoals, period, sprints, projects, deepData: null, identity, learnings }));
+        setSystemPrompt(buildSystemPrompt({ contextDocs: docs, page, recentMetrics, recentConvos, axesGoals, period, sprints, projects, deepData: null, identity, learnings, weeklyGoals, physicalMetrics }));
         setContextLoaded(true);
 
         setMessages((prev) =>
@@ -308,6 +324,27 @@ function AdvisorPanel({ page, pageName, userId }) {
       conversationSaved.current = true;
       try { await advisorService.saveConversation(messages, pageName); } catch (e) { /* ignore */ }
     }
+  }, [messages, pageName, SESSION_KEY]);
+
+  // ── End conversation + reset for next ──────────────────────────────────────
+
+  const clearConversation = useCallback(async () => {
+    if (messages.length > 1 && !conversationSaved.current) {
+      conversationSaved.current = true;
+      try { await advisorService.saveConversation(messages, pageName); } catch (e) { /* ignore */ }
+    }
+    localStorage.removeItem(SESSION_KEY);
+    setMessages([{ role: 'assistant', content: `${pageName} page. What's alive right now?`, id: Date.now() }]);
+    setDeepMode(false);
+    setPendingSave(null);
+    setPendingCorpusLog(null);
+    setPendingLearning(null);
+    setSaveStatus('');
+    setCorpusLogStatus('');
+    setLearningStatus('');
+    conversationSaved.current = false;
+    learningWritesThisSession.current = 0;
+    identityUpdatedThisSession.current = false;
   }, [messages, pageName, SESSION_KEY]);
 
   // ── Helpers ────────────────────────────────────────────────────────────────
@@ -461,7 +498,7 @@ Raw: ${rawPreview}${truncated}`;
     if (deepLoading) return;
     setDeepLoading(true);
     try {
-      const [docs, recentMetrics, recentConvos, axesGoals, period, sprints, projects, routine, journal, identity, learnings] = await Promise.all([
+      const [docs, recentMetrics, recentConvos, axesGoals, period, sprints, projects, routine, journal, identity, learnings, weeklyGoals, physicalMetrics] = await Promise.all([
         advisorService.getContextDocs(),
         advisorService.getRecentDailyMetrics(30),
         advisorService.getRecentConversations(5),
@@ -473,10 +510,12 @@ Raw: ${rawPreview}${truncated}`;
         advisorService.getRecentJournalEntries(5),
         advisorService.getAdvisorIdentity(),
         advisorService.getLearnings(15),
+        advisorService.getWeeklyGoals(),
+        advisorService.getRecentPhysicalMetrics(30),
       ]);
 
       const deepData = { routine, journal };
-      const prompt = buildSystemPrompt({ contextDocs: docs, page, recentMetrics, recentConvos, axesGoals, period, sprints, projects, deepData, identity, learnings });
+      const prompt = buildSystemPrompt({ contextDocs: docs, page, recentMetrics, recentConvos, axesGoals, period, sprints, projects, deepData, identity, learnings, weeklyGoals, physicalMetrics });
       setSystemPrompt(prompt);
       setDeepMode(true);
 
@@ -773,6 +812,15 @@ Raw: ${rawPreview}${truncated}`;
                   title="Log this conversation to the corpus"
                 >
                   ◎ Log
+                </button>
+                <button
+                  className={styles.logBtn}
+                  onClick={clearConversation}
+                  disabled={isStreaming || messages.length <= 1}
+                  title="Save this conversation and start a new one"
+                  style={{ marginLeft: 'auto' }}
+                >
+                  ↺ New
                 </button>
               </div>
 

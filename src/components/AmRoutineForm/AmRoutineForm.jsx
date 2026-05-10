@@ -56,21 +56,28 @@ const getTodayDateString = () => {
 function AmRoutineForm({ onSubmit, onClose }) {
   const { currentUser } = useAuth();
 
-  // == State for Checklist Items ==
-  const [checkedItems, setCheckedItems] = useState(
-    amRoutineItems.reduce((acc, item) => {
-      acc[item] = false;
-      return acc;
-    }, {})
+  const DRAFT_KEY = `amRoutineDraft_${getTodayDateString()}`;
+
+  const [draft] = useState(() => {
+    try { return JSON.parse(localStorage.getItem(DRAFT_KEY)) || {}; } catch { return {}; }
+  });
+
+  const [draftRestored] = useState(() =>
+    !!(draft.checkedItems && Object.values(draft.checkedItems).some(Boolean)) ||
+    !!(draft.gratitude1 || draft.goodThing || draft.amJournalEntry || draft.dreamEntry)
   );
 
-  // == State for Metric Inputs ==
-  const [gratitude1, setGratitude1] = useState('');
-  const [gratitude2, setGratitude2] = useState('');
-  const [gratitude3, setGratitude3] = useState('');
-  const [goodThing, setGoodThing] = useState('');
-  const [amJournalEntry, setAmJournalEntry] = useState('');
-  const [dreamEntry, setDreamEntry] = useState('');
+  const [checkedItems, setCheckedItems] = useState(() => {
+    const initial = amRoutineItems.reduce((acc, item) => ({ ...acc, [item]: false }), {});
+    return draft.checkedItems ? { ...initial, ...draft.checkedItems } : initial;
+  });
+
+  const [gratitude1, setGratitude1] = useState(draft.gratitude1 || '');
+  const [gratitude2, setGratitude2] = useState(draft.gratitude2 || '');
+  const [gratitude3, setGratitude3] = useState(draft.gratitude3 || '');
+  const [goodThing, setGoodThing] = useState(draft.goodThing || '');
+  const [amJournalEntry, setAmJournalEntry] = useState(draft.amJournalEntry || '');
+  const [dreamEntry, setDreamEntry] = useState(draft.dreamEntry || '');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
 
@@ -111,6 +118,13 @@ function AmRoutineForm({ onSubmit, onClose }) {
     };
     fetchRecitation();
   }, []);
+
+  // Auto-save draft on every change
+  useEffect(() => {
+    localStorage.setItem(DRAFT_KEY, JSON.stringify({
+      checkedItems, gratitude1, gratitude2, gratitude3, goodThing, amJournalEntry, dreamEntry
+    }));
+  }, [DRAFT_KEY, checkedItems, gratitude1, gratitude2, gratitude3, goodThing, amJournalEntry, dreamEntry]);
 
   // == Handlers ==
   const handleCheckboxChange = (event) => {
@@ -154,6 +168,7 @@ function AmRoutineForm({ onSubmit, onClose }) {
 
     try {
       await addDoc(collection(db, "amRoutineLogs"), baseFormData);
+      localStorage.removeItem(DRAFT_KEY);
       if (currentUser?.uid) {
         writeActivityEntry(currentUser.uid, {
           type: 'routine_completion',
@@ -208,6 +223,11 @@ function AmRoutineForm({ onSubmit, onClose }) {
   return (
     <form onSubmit={handleSubmit} onKeyDown={handleFormKeyDown} className={styles.form}>
       <h3 className={styles.formTitle}>AM Orientation & Daily Input</h3>
+      {draftRestored && (
+        <p style={{ fontSize: '0.78rem', color: '#8ecbac', margin: '0.2rem 0 0.5rem', opacity: 0.85 }}>
+          ↩ Resuming today's draft
+        </p>
+      )}
 
       {/* Today's Axis Display */}
       <div className={styles.axisDisplay}>

@@ -1,12 +1,11 @@
 // src/firebaseConfig.js
 
 import { initializeApp } from "firebase/app";
-// VVVV 1. IMPORT THE NEW, MODERN FUNCTIONS VVVV
 import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 import { getAuth } from "firebase/auth";
+import { initializeAppCheck, ReCaptchaV3Provider } from "firebase/app-check";
 
-// Your web app's Firebase configuration (no changes here)
 const firebaseConfig = {
   apiKey: "AIzaSyC83ZohFJ9gRd9pWNJbJlTKNzg94O0381E",
   authDomain: "dashboard-bb237.firebaseapp.com",
@@ -16,31 +15,26 @@ const firebaseConfig = {
   appId: "1:913925574800:web:1487a2148c228202578815"
 };
 
-// Initialize Firebase App (no changes here)
 const app = initializeApp(firebaseConfig);
 
-// VVVV 2. THIS IS THE MAJOR CHANGE VVVV
-// Initialize Firestore using the new method that allows for settings
-// This enables persistence and multi-tab support AT THE SAME TIME the db is created.
+// App Check — blocks any Firestore access not coming from this app.
+// In local dev, a debug token is printed to the console. Register it in
+// Firebase Console → App Check → Apps → [your app] → Debug tokens.
+if (import.meta.env.DEV) {
+  self.FIREBASE_APPCHECK_DEBUG_TOKEN = import.meta.env.VITE_APPCHECK_DEBUG_TOKEN || true;
+}
+
+initializeAppCheck(app, {
+  provider: new ReCaptchaV3Provider(import.meta.env.VITE_RECAPTCHA_SITE_KEY),
+  isTokenAutoRefreshEnabled: true,
+});
+
 const db = initializeFirestore(app, {
   localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
 });
-console.log("Firestore initialized with offline persistence enabled.");
 
-const auth = getAuth(app); // This line creates the auth service
-
-
-// Initialize Cloud Storage (no changes here)
+const auth = getAuth(app);
 const storage = getStorage(app);
-
-// VVVV 3. THE OLD, PROBLEMATIC CODE IS REMOVED VVVV
-/*
-  // This old block is what caused the error and has been replaced by the new initializeFirestore call above.
-  const db_old = getFirestore(app);
-  enableIndexedDbPersistence(db_old)
-    .then(() => { ... })
-    .catch((err) => { ... });
-*/
 
 
 // Export the instances for use elsewhere in the app

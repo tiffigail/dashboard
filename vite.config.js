@@ -57,7 +57,7 @@ export default defineConfig({
         // "screenshots": [ ... ]
       },
       workbox: {
-        // Workbox options for generating the service worker
+        maximumFileSizeToCacheInBytes: 4 * 1024 * 1024, // 4 MiB
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [/^\/assets\//, /\.[^/?]+$/], // Don't intercept asset/JS/CSS requests
         globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg,jpeg,woff,woff2}'], // Files to cache
