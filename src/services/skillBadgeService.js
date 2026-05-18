@@ -12,8 +12,8 @@ import {
   limit,
   serverTimestamp
 } from "firebase/firestore";
-import { db } from "../firebaseConfig";
-import { getSkillBadgeTemplateById, getFirstLevelNumber } from "../data/skillBadgeTemplates";
+import { db } from "@/firebaseConfig";
+import { getSkillBadgeTemplateById, getFirstLevelNumber } from "@/data/skillBadgeTemplates";
 
 // ============================================
 // SKILL BADGE ENROLLMENT

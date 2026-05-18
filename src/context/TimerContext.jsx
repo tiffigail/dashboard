@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect, useContext, useRef } from 'react';
 import { Howl } from 'howler';
-import { useAuth } from './AuthContext.jsx';
+import { useAuth } from '@/context/AuthContext.jsx';
 
 // --- Constants and Helpers ---
 const DEFAULT_POMODORO_MINUTES = 20;

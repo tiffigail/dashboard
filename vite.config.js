@@ -1,7 +1,8 @@
 // vite.config.js
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import { VitePWA } from 'vite-plugin-pwa' // <<< Import the plugin
+import { VitePWA } from 'vite-plugin-pwa'
+import path from 'path'
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -86,8 +87,13 @@ export default defineConfig({
     })
     // <<< End VitePWA plugin configuration >>>
   ],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
   server: {
-    host: true, // Keep this to allow access on local network
-    port: 3000 // Keep if you changed the port
+    host: true,
+    port: 3000
   }
 })

@@ -1,0 +1,47 @@
+/* DearAbiMarquee.module.css */
+
+.marqueeContainer {
+    background-color: white;
+    border-radius: 8px; /* Optional: for rounded corners */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Optional: for a subtle shadow */
+    overflow: hidden; /* Keep this to hide content outside the marquee's visible area */
+    width: 100%; /* Or a specific width if you prefer */
+    /* Add any other existing styles for marqueeContainer here */
+}
+
+.marqueeTitle {
+    /* Your existing styles for the title */
+    margin-bottom: 10px; /* Example: add some space below the title */
+    text-align: center; /* Or your preferred alignment */
+    font-weight: bold;
+}
+
+.marqueeContent {
+    display: flex;
+    width: fit-content; /* Allows the content to define its own width based on children */
+    animation-name: marqueeAnimation;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    /* animation-duration is set by inline style in the component */
+}
+
+.quoteItem {
+    padding: 0 1.5em; /* Spacing between quotes */
+    white-space: nowrap;
+    flex-shrink: 0;
+    /* Your existing styles for quote items */
+}
+
+@keyframes marqueeAnimation {
+    0% {
+        transform: translateX(0%);
+    }
+    100% {
+        transform: translateX(-50%); /* Crucial for seamless loop with duplicated content */
+    }
+}
+
+.loadingText,
+.errorText {
+    text-align: center;
+}

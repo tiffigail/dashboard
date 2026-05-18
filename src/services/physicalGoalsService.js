@@ -11,7 +11,8 @@ import {
   where,
   serverTimestamp
 } from "firebase/firestore";
-import { db } from "../firebaseConfig";
+import { db } from "@/firebaseConfig";
+import { getTodayDateString } from "@/utils/dateUtils";
 
 // ============================================
 // FITNESS GOALS
@@ -212,7 +213,7 @@ export const getWorkoutsForDate = async (userId, date) => {
 // Delegates to muscleBuildingService so both paths write the same flat schema.
 // Import is dynamic to avoid circular dependency.
 export const logBodyMeasurements = async (userId, date, measurements, weight, bodyFat) => {
-  const { logMeasurement } = await import('./muscleBuildingService');
+  const { logMeasurement } = await import('@/services/muscleBuildingService');
   return logMeasurement(userId, date, {
     ...measurements,
     weight: weight || null,
@@ -461,14 +462,3 @@ export const getBadgeLevel = (progress) => {
   return "bronze";
 };
 
-/**
- * Get today's date in YYYY-MM-DD format
- * @returns {string} Date string
- */
-export const getTodayDateString = () => {
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = String(today.getMonth() + 1).padStart(2, '0');
-  const day = String(today.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-};

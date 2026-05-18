@@ -9,9 +9,9 @@ import {
   where,
   serverTimestamp
 } from "firebase/firestore";
-import { db } from "../firebaseConfig";
-import { getProgramById } from "../data/muscleBuildingPrograms";
-import { getStrengthProgramById } from "../data/strengthPrograms";
+import { db } from "@/firebaseConfig";
+import { getProgramById } from "@/data/muscleBuildingPrograms";
+import { getStrengthProgramById } from "@/data/strengthPrograms";
 
 function getAnyProgramById(templateId) {
   return getProgramById(templateId) || getStrengthProgramById(templateId);

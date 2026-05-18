@@ -10,9 +10,9 @@ import {
   orderBy,
   serverTimestamp
 } from "firebase/firestore";
-import { db } from "../firebaseConfig";
-import { createFitnessGoal, updateFitnessGoal, achieveFitnessGoal, calculateGoalProgress, getBadgeLevel } from "./physicalGoalsService";
-import { getJourneyById, stepsToMiles } from "../data/enduranceJourneys";
+import { db } from "@/firebaseConfig";
+import { createFitnessGoal, updateFitnessGoal, achieveFitnessGoal, calculateGoalProgress, getBadgeLevel } from "@/services/physicalGoalsService";
+import { getJourneyById, stepsToMiles } from "@/data/enduranceJourneys";
 
 /**
  * Create a new endurance goal from a journey template

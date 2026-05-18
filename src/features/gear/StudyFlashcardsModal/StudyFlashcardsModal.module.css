@@ -1,0 +1,229 @@
+/* src/components/StudyFlashcardsModal/StudyFlashcardsModal.module.css */
+
+/* Modal Structure */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .modalContent {
+    background-color: white;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    width: 90%;
+    max-width: 550px; /* Adjust as needed */
+    position: relative;
+    text-align: center; /* Helps center some block children if they have auto margins */
+  }
+  
+  .closeButton {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 1.8rem;
+    cursor: pointer;
+    color: #333;
+  }
+  
+  .modalTitle {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+    color: #333;
+    text-align: center;
+  }
+  
+  /* Topic Selector - Centered */
+  .topicSelectorContainer {
+    margin-bottom: 20px;
+    display: flex;          /* Aligns label and select box inline */
+    align-items: center;    /* Vertically aligns label and select box */
+    justify-content: center;/* Horizontally centers the flex items (label and select) */
+    gap: 8px;
+    /* To center the container itself if it were not display:flex taking full width:
+       width: fit-content;
+       margin-left: auto;
+       margin-right: auto;
+       However, with justify-content: center, the inner content is centered.
+    */
+  }
+  
+  .topicLabel {
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .topicSelect {
+    padding: 8px 10px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    background-color: white;
+    font-size: 1rem;
+  }
+  
+  /* Status Messages */
+  .loadingText {
+    font-style: italic;
+    color: #555;
+    margin: 20px 0;
+  }
+  
+  .errorText {
+    color: #d9534f; /* Red color for errors */
+    margin: 15px 0;
+    font-weight: bold;
+  }
+  
+  .errorTextSmall {
+    color: #d9534f;
+    font-size: 0.85rem;
+    margin-top: 5px;
+  }
+  
+  /* Card Display */
+  .cardCounter {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 5px;
+    text-align: center;
+  }
+  
+  .topicDisplay {
+    font-size: 1rem;
+    color: #333;
+    margin-bottom: 15px;
+    text-align: center;
+  }
+  
+  .flashcard {
+    background-color: #f9f9f9;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 20px;
+    min-height: 150px; /* Adjust as needed */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    margin-bottom: 20px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  }
+  
+  .cardQuestion p, .cardAnswer p {
+    margin: 5px 0;
+  }
+  
+  .cardQuestion p:first-child, .cardAnswer p:first-child { /* "Question/Title:", "Answer:" */
+    font-weight: bold;
+    color: #555;
+  }
+  
+  .savingText {
+    font-size: 0.85rem;
+    font-style: italic;
+    color: #555;
+    margin-top: 5px;
+  }
+  
+  /* Controls for Previous/Show Answer/Next buttons */
+  .controls {
+    display: flex;
+    justify-content: center; /* Centers the buttons in the row */
+    align-items: center;
+    gap: 10px; /* Space between buttons */
+    margin-bottom: 15px; /* Space before the "End Study Session" button */
+  }
+  
+  /* General Button Styling (if you want a base style) */
+  .buttonBase { /* You can create a base class if many buttons share styles */
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    min-width: 100px; /* Ensure buttons have a decent minimum width */
+    text-align: center;
+  }
+  
+  /* Specific Button Styles */
+  .navButton { /* For Previous/Next */
+    composes: buttonBase; /* If using CSS Modules composes for base styles */
+    background-color: #e0e0e0; /* Greyish, as in image */
+    color: #333;
+    padding: 10px 15px; /* Ensure padding if not using composes */
+    border: none; /* Ensure border if not using composes */
+    border-radius: 5px; /* Ensure radius if not using composes */
+    font-size: 0.95rem; /* Ensure font-size if not using composes */
+    cursor: pointer; /* Ensure cursor if not using composes */
+  }
+  
+  .navButton:hover {
+    background-color: #d0d0d0;
+  }
+  
+  .flipButton { /* For Show Answer */
+    composes: buttonBase;
+    background-color: #43a69c; /* Teal/Greenish, as in image (adjust color) */
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    font-size: 0.95rem;
+    cursor: pointer;
+  }
+  
+  .flipButton:hover {
+    background-color: #27786d;
+  }
+  
+  .endSessionButton {
+    /* composes: buttonBase; Remove if not sharing all base styles or handle overrides */
+    background-color: #4477c9; /* Blue color from your update */
+    color: white;
+    padding: 10px 20px; /* Adjust padding as desired */
+    border: none;
+    border-radius: 5px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    
+    display: block;         /* Takes its own line */
+    width: fit-content;     /* Makes button only as wide as its content + padding */
+    margin-top: 10px;       /* Space from the controls above, adjust from 15px if needed */
+    margin-left: auto;      /* Centers the block element */
+    margin-right: auto;     /* Centers the block element */
+    text-align: center;     /* Ensures text inside is centered */
+  }
+  
+  .endSessionButton:hover {
+    background-color: #385483; /* Darker blue from your update */
+  }
+  
+  /* Disabled States */
+  .navButton:disabled,
+  .flipButton:disabled {
+    background-color: #ccc;
+    color: #777;
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+  /* If .endSessionButton can be disabled, add its disabled style too */
+  .endSessionButton:disabled {
+    background-color: #a0b3d1; /* Lighter shade of its blue */
+    color: #e0e0e0;
+    cursor: not-allowed;
+    opacity: 0.7;
+  }

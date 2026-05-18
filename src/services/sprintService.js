@@ -1,17 +1,7 @@
 // src/services/sprintService.js (FIXED VERSION)
 import { collection, getDocs, query, where } from "firebase/firestore";
-import { db } from '../firebaseConfig';
-
-/**
- * Get the date string for today in YYYY-MM-DD format
- */
-function getTodayDateString() {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-}
+import { db } from '@/firebaseConfig';
+import { getTodayDateString } from '@/utils/dateUtils';
 
 /**
  * Normalize axis name for matching
@@ -216,7 +206,6 @@ export async function getProjectIdFromSprint(sprint) {
  */
 export async function getProjectKanbanStats(projectId) {
     if (!projectId) {
-        console.log('No projectId provided to getProjectKanbanStats');
         return {
             total: 0,
             productBacklog: 0,
@@ -227,7 +216,6 @@ export async function getProjectKanbanStats(projectId) {
     }
     
     try {
-        console.log('Fetching kanban cards for project:', projectId);
         const cardsRef = collection(db, "kanbanCards");
         const q = query(cardsRef, where("projectId", "==", projectId));
         const querySnapshot = await getDocs(q);
@@ -245,12 +233,6 @@ export async function getProjectKanbanStats(projectId) {
             stats.total++;
             const status = data.status || 'productBacklog';
             
-            console.log('Card status:', {
-                id: doc.id,
-                title: data.title,
-                status: status
-            });
-            
             if (stats.hasOwnProperty(status)) {
                 stats[status]++;
             } else {
@@ -258,7 +240,6 @@ export async function getProjectKanbanStats(projectId) {
             }
         });
         
-        console.log('Kanban stats:', stats);
         return stats;
     } catch (error) {
         console.error("Error fetching kanban stats:", error);

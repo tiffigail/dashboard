@@ -1,0 +1,230 @@
+/* src/components/AxisEditor/AxisEditor.module.css */
+
+.editorContainer {
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 700px; /* Adjust as needed */
+    margin: 1rem auto; /* Center on page if used alone */
+    border: 1px solid #e2e8f0;
+  }
+  
+  .editorTitle {
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 1.5rem;
+  }
+  
+  .inputGroup {
+    margin-bottom: 1.25rem;
+  }
+  
+  .inputGroup label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #4a5568;
+    font-size: 0.9rem;
+  }
+  
+  .inputGroup input[type="text"],
+  .inputGroup textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: 4px;
+    border: 1px solid #e2e8f0;
+    font-size: 1rem;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease;
+    font-family: inherit;
+  }
+  
+  .inputGroup textarea {
+    resize: vertical;
+    min-height: 60px;
+  }
+  
+  .inputGroup input[type="text"]:focus,
+  .inputGroup textarea:focus {
+    border-color: #3b82f6; /* Blue focus */
+    outline: none;
+  }
+  
+  .loadControls {
+    display: flex;
+    gap: 0.5rem;
+  }
+  
+  .loadControls input {
+    flex-grow: 1; /* Allow input to take available space */
+  }
+  
+  .loadControls button {
+    padding: 0.75rem 1rem;
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.2s ease;
+  }
+  .loadControls button:hover:not(:disabled) {
+    background-color: #2563eb;
+  }
+  .loadControls button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  
+  .milestonesSection {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #eee;
+  }
+  
+  .milestoneList {
+    list-style: none;
+    padding: 0;
+    margin-top: 0.5rem;
+    max-height: 300px; /* Limit height */
+    overflow-y: auto; /* Add scroll if list is long */
+    border: 1px solid #eee;
+    border-radius: 4px;
+    padding: 0.5rem;
+  }
+  
+  .milestoneItem {
+    background-color: #f8f9fa;
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.5rem;
+    border-radius: 4px;
+    border: 1px solid #dee2e6;
+    display: flex; /* Use flexbox */
+    justify-content: space-between; /* Push button to the right */
+    align-items: center; /* Align items vertically */
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .milestoneItem:last-child {
+    margin-bottom: 0;
+  }
+  
+  .milestoneInfo {
+   flex-grow: 1; /* Allow info section to take space */
+   display: flex;
+   flex-direction: column; /* Stack text and dates */
+  }
+  
+  
+  .milestoneText {
+    /* flex-grow: 1; */ /* Removed from here */
+    margin-right: 1rem; /* Space before dates/button */
+    font-size: 0.95rem;
+  }
+  
+  .milestoneDate {
+    font-size: 0.8rem;
+    color: #6c757d;
+    white-space: nowrap;
+    /* flex-shrink: 0; */ /* Removed from here */
+    margin-top: 0.2rem; /* Space between text and dates */
+  }
+  
+  /* Edit Button Style */
+  .editButton {
+    background-color: #6b7280; /* Gray */
+    color: white;
+    border: none;
+    padding: 0.3rem 0.7rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+    flex-shrink: 0; /* Prevent button shrinking */
+  }
+  .editButton:hover {
+    background-color: #4b5563;
+  }
+  
+  
+  .noMilestones {
+    font-style: italic;
+    color: #6c757d;
+    text-align: center;
+    padding: 1rem;
+  }
+  
+  .addMilestoneForm {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #eee;
+  }
+  
+  .addMilestoneInput {
+    flex-grow: 1;
+    padding: 0.6rem;
+    border-radius: 4px;
+    border: 1px solid #e2e8f0;
+    font-size: 0.95rem;
+  }
+  
+  .addMilestoneButton {
+    padding: 0.6rem 1rem;
+    background-color: #3b82f6; /* Blue */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.2s ease;
+  }
+  .addMilestoneButton:hover:not(:disabled) {
+    background-color: #2563eb;
+  }
+  .addMilestoneButton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  
+  .saveButton {
+    background-color: #16a34a; /* Green */
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: background-color 0.2s ease;
+    margin-top: 1.5rem;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .saveButton:hover:not(:disabled) {
+    background-color: #15803d;
+  }
+  .saveButton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  .errorText {
+    color: #dc2626; /* Red */
+    font-size: 0.9rem;
+    text-align: center;
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  

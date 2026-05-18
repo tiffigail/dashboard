@@ -1,0 +1,324 @@
+/* --- COLOR & FONT PALETTE --- */
+:root {
+    --bg-color: #ffffff;
+    --primary-container-bg: #a5d1ca;
+    --border-color: #073023;
+    --text-color: #254B4B;
+    --text-secondary: #92aeae;
+    --accent-color-red: #d9534f;
+    --accent-color-blue: #528fa1;
+    --accent-color-green: #40b48f;
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* --- PAGE LAYOUT --- */
+.lifeMapPage {
+    width: 100%;
+}
+
+.title {
+    padding: 18rem;
+    font-size: 3rem;
+    font-weight: 700;
+}
+
+/* --- STAT CARD STYLES --- */
+.statCard {
+    background-color: var(--primary-container-bg);
+    border-width: 1px;
+    border-style: solid;
+    border-color: var(--border-color);
+    border-radius: 12px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden;
+    color: var(--text-color);
+    min-height: 120px;
+    container-type: inline-size;
+    container-name: card;
+}
+
+.cardTitle {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin: 0 0 0.5rem 0;
+    /* Removed white-space: nowrap to allow wrapping */
+}
+
+.groupTitle {
+    text-align: left;
+    font-size: .8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin: 0 0 0.75rem 0;
+    border-bottom: .5px solid var(--border-color);
+    padding-bottom: 0.5rem;
+}
+
+/* --- DYNAMIC FONT SIZES --- */
+@container card (min-width: 0px) {
+    .rotationsValue {
+        font-weight: 700;
+        font-feature-settings: "tnum";
+        text-align: center;
+        font-size: clamp(1.2rem, 10cqi, 2rem);
+    }
+    .heartbeatContent span,
+    .breathsValue {
+        font-weight: 600;
+        font-size: clamp(.7rem, 12cqi, 2rem);
+        
+    }
+    .offspringValue,
+    .bonesValue,
+    .menstruatingValue {
+        font-weight: 700;
+        line-height: 1;
+        font-size: clamp(1rem, 10cqi, 1.8rem);
+    }
+    .countdownValue {
+        color: #E6EFEC;
+        font-weight: 700;
+        text-align: center;
+        font-feature-settings: "tnum";
+        font-size: clamp(1rem, 10cqi, 1.6rem);
+    }
+}
+
+.atomValue {
+    font-size: .8rem;
+    font-weight: 600;
+}
+
+
+/* --- START: Final Orbit Styles --- */
+
+/* This style on the parent card will center the animation correctly */
+/* This style on the parent card will center the animation correctly */
+.rotationsCard { 
+    justify-content: space-between; 
+    align-items: center; 
+}
+
+/* The main container for the animation */
+.sunOrbit {
+    position: relative;
+    width: 140px;
+    height: 50px;
+    margin: 0.75rem 0; /* Vertical margin only */
+}
+
+/* The Sun, positioned absolutely in the center of the container */
+.sun {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    background: #f6ad55;
+    border-radius: 50%;
+    box-shadow: 0 0 15px #f6ad55;
+    z-index: 10;
+}
+
+/* The visible gray oval path */
+.orbitPath {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border: 1px solid var(--border-color);
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* The invisible container that provides the motion */
+.earthOrbit {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    animation: elliptical-orbit 10s linear infinite;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* The blue dot, positioned at its starting point */
+.earth {
+    position: absolute;
+    top: 50%;
+    left: 0; 
+    transform: translate(-50%, -50%);
+    width: 10px;
+    height: 10px;
+    background: var(--accent-color-blue);
+    border-radius: 50%;
+}
+
+/* The keyframe for the rotation animation */
+@keyframes elliptical-orbit {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+
+/* --- END: Final Orbit Styles --- */
+
+.heartbeatContent { display: flex; align-items: center; justify-content: center; gap: 0.75rem; flex-wrap: wrap; }
+.anatomicalHeart { width: 32px; height: 32px; fill: var(--accent-color-red); animation: pulse .5s ease-in-out infinite; flex-shrink: 3; }
+.heartbeatSvg { width: 100%; height: 40px; margin-top: 0.5rem; }
+.heartbeatPath { fill: none; stroke: var(--accent-color-red); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 200; stroke-dashoffset: 200; animation: ekg 3s linear infinite; }
+@keyframes ekg { to { stroke-dashoffset: 0; } }
+.atom { position: relative; width: 60px; height: 60px; margin: 0.5rem 0; }
+.atom::before { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 12px; height: 12px; background: var(--text-color); border-radius: 50%; }
+.electronPath { position: absolute; width: 100%; height: 100%; border-width: 1px; border-style: solid; border-color: var(--border-color); border-radius: 50%; animation: spin var(--duration) linear infinite; }
+.electron { position: absolute; top: -4px; left: 50%; transform: translateX(-50%); width: 8px; height: 8px; background: var(--accent-color-blue); border-radius: 50%; }
+@keyframes spin { from { transform: rotate(var(--angle)) rotate(0deg); } to { transform: rotate(var(--angle)) rotate(360deg); } }
+.menopauseCard { background-color: var(--text-color); }
+.menopauseCard .cardTitle { color: var(--border-color); }
+.menstruatingValue { color: var(--accent-color-red); }
+
+/* --- TWO-COLUMN LAYOUT STYLES --- */
+.mainLayout {
+    display: grid;
+    grid-template-columns: 480px 1fr;
+    gap: 2rem;
+    padding: 1.5rem;
+    align-items: start;
+    height: 100vh;
+    box-sizing: border-box;
+}
+
+.statsColumn {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    border: 2px solid var(--border-color);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-sizing: border-box;
+}
+
+.cosmicGrid {
+    display: grid;
+    grid-template-columns: 2fr 1.2fr 1.2fr 1.2fr;
+    gap: 1rem;
+}
+
+.milestonesGrid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+}
+
+.timelineColumn {
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+    margin: 0;
+}
+
+.timelinesContainer {
+    overflow-x: auto;
+    overflow-y: hidden;
+    height: 100%;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-color) var(--primary-container-bg);
+}
+
+/* --- TIMELINE-SPECIFIC STYLES --- */
+.timelinesContent {
+    position: relative;
+    width: 2000px;
+    padding: 1rem 2rem; /* CHANGED: Reduced vertical padding */
+}
+
+.yearMarker {
+    position: absolute;
+    top: 0; /* CHANGED: Brought marker inside the container */
+    bottom: 5rem; /* CHANGED: Stretches to new shorter height */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transform: translateX(-50%);
+    z-index: 0;
+}
+.yearMarkerLabel {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-bottom: 5px;
+    position: absolute; /* CHANGED: Position label at top */
+    top: 0;
+}
+.yearMarkerLine {
+    width: 1px;
+    height: 100%; /* Line will fill the parent marker's height */
+    background-color: rgba(168, 208, 195, 0.4);
+}
+.nowMarker {
+    position: absolute;
+    top: 40px;     /* CHANGED: Adjusted for new compact scale */
+    bottom: 40px;  /* CHANGED: Adjusted for new compact scale */
+    width: 3px;
+    background: var(--accent-color-red);
+    z-index: 10;
+    display: flex;
+    justify-content: center;
+}
+.nowLabel {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--accent-color-red);
+    color: white;
+    padding: 0.2rem 0.5rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+.timeline {
+    position: relative;
+    height: 120px; /* CHANGED: Reduced timeline height */
+    margin-bottom: 6rem; /* CHANGED: Reduced margin */
+}
+.columnTitle {
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin: 0;
+  padding-bottom: 0;
+  border-bottom: 1px solid var(--border-color);
+  text-align: left; /* Add this line */
+}
+.timelineTitle { position: sticky; left: 20px; font-size: 1rem; font-weight: bold; color: var(--text-secondary); background-color: rgba(248, 250, 252, 0.8); backdrop-filter: blur(4px); padding: 4px 8px; border-radius: 6px; z-index: 20; width: fit-content; }
+.timelineTrack { position: absolute; top: 50%; left: 0; right: 0; height: 3px; background-color: var(--border-color); transform: translateY(-50%); }
+.timelineTracksWrapper {
+  margin-top: 3rem; /* Adjust this value to control the distance */
+}
+.endpointCircle { position: absolute; top: 50%; width: 20px; height: 20px; border-radius: 50%; background-color: var(--text-color); border-width: 4px; border-style: solid; border-color: var(--bg-color); transform: translate(-50%, -50%); z-index: 5; }
+.timelineEvent { position: absolute; top: 50%; z-index: 4; font-size: 1rem; }
+.clickable { cursor: pointer; }
+.clickable:hover { filter: brightness(1.1); }
+.timelineEvent:not(.timelineSpan) { display: flex; flex-direction: column; align-items: center; transform: translateX(-50%); }
+.pointDot { width: 12px; height: 12px; background-color: var(--accent-color-blue); border-radius: 50%; border-width: 3px; border-style: solid; border-color: var(--bg-color); }
+.pointConnector {
+    width: 2px;
+    height: 15px; /* CHANGED: Shortened connector */
+    background-color: var(--border-color);
+}
+.pointCard { background-color: white; padding: 0.3rem 0.8rem; border-radius: 8px; border-width: 1px; border-style: solid; border-color: var(--border-color); box-shadow: 0 2px 5px rgba(0,0,0,0.05); font-size: 0.85rem; font-weight: 600; white-space: nowrap; }
+.timelineEvent:not(.timelineSpan):nth-child(even) { transform: translateX(-50%) translateY(-100%); }
+.timelineEvent:not(.timelineSpan):nth-child(odd) { transform: translateX(-50%); }
+.timelineEvent:not(.timelineSpan):nth-child(even) .pointConnector { order: 2; }
+.timelineEvent:not(.timelineSpan):nth-child(even) .pointCard { order: 1; margin-bottom: 5px; }
+.timelineEvent:not(.timelineSpan):nth-child(odd) .pointConnector { order: 1; }
+.timelineEvent:not(.timelineSpan):nth-child(odd) .pointCard { order: 2; margin-top: 5px; }
+.timelineSpan { height: 30px; background-color: var(--accent-color-blue); border-radius: 15px; transform: translateY(-50%); display: flex; align-items: center; justify-content: center; }
+.spanCard { color: white; font-size: 0.7rem; font-weight: 600; padding: 0 1rem; white-space: nowrap; }
+.projectTimeline .pointDot, .projectTimeline .timelineSpan { background-color: var(--accent-color-green); }

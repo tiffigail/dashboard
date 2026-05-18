@@ -1,0 +1,220 @@
+/* src/components/AmRoutineForm/AmRoutineForm.module.css */
+
+/* Using styles similar to PM form for consistency */
+
+.form {
+    padding: 0.5rem 1rem;
+  }
+  
+  .formTitle {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  
+  .section {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+  }
+  .section:last-of-type {
+    border-bottom: none;
+    margin-bottom: 1rem;
+  }
+  
+  
+  .sectionTitle {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 1rem;
+  }
+  
+  .checkItem {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.6rem;
+  }
+  
+  .checkItem label {
+    margin-left: 0.75rem;
+    font-size: 0.95rem;
+    color: #444;
+    cursor: pointer;
+  }
+  
+  .checkbox {
+    width: 1.1rem;
+    height: 1.1rem;
+    cursor: pointer;
+  }
+  
+  /* Styles for regular input fields */
+  .inputField {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1rem;
+  }
+  
+  .inputField label {
+    margin-bottom: 0.4rem;
+    font-weight: 600;
+    color: #4a5568;
+    font-size: 0.9rem;
+  }
+  
+  .inputField input {
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: 4px;
+    border: 1px solid #e2e8f0;
+    font-size: 1rem;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease;
+  }
+  
+  .inputField input:focus {
+    border-color: #4CAF50; /* Green border on focus */
+    outline: none;
+  }
+  
+  /* Styles for the Journal textarea field - Updated */
+  /* Applied similar styles as PM form */
+  .journalSection { /* Added class for potential section styling */
+    padding-bottom: 1rem;
+  }
+  
+  .journalField {
+    display: flex;
+    flex-direction: column;
+    margin-top: 0.5rem; /* Space above textarea */
+    /* Removed padding-left */
+  }
+  
+  .journalField label {
+    margin-bottom: 0.4rem;
+    font-weight: 600;
+    color: #4a5568;
+    font-size: 0.9rem;
+    text-align: center; /* Center label */
+  }
+  
+  .journalField textarea {
+    width: 100%;
+    max-width: 100%;
+    padding: 0.75rem;
+    border-radius: 4px;
+    border: 1px solid #e2e8f0;
+    font-size: 1rem;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease;
+    font-family: inherit;
+    resize: vertical;
+    min-height: 100px; /* Increased default height */
+  }
+  
+  .journalField textarea:focus {
+    border-color: #4CAF50; /* Green border on focus */
+    outline: none;
+  }
+  
+  
+  /* Error text style */
+  .errorText {
+    color: #dc2626; /* Red color */
+    font-size: 0.9rem;
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+  
+  .submitButton {
+    background-color: #e7514c; /* Physical axis red */
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: background-color 0.2s ease;
+    margin-top: 1.5rem;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .submitButton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  .submitButton:hover:not(:disabled) {
+    background-color: #c93e3a; /* Physical axis red darker */
+  }
+
+  .chartButton {
+    background-color: #618882;
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: background-color 0.2s ease;
+    display: block;
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+  .chartButton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  .chartButton:hover:not(:disabled) {
+    background-color: #4a6b65;
+  }
+
+  /* Today's axis display */
+  .axisDisplay {
+    background: linear-gradient(135deg, #BCDDDC, #eaf1fa);
+    border-left: 4px solid #618882;
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+  .axisLabel {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #618882;
+    font-weight: 700;
+    margin: 0 0 0.2rem;
+  }
+  .axisName {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #053229;
+    margin: 0 0 0.3rem;
+  }
+  .axisSubtext {
+    font-size: 0.85rem;
+    color: #4a5568;
+    margin: 0;
+    font-style: italic;
+  }
+
+  .recitationDisplay {
+    background-color: #f0f9f0;
+    border-left: 3px solid #4CAF50;
+    padding: 0.6rem 0.75rem;
+    margin: 0.25rem 0 0.75rem 1.5rem;
+    border-radius: 3px;
+  }
+  .recitationText {
+    font-size: 0.9rem;
+    color: #2d6a2d;
+    margin: 0;
+    font-style: italic;
+  }

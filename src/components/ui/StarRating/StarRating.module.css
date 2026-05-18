@@ -1,0 +1,37 @@
+/* src/components/StarRating/StarRating.module.css */
+
+.starRating {
+    display: flex;
+    justify-content: center; /* Center stars */
+    align-items: center;
+    gap: var(--space-xs, 0.25rem);
+}
+
+.starRating button {
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    font-size: 2rem; /* Adjust size of stars */
+    color: var(--border-muted, #ced4da); /* Default off color (light grey) */
+    transition: color 0.2s ease-in-out;
+    line-height: 1; /* Prevent extra spacing */
+}
+
+.starRating button.on {
+    color: var(--color-environment-3, #d8bf67); /* Pistachio 'on' color */
+}
+
+.starRating button:hover:not(.on):not(:disabled) {
+    color: var(--color-environment-2, #ead6a0); /* Sage hover color for off stars */
+}
+
+.starRating button:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.star {
+    display: inline-block; /* Helps with alignment */
+}

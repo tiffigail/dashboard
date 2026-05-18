@@ -1,0 +1,179 @@
+/* src/components/BudgetForm/BudgetForm.module.css */
+
+.form {
+    padding: var(--space-lg, 1.5rem);
+    background-color: var(--bg-card, #fff);
+    border-radius: 8px; /* Match modal rounding */
+    max-height: 80vh; /* Limit height */
+    /* REMOVED overflow-y: auto; Let the parent Modal handle scrolling */
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg, 1.5rem);
+    color: var(--text-primary); /* Use global text color */
+    /* Add some horizontal padding if needed */
+    /* padding-left: var(--space-xl, 2rem); */
+    /* padding-right: var(--space-xl, 2rem); */
+}
+
+.formTitle {
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: var(--space-md, 1rem);
+    color: var(--text-secondary, #355E58);
+    font-size: 1.5em; /* Adjust size */
+}
+
+.section {
+    padding: var(--space-md, 1rem);
+    border: 1px solid var(--border-light, #BCDDDC);
+    border-radius: 6px;
+    background-color: var(--bg-panel-accent, #e0f2f7);
+}
+
+.sectionTitle {
+    font-size: 1.1em;
+    font-weight: 600;
+    margin-top: 0;
+    margin-bottom: var(--space-md, 1rem);
+    padding-bottom: var(--space-sm, 0.5rem);
+    border-bottom: 1px solid var(--border-secondary, #72B0AB);
+    color: var(--text-secondary, #355E58);
+}
+
+.checkItem {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm, 0.5rem); /* Space between checkbox and label */
+    margin-bottom: var(--space-md, 1rem); /* Space between items */
+}
+.checkItem:last-child {
+    margin-bottom: 0;
+}
+
+.checkItem label {
+    flex-grow: 1; /* Allow label to take space */
+    cursor: pointer;
+    line-height: 1.3; /* Ensure text doesn't get cut off */
+}
+
+.checkbox {
+    margin-right: var(--space-sm, 0.5rem);
+    width: 1.1rem;
+    height: 1.1rem;
+    cursor: pointer;
+    accent-color: var(--text-secondary);
+    flex-shrink: 0; /* Prevent checkbox shrinking */
+}
+
+/* --- UPDATED Styles for Input Grid --- */
+.inputGrid {
+    display: grid;
+    /* UPDATED: Make it a single column */
+    grid-template-columns: 1fr;
+    gap: var(--space-md, 1rem); /* Keep vertical gap */
+}
+
+.inputField {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs, 0.25rem);
+}
+
+.inputField label {
+    font-weight: 500;
+    font-size: 0.9em;
+    color: var(--text-secondary);
+    margin-bottom: 0;
+}
+
+.numberInput { /* Style for the new number inputs */
+    padding: var(--space-sm, 0.5rem);
+    border: 1px solid var(--border-muted, #ced4da);
+    border-radius: 4px;
+    width: 100%; /* Allow input to fill grid column */
+    font-size: 1em;
+    box-sizing: border-box;
+    background-color: var(--bg-input, #fff);
+    color: var(--text-primary);
+}
+.numberInput:disabled {
+     background-color: var(--bg-input-disabled, #f8f9fa);
+     opacity: 0.7;
+}
+/* --- End Input Grid Styles --- */
+
+
+.errorText {
+    color: var(--text-error, #dc3545);
+    font-size: 0.9em;
+    margin-top: var(--space-sm, 0.5rem);
+    text-align: center;
+    margin-bottom: 0;
+}
+
+.submitButton {
+    align-self: center; /* Center button */
+    padding: var(--space-md, 1rem) var(--space-lg, 1.5rem);
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s, box-shadow 0.2s;
+    /* Using Financial Axis colors for the button */
+    border: 1px solid var(--axis-color-financial-3, #927aaa);
+    background-color: var(--axis-color-financial-2, #b8a7cd);
+    color: var(--text-primary, #053229); /* Contrast text */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-top: var(--space-md, 1rem);
+}
+.submitButton:hover:not(:disabled) {
+    background-color: var(--axis-color-financial-3, #927aaa);
+    color: var(--color-white, #fff); /* White text on hover */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+.submitButton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* --- Styles for Success Popup --- */
+.successPopup {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-md, 1rem);
+    padding: var(--space-xl, 2rem);
+    text-align: center;
+}
+
+.successPopup h4 {
+    font-size: 1.4em;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.successPopup p {
+    font-size: 1em;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.rewardButton {
+    /* Style like a primary button or distinctively */
+    padding: var(--space-sm) var(--space-lg);
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s, box-shadow 0.2s;
+    border: 1px solid var(--button-primary-border, #355E58);
+    background-color: var(--button-primary-bg, #72B0AB);
+    color: var(--button-primary-text, #fff);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.rewardButton:hover {
+     background-color: var(--button-primary-hover-bg, #355E58);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+/* --- End Success Popup Styles --- */
+

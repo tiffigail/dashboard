@@ -22,7 +22,6 @@ export const useTimeAggregator = (trackerId) => {
         const storageKey = `${trackerId}_${today}`;
         const intervalInSeconds = 5; // How often to save progress
 
-        console.log(`Time aggregator started for: ${trackerId}`);
 
         const intervalId = setInterval(() => {
             const currentSeconds = Number(localStorage.getItem(storageKey) || 0);
@@ -32,7 +31,6 @@ export const useTimeAggregator = (trackerId) => {
         // This is the cleanup function. It runs when the component unmounts (modal closes).
         return () => {
             clearInterval(intervalId);
-            console.log(`Time aggregator stopped for: ${trackerId}.`);
         };
     }, [trackerId]); // Effect dependency array
 };

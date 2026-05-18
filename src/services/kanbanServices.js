@@ -12,8 +12,8 @@ import {
   updateDoc,
   limit,
 } from "firebase/firestore";
-import { db } from "../firebaseConfig";
-import { getCurrentWeekId, getTodayDateString } from "../utils/dateUtils";
+import { db } from "@/firebaseConfig";
+import { getWeekId, getTodayDateString } from "@/utils/dateUtils";
 
 /**
  * Fetches the active goal for a given axis and year.
@@ -100,7 +100,6 @@ export const markProjectComplete = async (projectId) => {
             status: 'completed',
             completedAt: serverTimestamp()
         });
-        console.log(`Project ${projectId} marked as complete`);
     } catch (error) {
         console.error("Error marking project complete:", error);
         throw error;
@@ -159,7 +158,6 @@ export const deleteKanbanCard = async (cardId) => {
     try {
         const cardRef = doc(db, "kanbanCards", cardId);
         await deleteDoc(cardRef);
-        console.log(`Card ${cardId} deleted successfully`);
     } catch (error) {
         console.error("Error deleting kanban card:", error);
         throw error;
@@ -175,7 +173,7 @@ export const createTasksFromCard = async (card, stage = 'all') => {
   const newAcceptanceCriteria = [...(card.acceptanceCriteria || [])];
   let tasksWereCreated = false;
 
-  const weekId = `${new Date().getFullYear()}-${getCurrentWeekId()}`;
+  const weekId = getWeekId();
   const assignedDate = getTodayDateString();
 
   const taskPayloadBase = {

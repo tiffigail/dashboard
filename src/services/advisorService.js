@@ -12,7 +12,8 @@ import {
   serverTimestamp,
   updateDoc,
 } from "firebase/firestore";
-import { db } from "../firebaseConfig";
+import { db } from "@/firebaseConfig";
+import { getWeekId } from "@/utils/dateUtils";
 
 // ── Context Docs ─────────────────────────────────────────────────────────────
 
@@ -239,20 +240,6 @@ export const getRoutineAdherence = async (days = 14) => {
 };
 
 // ── Weekly Goals ──────────────────────────────────────────────────────────────
-
-const getWeekId = (date = new Date()) => {
-  const d = new Date(date);
-  d.setHours(12, 0, 0, 0);
-  const weekStart = new Date(d);
-  weekStart.setDate(d.getDate() - d.getDay());
-  const year = weekStart.getFullYear();
-  const janFirst = new Date(year, 0, 1);
-  const firstWeekStart = new Date(janFirst);
-  firstWeekStart.setDate(janFirst.getDate() - janFirst.getDay());
-  const diffDays = (weekStart - firstWeekStart) / (1000 * 60 * 60 * 24);
-  const weekNum = Math.round(diffDays / 7) + 1;
-  return `${year}-W${String(weekNum).padStart(2, '0')}`;
-};
 
 export const getWeeklyGoals = async () => {
   try {
